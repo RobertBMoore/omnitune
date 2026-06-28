@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "updated": "2026-06-14",
+  "note": "Model library manifest. omnitune selects a rubric by matching the CURRENT session's model id to an entry here, then loading its rubric. ga_date/deprecated_date are filled from docs when known; null = not yet recorded (do not fabricate). status: ga | limited | deprecated | retired.",
+  "sync_entrypoints": {
+    "comment": "Stable discovery URLs for /omnitune:sync. Fetch these (Anthropic domains only), then derive/verify a model rubric. The model-specific 'what's new' page is discovered from the overview, not guessed.",
+    "models_overview": "https://platform.claude.com/docs/en/about-claude/models/overview",
+    "prompting_best_practices": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+    "migration_guide": "https://platform.claude.com/docs/en/about-claude/models/migration-guide",
+    "models_api": "https://platform.claude.com/docs/en/api/models/list",
+    "allowlist_domains": ["platform.claude.com", "docs.anthropic.com", "www.anthropic.com"]
+  },
+  "retention": {
+    "keep_all_ga": true,
+    "keep_recently_used_days": 90,
+    "auto_delete": false,
+    "comment": "Retired-model rubrics are flagged for removal but never deleted without operator confirmation."
+  },
+  "models": [
+    {
+      "id": "claude-fable-5",
+      "family": "fable",
+      "status": "ga",
+      "ga_date": "2026-06-09",
+      "deprecated_date": null,
+      "rubric": "references/rubrics/claude-fable-5.md",
+      "rubric_note": "Synced from live docs 2026-06-14. Reverses two Opus-4.8 behaviors (more subagents; over-prescription degrades) + a refusal-trigger rule (no show-your-reasoning).",
+      "source_urls": [
+        "https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5",
+        "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5",
+        "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "https://platform.claude.com/docs/en/about-claude/models/migration-guide"
+      ]
+    },
+    {
+      "id": "claude-mythos-5",
+      "family": "mythos",
+      "status": "limited",
+      "ga_date": null,
+      "deprecated_date": null,
+      "rubric": null,
+      "rubric_note": "Project Glasswing, invitation-only (not GA). Derive on demand only if a session runs it.",
+      "source_urls": [
+        "https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5"
+      ]
+    },
+    {
+      "id": "claude-opus-4-8",
+      "family": "opus",
+      "status": "ga",
+      "ga_date": null,
+      "deprecated_date": null,
+      "rubric": "references/rubrics/claude-opus-4-8.md",
+      "source_urls": [
+        "https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-8",
+        "https://platform.claude.com/docs/en/about-claude/models/migration-guide",
+        "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+        "https://www.anthropic.com/news/claude-opus-4-8"
+      ]
+    },
+    {
+      "id": "claude-sonnet-4-6",
+      "family": "sonnet",
+      "status": "ga",
+      "ga_date": null,
+      "deprecated_date": null,
+      "rubric": "references/rubrics/claude-sonnet-4-6.md",
+      "source_urls": [
+        "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+        "https://platform.claude.com/docs/en/about-claude/models/migration-guide"
+      ]
+    },
+    {
+      "id": "claude-haiku-4-5",
+      "family": "haiku",
+      "status": "ga",
+      "ga_date": null,
+      "deprecated_date": null,
+      "rubric": "references/rubrics/claude-haiku-4-5.md",
+      "source_urls": [
+        "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-5",
+        "https://www.anthropic.com/news/claude-haiku-4-5",
+        "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"
+      ]
+    },
+    {
+      "id": "claude-opus-4-7",
+      "family": "opus",
+      "status": "deprecated",
+      "ga_date": null,
+      "deprecated_date": null,
+      "rubric": null,
+      "rubric_note": "Legacy/deprecated; no shipped rubric. Derived on demand via /omnitune:sync only if a session still runs this model.",
+      "source_urls": []
+    }
+  ]
+}

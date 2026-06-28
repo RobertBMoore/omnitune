@@ -10,7 +10,7 @@ Omnitune is a model-agnostic Claude Code plugin that audits your skills/agents a
 
 - **`/omnitune:tune-prompt "<text>"`** — rewrite an ad-hoc prompt into model-optimized form, self-scored in a QA loop (with a fabrication ledger so it never invents requirements) before you see it.
 - **`/omnitune:tune-skill <name>`** — audit a `SKILL.md` or agent file against the current model's prompt-engineering best practices (7-dimension rubric) and apply interactive fixes.
-- **`/omnitune:install`** — a guided interview that learns your repo and writes `omnitune.config.yaml`.
+- **`/omnitune:install`** *(optional)* — a guided interview that learns your repo and writes `omnitune.config.yaml` for repo-aware audits; the tune commands work without it.
 - **`/omnitune:sync`** — when your session runs a model the rubric library doesn't cover yet, derive a behavioral-diff rubric to propose (human-approved, never silent).
 
 ## Quickstart
@@ -19,9 +19,18 @@ Omnitune is a model-agnostic Claude Code plugin that audits your skills/agents a
 /plugin marketplace add RobertBMoore/omnitune
 /plugin install omnitune@omnitune
 /reload-plugins
-/omnitune:install            # one-time, builds omnitune.config.yaml by interview
-/omnitune:tune-prompt "your rough prompt"
+/omnitune:tune-prompt "your rough prompt"   # works immediately — no setup needed
 ```
+
+That's it — `tune-prompt` and `tune-skill` run **standalone** (model-rubric only) the moment the plugin is installed. The model your session is running is detected automatically (including Nimbalyst ids like `claude-opus-4-8[1m]`).
+
+Optional, for repo-aware power use:
+
+```text
+/omnitune:install            # builds omnitune.config.yaml by interview
+```
+
+This teaches Mode A/B your skills, routing, house style, and where to save reports/prompts — enrichment, not a prerequisite.
 
 To get updates automatically, open `/plugin` → **Marketplaces → omnitune** → **Enable auto-update** (a one-time toggle). Organizations can roll Omnitune out hands-off via managed settings — see [`deploy/managed-settings.json`](deploy/managed-settings.json) and [`RELEASING.md`](RELEASING.md).
 

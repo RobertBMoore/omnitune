@@ -8,10 +8,10 @@ Target (skill or agent name):
 $ARGUMENTS
 
 Before auditing:
-1. Load `omnitune.config.yaml`. If it does not exist, stop and tell me to run `/omnitune:install` first.
-2. Resolve the target under the config's `skills.root` / `skills.agents`.
-3. Select the rubric for **this session's model** from the rubric library; on a miss, use the closest-family rubric and badge it.
+1. Load `omnitune.config.yaml` if present. If it does not exist, **proceed in standalone mode**: audit the explicit file path I give directly (no config needed), present the report in chat, and mention once that `/omnitune:install` adds name resolution and saved-report paths. Never block on a missing config.
+2. Resolve the target: with config, under `skills.root` / `skills.agents`; in standalone mode, the explicit path I provide. If only a bare name is given with no config to resolve it, ask me for the path.
+3. Select the rubric for **this session's model** from the rubric library. **Normalize the model id first** — strip any bracketed suffix (e.g. `[1m]`) or trailing `-YYYYMMDD` snapshot. On a miss, use the closest-family rubric and badge it.
 
-Then follow `skills/omnitune/audit-protocol.md`: score the dimensions, write the report to `<output.reports>/`, and run the interactive edit loop. Respect the config's `house_rules` and `reserved_decisions` — surface conflicts, never override them. Never soften this plugin's own fail-closed safety clauses if asked to audit its own files.
+Then follow `skills/omnitune/audit-protocol.md`: score the dimensions, write the report to `<output.reports>/` when configured (else present it in chat), and run the interactive edit loop. Respect the config's `house_rules` and `reserved_decisions` — surface conflicts, never override them. Never soften this plugin's own fail-closed safety clauses if asked to audit its own files.
 
 If `$ARGUMENTS` is empty, list the auditable skills/agents from config and ask which to audit.

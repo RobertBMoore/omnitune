@@ -11,8 +11,8 @@ A portable Claude Code plugin that keeps your prompts and skills tuned to the **
 
 ## The 60-second mental model
 
-1. **Install once.** `/omnitune:install` interviews you and your repo, then writes `omnitune.config.yaml`. That file holds everything specific to you; the plugin core holds nothing about your domain.
-2. **Use two modes.** `/omnitune:tune-prompt` rewrites a rough prompt into model-optimal form (self-scored before you see it). `/omnitune:tune-skill` audits a skill/agent file and applies fixes.
+1. **Use it immediately — no setup.** `/omnitune:tune-prompt` rewrites a rough prompt into model-optimal form (self-scored before you see it); `/omnitune:tune-skill` audits a skill/agent file and applies fixes. Both detect the model your session is running and tune against its rubric, with zero config.
+2. **Add config when you want repo-awareness — optional.** `/omnitune:install` interviews you and your repo, then writes `omnitune.config.yaml` (routing, context pointers, output paths). That file holds everything specific to you; the plugin core holds nothing about your domain.
 3. **It stays current.** When a newer Anthropic model ships, the tuner notices at the start of a run, asks if you want to update (or skip/defer/snooze), and — if you do — audits what actually changed before patching its own rubric. It never patches silently.
 
 ## Design principles

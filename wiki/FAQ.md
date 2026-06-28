@@ -1,7 +1,7 @@
 # FAQ & Troubleshooting
 
-**A command doesn't fire / "run /omnitune:install first."**
-The modes need `omnitune.config.yaml` at your repo root. Run `/omnitune:install`. If commands aren't recognized at all, confirm the plugin installed and its `commands/` directory is present.
+**A command doesn't fire.**
+You do **not** need `omnitune.config.yaml` — the modes run standalone on the session model's rubric. If `/omnitune:tune-prompt` / `/omnitune:tune-skill` aren't recognized at all, the plugin isn't loaded: confirm it installed (`claude plugin list` shows `omnitune@omnitune`) and reload (`/reload-plugins`, or restart your editor). Config via `/omnitune:install` only adds repo-aware routing, pointers, and saved-output paths — it's never required to make a command fire.
 
 **I see "No tuned rubric for `<model>`" badge.**
 Your session is running a model the library doesn't cover yet. The run still completed — it used the closest-family rubric. Run `/omnitune:sync` when convenient to derive a tuned rubric (propose-only; you apply it). See [Auto-Sync](Auto-Sync.md).

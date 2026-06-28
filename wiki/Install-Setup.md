@@ -13,8 +13,20 @@ Quickest path — add the marketplace and install (user scope = available in all
 - **Auto-update** is a one-time per-user toggle: `/plugin` → Marketplaces → `omnitune` → Enable auto-update.
 - **Teams:** commit [`docs/install/team-settings.json`](../docs/install/team-settings.json) into a repo's `.claude/settings.json` to prompt collaborators on trust; or roll out hands-off org-wide with [`deploy/managed-settings.json`](../deploy/managed-settings.json) (see [`RELEASING.md`](../RELEASING.md)).
 
-## 2. Run `/omnitune:install`
-Setup is an **interview that audits its own understanding before writing anything** — it drafts your config from the repo, then asks you to confirm. It never writes `omnitune.config.yaml` from guesses.
+## 2. Use it immediately — no setup required
+Both modes work the moment the plugin is installed, with **zero config**:
+
+```text
+/omnitune:tune-prompt "a rough prompt you want sharpened"
+/omnitune:tune-skill path/to/SKILL.md
+```
+
+In standalone mode the tool reads the model **your session is running** (including Nimbalyst ids like `claude-opus-4-8[1m]`), selects that model's rubric, rewrites/audits against it, and shows the result in chat — no `omnitune.config.yaml` needed. `/omnitune:tune-skill` audits any explicit file path directly.
+
+Config is **optional enrichment**, not a prerequisite — add it (next) only when you want repo-aware routing, context pointers, saved report/prompt paths, and house-style awareness.
+
+## 3. (Optional) Run `/omnitune:install` for repo-aware mode
+Optional — the modes already work without it (above). Run it when you want omnitune to learn your repo: routing by skill, context pointers, house rules, and where to save reports/prompts. Setup is an **interview that audits its own understanding before writing anything** — it drafts your config from the repo, then asks you to confirm. It never writes `omnitune.config.yaml` from guesses.
 
 What it does, in order:
 1. **Detect + draft.** Reads your `CLAUDE.md`/`AGENTS.md`/`README.md`, lists your skills, and **drafts the technical fields for you** — the routing keyword table and context-pointers — by reading the repo. You don't author routing tables blind.
@@ -29,4 +41,4 @@ What it does, in order:
 - **Non-technical operator** — the technical fields are drafted *for* you; an optional "have a developer eyeball the routing table?" hand-off is offered, never required.
 
 ## Verify
-After install, run `/omnitune:tune-prompt "a rough prompt"` and `/omnitune:tune-skill <one-of-your-skills>`. Both should run against your new config. See [Configuration](Configuration.md) to hand-edit anything, and [FAQ](FAQ.md) if a command doesn't fire.
+Run `/omnitune:tune-prompt "a rough prompt"` and `/omnitune:tune-skill <a skill file>`. In standalone mode both run against the session model's rubric and print to chat; once you've run `/omnitune:install`, they additionally honor your config's routing, context pointers, and output paths. See [Configuration](Configuration.md) to hand-edit anything, and [FAQ](FAQ.md) if a command doesn't fire.

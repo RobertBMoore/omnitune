@@ -1,0 +1,16 @@
+project:
+  name: "omnitune"
+  domain: "Claude Code plugin: model-agnostic prompt and skill tuner"
+skills:
+  root: "skills/"
+  agents: ""
+house_rules: ""
+reserved_decisions: ""
+output:
+  reports: "reports/"
+  prompts: "docs/prompts/"
+model_sync:
+  channel: "badge"
+  target_model: ""
+  snooze_default: "24h"
+  regression_corpus: "tuner/regression/"

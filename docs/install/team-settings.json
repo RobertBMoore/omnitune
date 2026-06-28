@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "omnitune": {
+      "source": {
+        "source": "github",
+        "repo": "RobertBMoore/omnitune"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "omnitune@omnitune": true
+  }
+}

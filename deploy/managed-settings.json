@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "extraKnownMarketplaces": {
+    "omnitune": {
+      "source": { "source": "github", "repo": "RobertBMoore/omnitune" },
+      "autoUpdate": true
+    }
+  },
+  "enabledPlugins": { "omnitune@omnitune": true }
+}

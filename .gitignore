@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+
+# Runtime state written into a host repo (never committed)
+omnitune/.sync-state.json
+omnitune/.model-usage.json
+*.tmp
+
+# Dogfood output artifacts (Mode A reports / Mode B saved prompts)
+reports/
+docs/prompts/
+
+# Private denylist of client/company terms for check_public_clean (never publish)
+scripts/.public-denylist.txt

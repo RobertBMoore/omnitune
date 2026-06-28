@@ -1,0 +1,41 @@
+# omnitune.config.example.yaml
+# ONE worked example (fictional brand: TrailGear, a direct-to-consumer outdoor-gear company).
+# Your install will look nothing like this — /omnitune:install builds yours by interview.
+# The core plugin contains zero TrailGear strings; all domain coupling lives in THIS file.
+
+project:
+  name: "TrailGear — Outdoor Gear"
+  domain: "Direct-to-consumer outdoor gear; product copy and lifecycle email on a typical e-commerce stack."
+
+skills:
+  root: "skills/"
+  agents: ""
+
+routing:
+  - skill: "product-copy"
+    keywords: ["write the product description", "rewrite this product blurb", "spec sheet copy"]
+  - skill: "campaign-review"
+    keywords: ["review this campaign", "is this ready to send", "go/no-go"]
+  - skill: "lifecycle-email"
+    keywords: ["draft the welcome series", "rewrite this subject line", "cart abandonment email"]
+  - skill: "deliverability"
+    keywords: ["spam rate", "inbox placement", "sender reputation"]
+
+context_pointers:
+  - when: "lifecycle-email"
+    point_to: ["brand/voice.md"]
+  - when: "campaign-review"
+    point_to: ["reference/campaign-checklist.md"]
+
+house_rules: "reference/anti-patterns.md"
+reserved_decisions: "reference/executive-decisions.md"
+
+output:
+  reports: "reports/"
+  prompts: "docs/prompts/"
+
+model_sync:
+  channel: "badge"
+  target_model: ""
+  snooze_default: "24h"
+  regression_corpus: "tuner/regression/"

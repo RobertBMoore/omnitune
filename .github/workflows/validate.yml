@@ -1,0 +1,27 @@
+name: validate
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Unit tests (dependency-free)
+        working-directory: scripts
+        run: python3 -m unittest test_tuner_check test_rubric_ratchet test_sync_state test_validate_plugin test_check_public_clean
+      - name: Plugin + marketplace manifest lint (blocking)
+        run: python3 scripts/validate_plugin.py .
+      - name: Public-clean sweep (blocking; generic patterns — private denylist is local-only)
+        run: python3 scripts/check_public_clean.py .
+      # Best-effort: the canonical CLI check. Non-blocking because `claude` may
+      # require auth/network in CI; the Python validator above is the authoritative gate.
+      - name: claude plugin validate (best-effort)
+        continue-on-error: true
+        run: npx --yes @anthropic-ai/claude-code plugin validate .

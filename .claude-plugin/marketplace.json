@@ -1,0 +1,19 @@
+{
+  "name": "omnitune",
+  "description": "Open-source Claude Code tools by Digital Research Group.",
+  "owner": {
+    "name": "Digital Research Group"
+  },
+  "plugins": [
+    {
+      "name": "omnitune",
+      "source": "./",
+      "description": "Keep your prompts and skills in tune with the current best practices of whatever AI model you're running. Audits skills/agents and rewrites ad-hoc prompts; model-agnostic, repo-agnostic, self-updating. Open-sourced by Digital Research Group.",
+      "author": {
+        "name": "Digital Research Group"
+      },
+      "homepage": "https://github.com/RobertBMoore/omnitune",
+      "license": "MIT"
+    }
+  ]
+}

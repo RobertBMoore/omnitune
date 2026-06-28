@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="console">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>omnitune — wiki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0d0c; --bg2:#0e1110; --panel:#121615; --panel2:#161b19;
+  --line:rgba(233,228,217,.10); --line2:rgba(233,228,217,.06);
+  --ink:#e9e4d9; --muted:#8b918a; --faint:#5b615b;
+  --amber:#e9b14c; --teal:#5ad6b0; --amber-soft:rgba(233,177,76,.13); --teal-soft:rgba(90,214,176,.12);
+  --serif:'Instrument Serif',Georgia,serif; --mono:'IBM Plex Mono',ui-monospace,monospace; --sans:'IBM Plex Sans',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;font-family:var(--sans);color:var(--ink);background:var(--bg);
+  font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(120% 80% at 8% -10%,rgba(233,177,76,.10),transparent 55%),
+    radial-gradient(90% 60% at 100% 0%,rgba(90,214,176,.06),transparent 50%);
+  background-attachment:fixed;
+}
+/* fine instrument grid + grain */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+  background-image:linear-gradient(var(--line2) 1px,transparent 1px),linear-gradient(90deg,var(--line2) 1px,transparent 1px);
+  background-size:46px 46px;mask-image:radial-gradient(120% 100% at 50% 0,#000,transparent 90%);}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.035;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
+
+.layout{display:grid;grid-template-columns:286px 1fr;min-height:100vh;position:relative;z-index:1}
+
+/* ---------- sidebar ---------- */
+aside{position:sticky;top:0;height:100vh;border-right:1px solid var(--line);
+  background:linear-gradient(180deg,var(--panel),var(--bg2));display:flex;flex-direction:column;padding:26px 20px 18px}
+.brand{display:flex;align-items:center;gap:11px;margin-bottom:4px}
+.brand .wave{width:34px;height:22px;flex:none}
+.brand .wave path{stroke:var(--amber);stroke-width:2;fill:none;stroke-linecap:round}
+.brand .nm{font-family:var(--mono);font-weight:600;letter-spacing:.02em;font-size:15px}
+.brand .nm b{color:var(--amber)}
+.tagline{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:2px 0 18px 45px}
+
+.readout{border:1px solid var(--line);border-radius:9px;background:var(--bg);padding:9px 11px;margin-bottom:16px;font-family:var(--mono);font-size:11px;display:flex;align-items:center;gap:8px;color:var(--muted)}
+.readout .pip{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 0 var(--teal);animation:pip 2.6s infinite}
+.readout b{color:var(--ink);font-weight:500}
+@keyframes pip{0%{box-shadow:0 0 0 0 rgba(90,214,176,.45)}70%{box-shadow:0 0 0 7px rgba(90,214,176,0)}100%{box-shadow:0 0 0 0 rgba(90,214,176,0)}}
+
+.search{position:relative;margin-bottom:16px}
+.search input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--ink);
+  font-family:var(--mono);font-size:12.5px;padding:9px 11px 9px 30px;outline:none;transition:.2s}
+.search input:focus{border-color:var(--amber);box-shadow:0 0 0 3px var(--amber-soft)}
+.search svg{position:absolute;left:9px;top:9px;width:14px;height:14px;stroke:var(--faint)}
+.search .key{position:absolute;right:8px;top:7px;font-family:var(--mono);font-size:10px;color:var(--faint);border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+.results{position:absolute;top:42px;left:0;right:0;background:var(--panel2);border:1px solid var(--line);border-radius:9px;overflow:hidden;z-index:30;display:none;box-shadow:0 14px 40px rgba(0,0,0,.5)}
+.results.show{display:block}
+.results a{display:block;padding:8px 11px;font-size:12.5px;color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line2)}
+.results a:last-child{border-bottom:0}
+.results a:hover,.results a.sel{background:var(--amber-soft);color:var(--ink)}
+.results a .pg{font-family:var(--mono);font-size:10px;color:var(--amber);display:block;letter-spacing:.05em}
+
+nav{display:flex;flex-direction:column;gap:1px;overflow-y:auto;margin:-4px -8px 0;padding:4px 8px}
+.navlink{position:relative;display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;color:var(--muted);
+  text-decoration:none;font-size:13.5px;font-weight:500;letter-spacing:.01em;transition:.18s;
+  opacity:0;transform:translateX(-8px);animation:navin .5s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:calc(var(--d) * 55ms + 120ms)}
+@keyframes navin{to{opacity:1;transform:none}}
+.navlink .dot{width:6px;height:6px;border-radius:50%;background:var(--faint);transition:.18s;flex:none}
+.navlink:hover{color:var(--ink);background:var(--line2)}
+.navlink:hover .dot{background:var(--muted)}
+.navlink.active{color:var(--ink);background:var(--amber-soft)}
+.navlink.active .dot{background:var(--amber);box-shadow:0 0 9px var(--amber)}
+.navlink.active::before{content:"";position:absolute;left:-8px;top:8px;bottom:8px;width:2px;border-radius:2px;background:var(--amber);box-shadow:0 0 10px var(--amber)}
+.spacer{flex:1}
+.foot{font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.05em;padding-top:14px;border-top:1px solid var(--line2);line-height:1.7}
+.foot a{color:var(--muted);text-decoration:none}
+.foot a:hover{color:var(--amber)}
+
+/* ---------- main ---------- */
+main{padding:0;min-width:0;position:relative}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;height:54px;padding:0 40px;
+  border-bottom:1px solid var(--line);background:rgba(11,13,12,.72);backdrop-filter:blur(12px)}
+.crumb{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;color:var(--muted)}
+.crumb b{color:var(--amber)}
+.meter{margin-left:auto;display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.08em}
+.meter .bars{display:flex;gap:2px;align-items:flex-end;height:14px}
+.meter .bars i{width:3px;background:var(--teal);border-radius:1px;opacity:.5;animation:eq 1.4s ease-in-out infinite}
+.meter .bars i:nth-child(2){animation-delay:.2s}.meter .bars i:nth-child(3){animation-delay:.4s}.meter .bars i:nth-child(4){animation-delay:.1s}.meter .bars i:nth-child(5){animation-delay:.3s}
+@keyframes eq{0%,100%{height:4px}50%{height:14px}}
+.menubtn{display:none}
+
+.scroll{height:calc(100vh - 54px);overflow-y:auto;scroll-behavior:smooth}
+.wrap{max-width:780px;margin:0 auto;padding:52px 40px 120px}
+.page{display:none;animation:pagein .45s cubic-bezier(.2,.8,.2,1)}
+.page.show{display:block}
+@keyframes pagein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.pagehead{margin-bottom:34px;padding-bottom:26px;border-bottom:1px solid var(--line)}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--amber);text-transform:uppercase}
+.pagetitle{font-family:var(--serif);font-weight:400;font-size:clamp(40px,6vw,62px);line-height:1.02;margin:12px 0 0;letter-spacing:.005em}
+
+.page h2{font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);
+  margin:46px 0 16px;padding-top:14px;border-top:1px solid var(--line2)}
+.page h3{font-family:var(--sans);font-weight:600;font-size:18px;margin:30px 0 10px;color:var(--ink)}
+.page h4{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:22px 0 8px}
+.page p{margin:14px 0;color:#d7d3c8}
+.page strong{color:var(--ink);font-weight:600}
+.page em{color:var(--teal);font-style:italic}
+.page a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-soft);transition:.15s}
+.page a:hover{border-bottom-color:var(--amber)}
+.page a.xnav{cursor:pointer}
+.page ul,.page ol{margin:14px 0;padding-left:22px;color:#d7d3c8}
+.page li{margin:7px 0}
+.page li::marker{color:var(--amber)}
+.page hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+.page blockquote{margin:20px 0;padding:14px 18px;border-left:2px solid var(--teal);background:var(--teal-soft);border-radius:0 8px 8px 0;color:var(--ink)}
+
+code{font-family:var(--mono);font-size:.86em;background:var(--panel2);border:1px solid var(--line2);border-radius:5px;padding:1.5px 6px;color:var(--amber)}
+pre.code{position:relative;margin:18px 0;background:var(--bg2);border:1px solid var(--line);border-radius:11px;padding:18px 18px 16px;overflow-x:auto}
+pre.code code{background:none;border:0;padding:0;color:#cfd6cf;font-size:13px;line-height:1.6;display:block}
+pre.code::before{content:attr(data-lang);position:absolute;top:0;right:14px;transform:translateY(-50%);font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);background:var(--bg);padding:2px 8px;border:1px solid var(--line2);border-radius:20px}
+
+.tablewrap{overflow-x:auto;margin:20px 0;border:1px solid var(--line);border-radius:11px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--amber);text-align:left;padding:11px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
+td{padding:11px 14px;border-bottom:1px solid var(--line2);color:#d2cfc5;vertical-align:top}
+tr:last-child td{border-bottom:0}
+tr:hover td{background:rgba(233,177,76,.03)}
+
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-thumb{background:#2a302d;border-radius:6px;border:3px solid var(--bg)}
+::-webkit-scrollbar-thumb:hover{background:#3a423d}
+
+/* ---------- responsive ---------- */
+.scrim{display:none}
+@media(max-width:880px){
+  .layout{grid-template-columns:1fr}
+  aside{position:fixed;left:0;top:0;width:286px;z-index:60;transform:translateX(-100%);transition:.28s cubic-bezier(.2,.8,.2,1)}
+  aside.open{transform:none;box-shadow:30px 0 80px rgba(0,0,0,.6)}
+  .menubtn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);cursor:pointer}
+  .menubtn svg{width:17px;height:17px;stroke:var(--ink)}
+  .scrim.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:55}
+  .wrap{padding:38px 22px 100px}
+  .topbar{padding:0 18px}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <div class="scrim" id="scrim"></div>
+  <aside id="aside">
+    <div class="brand">
+      <svg class="wave" viewBox="0 0 34 22"><path d="M1 11 H6 L8 4 L11 18 L14 8 L17 14 L20 2 L23 16 L26 11 H33"/></svg>
+      <span class="nm"><b>prompt</b>-tuner</span>
+    </div>
+    <div class="tagline">tuning console</div>
+    <div class="readout"><span class="pip"></span><span>rubric&nbsp;·&nbsp;<b id="rdModel">claude-opus-4-8</b></span></div>
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="q" type="text" placeholder="Search the docs" autocomplete="off" spellcheck="false">
+      <span class="key">/</span>
+      <div class="results" id="results"></div>
+    </div>
+    <nav id="nav"><a class="navlink active" data-target="overview" href="#overview" style="--d:0"><span class="dot"></span>Overview</a>
+<a class="navlink" data-target="how-it-works" href="#how-it-works" style="--d:1"><span class="dot"></span>How It Works</a>
+<a class="navlink" data-target="install" href="#install" style="--d:2"><span class="dot"></span>Install &amp; Setup</a>
+<a class="navlink" data-target="configuration" href="#configuration" style="--d:3"><span class="dot"></span>Configuration</a>
+<a class="navlink" data-target="auto-sync" href="#auto-sync" style="--d:4"><span class="dot"></span>Auto-Sync</a>
+<a class="navlink" data-target="faq" href="#faq" style="--d:5"><span class="dot"></span>FAQ</a></nav>
+    <div class="spacer"></div>
+    <div class="foot">v0.2 · MIT<br><a href="https://github.com/RobertBMoore/omnitune">github.com/RobertBMoore/omnitune</a></div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <button class="menubtn" id="menubtn" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <div class="crumb">wiki&nbsp;/&nbsp;<b id="crumb">Overview</b></div>
+      <div class="meter"><span>in&nbsp;tune</span><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div>
+    </div>
+    <div class="scroll" id="scroll">
+      <div class="wrap"><section class="page show" id="overview" data-label="Overview"><div class="pagehead"><span class="kicker">01 / OVERVIEW</span><h1 class="pagetitle">Overview</h1></div><p>A portable Claude Code plugin that keeps your prompts and skills tuned to the <strong>current</strong> Anthropic model — in any repo, for any business.</p>
+<h2 id="pages" class="h2">Pages</h2>
+<ul><li><strong><a class="xnav" data-target="how-it-works" href="#how-it-works">How-It-Works</a></strong> — the two modes, the QA loop, the 7-dimension rubric, the freshness contract.</li><li><strong><a class="xnav" data-target="install" href="#install">Install-Setup</a></strong> — installing the plugin and the guided <code>/omnitune:install</code> interview.</li><li><strong><a class="xnav" data-target="configuration" href="#configuration">Configuration</a></strong> — every <code>omnitune.config.yaml</code> field, with a worked example.</li><li><strong><a class="xnav" data-target="auto-sync" href="#auto-sync">Auto-Sync</a></strong> — how the model-sync interrupt + behavioral-diff loop keeps the rubric current.</li><li><strong><a class="xnav" data-target="faq" href="#faq">FAQ</a></strong> — troubleshooting, offline use, adding a skill to routing.</li></ul>
+<h2 id="the-60-second-mental-model" class="h2">The 60-second mental model</h2>
+<ol><li><strong>Install once.</strong> <code>/omnitune:install</code> interviews you and your repo, then writes <code>omnitune.config.yaml</code>. That file holds everything specific to you; the plugin core holds nothing about your domain.</li><li><strong>Use two modes.</strong> <code>/omnitune:tune-prompt</code> rewrites a rough prompt into model-optimal form (self-scored before you see it). <code>/omnitune:tune-skill</code> audits a skill/agent file and applies fixes.</li><li><strong>It stays current.</strong> When a newer Anthropic model ships, the tuner notices at the start of a run, asks if you want to update (or skip/defer/snooze), and — if you do — audits what actually changed before patching its own rubric. It never patches silently.</li></ol>
+<h2 id="design-principles" class="h2">Design principles</h2>
+<ul><li><strong>Repo-agnostic core.</strong> Zero domain assumptions; all coupling lives in <code>omnitune.config.yaml</code>.</li><li><strong>Model-agnostic + self-updating.</strong> The rubric tracks whatever model is current.</li><li><strong>Human is the auditor.</strong> Install confirms before writing; model-sync proposes before patching. The tool never grades its own brain unsupervised.</li></ul></section>
+<section class="page" id="how-it-works" data-label="How It Works"><div class="pagehead"><span class="kicker">02 / HOW IT WORKS</span><h1 class="pagetitle">How It Works</h1></div><p>omnitune has two user-facing modes and two operational commands, all reading one config file and a per-model rubric.</p>
+<h2 id="the-rubric-library" class="h2">The rubric library</h2>
+<p>The plugin ships a library of rubrics, one per supported model, under <code>skills/omnitune/references/rubrics/</code>:</p>
+<ul><li><code>_core.md</code> — the model-invariant prompt-engineering rules (shared by every model).</li><li><code>claude-&lt;model&gt;.md</code> — each model&#x27;s specific calibration (effort defaults, literalness, structure needs), layered on <code>_core</code>.</li><li><code>models.json</code> — the manifest: which models exist, their status (<code>ga</code>/<code>deprecated</code>/<code>retired</code>), and which rubric file each maps to.</li></ul>
+<p>At the start of every run, the plugin reads <strong>the model your session is running</strong>, matches it in <code>models.json</code>, and loads that rubric. No network call, no &quot;latest model&quot; guess — it tunes for the model actually in use. (See <a class="xnav" data-target="auto-sync" href="#auto-sync">Auto-Sync</a>.)</p>
+<h2 id="mode-a-omnitunetune-skill-name" class="h2">Mode A — <code>/omnitune:tune-skill &lt;name&gt;</code></h2>
+<p>Audits a <code>SKILL.md</code> or agent file against the session model&#x27;s rubric across these dimensions: instruction hygiene, structural clarity, context economy, tool/permission alignment (agents), trigger-description fidelity, internal consistency, and register/voice (copy-focused targets only). Each finding cites a rubric section.</p>
+<p>Aggregation uses a <strong>floor rule, not an average</strong>: any dimension scoring 1 (Critical) caps the verdict at &quot;do not pass&quot; — a safety/correctness finding can never be averaged away. It writes a report to your configured <code>output.reports/</code> and offers an interactive <code>[a]pply / [s]kip / [e]dit / [q]uit</code> loop per finding.</p>
+<h2 id="mode-b-omnitunetune-prompt-text" class="h2">Mode B — <code>/omnitune:tune-prompt &quot;&lt;text&gt;&quot;</code></h2>
+<p>Rewrites an ad-hoc prompt into model-optimized form. Two safety mechanisms make it trustworthy:</p>
+<ol><li><strong>Prompt-class gate (first step).</strong> It classifies the prompt — <code>creative-brief</code>, <code>code</code>, <code>factual-terse</code>, <code>adversarial-eval</code>, <code>command</code>, or <code>other</code> — and only applies the brief-shaped QA dimensions (context completeness, constraint specificity, success criteria) to the classes that need them. A terse or code prompt is <strong>never</strong> padded with requirements it doesn&#x27;t want.</li><li><strong>Fabrication ledger.</strong> Every specific the rewrite adds that wasn&#x27;t in your prompt (a count, price, date, scope) must be either <em>cited</em> to a config context-pointer or <em>laddered</em> as an explicit &quot;I assumed X — confirm.&quot; It cannot silently invent requirements and still pass.</li></ol>
+<p>The draft is self-scored against the rubric in a QA loop (max 3 drafts) before you ever see it, then saved to <code>output.prompts/</code> and offered as <code>[r]un / [c]opy / [e]dit / [a]bandon</code>.</p>
+<h2 id="the-two-operational-commands" class="h2">The two operational commands</h2>
+<ul><li><strong><code>/omnitune:install</code></strong> — the adaptive install wizard (<a class="xnav" data-target="install" href="#install">Install-Setup</a>).</li><li><strong><code>/omnitune:sync</code></strong> — derives a rubric when your session runs a model the library doesn&#x27;t cover yet, propose-only (<a class="xnav" data-target="auto-sync" href="#auto-sync">Auto-Sync</a>).</li></ul>
+<h2 id="the-decoupling-contract" class="h2">The decoupling contract</h2>
+<p>The plugin core names no company, campaign, or domain file. Everything repo-specific lives in <code>omnitune.config.yaml</code> (<a class="xnav" data-target="configuration" href="#configuration">Configuration</a>). That&#x27;s what lets the same plugin tune an email shop, an outdoor-gear store, or a codebase with no changes to the core.</p></section>
+<section class="page" id="install" data-label="Install &amp; Setup"><div class="pagehead"><span class="kicker">03 / INSTALL &amp; SETUP</span><h1 class="pagetitle">Install &amp; Setup</h1></div><h2 id="1-install-the-plugin" class="h2">1. Install the plugin</h2>
+<p>Quickest path — add the marketplace and install (user scope = available in all your repos), then reload:</p>
+<pre class="code" data-lang="text"><code>/plugin marketplace add RobertBMoore/omnitune
+/plugin install omnitune@omnitune
+/reload-plugins</code></pre>
+<ul><li>Marketplace: <code>omnitune</code>, tracking the <code>main</code> channel. Commands register namespaced: <code>/omnitune:tune-prompt</code>, <code>/omnitune:tune-skill</code>, <code>/omnitune:install</code>, <code>/omnitune:sync</code>.</li><li><strong>Auto-update</strong> is a one-time per-user toggle: <code>/plugin</code> → Marketplaces → <code>omnitune</code> → Enable auto-update.</li><li><strong>Teams:</strong> commit <a href="../docs/install/team-settings.json"><code>docs/install/team-settings.json</code></a> into a repo&#x27;s <code>.claude/settings.json</code> to prompt collaborators on trust; or roll out hands-off org-wide with <a href="../deploy/managed-settings.json"><code>deploy/managed-settings.json</code></a> (see <a href="../RELEASING.md"><code>RELEASING.md</code></a>).</li></ul>
+<h2 id="2-run-omnituneinstall" class="h2">2. Run <code>/omnitune:install</code></h2>
+<p>Setup is an <strong>interview that audits its own understanding before writing anything</strong> — it drafts your config from the repo, then asks you to confirm. It never writes <code>omnitune.config.yaml</code> from guesses.</p>
+<p>What it does, in order:</p>
+<ol><li><strong>Detect + draft.</strong> Reads your <code>CLAUDE.md</code>/<code>AGENTS.md</code>/<code>README.md</code>, lists your skills, and <strong>drafts the technical fields for you</strong> — the routing keyword table and context-pointers — by reading the repo. You don&#x27;t author routing tables blind.</li><li><strong>Gauge.</strong> One question sets how much it explains, not what it covers: comfortable with YAML, or prefer plain language? Every operator gets the full drafted config either way.</li><li><strong>Confirm.</strong> It walks each drafted field at your chosen depth — &quot;I think &#x27;review this campaign&#x27; should route to your <code>campaign-review</code> skill — right?&quot; — and you confirm or correct. Low-confidence guesses are flagged for extra scrutiny.</li><li><strong>Dry-run.</strong> Before saving, it proves the config works: rewrites one sample prompt (Mode B) and audits one of your real skills (Mode A), and shows you the results.</li><li><strong>Write.</strong> Only now does it write <code>omnitune.config.yaml</code> to your repo root, and prints the three commands with an example of each.</li></ol>
+<h2 id="edge-cases-the-wizard-handles" class="h2">Edge cases the wizard handles</h2>
+<ul><li><strong>No skills yet</strong> — produces a valid Mode-B-only config (empty <code>routing[]</code>); the Mode A dry-run is skipped.</li><li><strong>Monorepo / multiple skill roots</strong> — it asks which package root owns the config.</li><li><strong>Non-technical operator</strong> — the technical fields are drafted <em>for</em> you; an optional &quot;have a developer eyeball the routing table?&quot; hand-off is offered, never required.</li></ul>
+<h2 id="verify" class="h2">Verify</h2>
+<p>After install, run <code>/omnitune:tune-prompt &quot;a rough prompt&quot;</code> and <code>/omnitune:tune-skill &lt;one-of-your-skills&gt;</code>. Both should run against your new config. See <a class="xnav" data-target="configuration" href="#configuration">Configuration</a> to hand-edit anything, and <a class="xnav" data-target="faq" href="#faq">FAQ</a> if a command doesn&#x27;t fire.</p></section>
+<section class="page" id="configuration" data-label="Configuration"><div class="pagehead"><span class="kicker">04 / CONFIGURATION</span><h1 class="pagetitle">Configuration</h1></div><p>Everything repo-specific lives in <code>omnitune.config.yaml</code> at your repo root. The plugin core holds no domain knowledge of its own. <code>/omnitune:install</code> generates this file; you can also hand-edit it. Full field reference: <a href="../omnitune.config.schema.md"><code>omnitune.config.schema.md</code></a>.</p>
+<h2 id="worked-example" class="h2">Worked example</h2>
+<pre class="code" data-lang="yaml"><code>project:
+  name: &quot;TrailGear&quot;
+  domain: &quot;Direct-to-consumer outdoor gear (tents, packs, apparel).&quot;
+skills:
+  root: &quot;skills/&quot;
+  agents: &quot;&quot;                      # &quot;&quot; if you have no agent files
+routing:                          # keyword -&gt; skill, for Mode B target detection
+  - skill: &quot;product-blurb&quot;
+    keywords: [&quot;product blurb&quot;, &quot;write a blurb&quot;, &quot;blurb for the&quot;, &quot;product copy&quot;]
+context_pointers:                 # files Mode B cites when a target is detected
+  - when: &quot;product-blurb&quot;
+    point_to: [&quot;brand/voice.md&quot;]
+house_rules: &quot;brand/voice.md&quot;     # voice/anti-patterns the tuner must respect; &quot;&quot; if none
+reserved_decisions: &quot;&quot;            # decisions to SURFACE not pre-empt; &quot;&quot; if none
+output:
+  reports: &quot;reports/&quot;
+  prompts: &quot;docs/prompts/&quot;
+model_sync:
+  channel: &quot;badge&quot;                # badge (default) | interrupt | manual
+  target_model: &quot;&quot;                # override session-model detection (headless/CI)
+  snooze_default: &quot;24h&quot;
+  regression_corpus: &quot;tuner/regression/&quot;</code></pre>
+<p>(A fuller fictional TrailGear example ships in <a href="../omnitune.config.example.yaml"><code>omnitune.config.example.yaml</code></a> — nothing is baked into the core.)</p>
+<h2 id="how-the-fields-drive-the-modes" class="h2">How the fields drive the modes</h2>
+<ul><li><strong><code>routing[]</code></strong> — Mode B matches your raw prompt&#x27;s words against these keywords to pick the target skill. Empty is valid (Mode B then runs without target context).</li><li><strong><code>context_pointers[]</code></strong> — when a target is detected, Mode B cites these files. This is also what the fabrication ledger checks &quot;cited&quot; against.</li><li><strong><code>house_rules</code></strong> — Mode A&#x27;s voice dimension (D7) and Mode B&#x27;s caveats read this. If empty, D7 scores N/A.</li><li><strong><code>reserved_decisions</code></strong> — Mode B surfaces (never pre-empts) any decision in this file that a rewrite touches.</li><li><strong><code>output.*</code></strong> — where reports and rewritten prompts are saved.</li></ul>
+<h2 id="common-edits" class="h2">Common edits</h2>
+<ul><li><strong>Add a skill to routing:</strong> append a <code>routing[]</code> entry with the phrases users would type for it.</li><li><strong>Add a voice/style source:</strong> set <code>house_rules</code> to its path; Mode A will start scoring copy skills against it.</li><li><strong>Turn off model notices:</strong> set <code>model_sync.channel: manual</code> (air-gapped/CI). See <a class="xnav" data-target="auto-sync" href="#auto-sync">Auto-Sync</a>.</li><li><strong>CI config check:</strong> run the install wizard&#x27;s <code>--check</code> (v0.2) to assert every <code>routing</code> skill and pointer path still resolves — catches silent config rot after renames.</li></ul></section>
+<section class="page" id="auto-sync" data-label="Auto-Sync"><div class="pagehead"><span class="kicker">05 / AUTO-SYNC</span><h1 class="pagetitle">Auto-Sync</h1></div><p>omnitune does <strong>not</strong> scrape the web asking &quot;is there a newer model?&quot; It asks a local question: <em>does my library have a rubric for the model this session is running?</em></p>
+<h2 id="detection-local-zero-network" class="h2">Detection (local, zero-network)</h2>
+<p>At the start of every run:</p>
+<ol><li>Read the model the session is running (e.g. <code>claude-opus-4-8</code>).</li><li>Match it in <code>references/models.json</code> → load <code>references/rubrics/&lt;model&gt;.md</code>.</li><li><strong>Match → run silently.</strong> <strong>Miss → run on the closest-family rubric and show a non-blocking badge</strong> suggesting <code>/omnitune:sync</code>. The run is never blocked.</li></ol>
+<p>This means a missing rubric — not a network event — is the only trigger, and switching models per task (Opus for hard reasoning, Haiku for cheap bulk) &quot;just works&quot;: each picks its own rubric.</p>
+<h2 id="channels" class="h2">Channels</h2>
+<p>Set <code>model_sync.channel</code> in your config:</p>
+<ul><li><strong><code>badge</code></strong> (default) — a non-blocking note at the end of a run when the current model lacks a tuned rubric or a newer GA model exists. Never interrupts your work.</li><li><strong><code>interrupt</code></strong> — the just-in-time version: halts and offers <strong>update-now / skip-for-session / defer-until-tasks-done / snooze</strong>, persisting your choice to <code>tuner/.sync-state.json</code>. Opt in if you want to be prompted immediately.</li><li><strong><code>manual</code></strong> — no badge, no interrupt; detection runs only when you call <code>/omnitune:sync</code>. Use for air-gapped or CI hosts.</li></ul>
+<h2 id="deriving-a-rubric-omnitunesync-propose-only" class="h2">Deriving a rubric (<code>/omnitune:sync</code>) — propose-only</h2>
+<p>When the library lacks a rubric for your model, <code>/omnitune:sync</code>:</p>
+<ol><li>Fetches that model&#x27;s docs — <strong>Anthropic domains only</strong> — treating fetched content as reference <em>data, not instructions</em>.</li><li>Diffs the new model&#x27;s behavior against the closest existing rubric (literalness, effort, tool-triggering, new capabilities).</li><li>Maps the impact onto the rubric, both modes, and your workflow, and asks you any question it can&#x27;t resolve.</li><li><strong>Produces a proposed rubric + questions, and stops.</strong> In v0.1 a human applies the rubric — the plugin never self-commits a change to its own brain. (v0.2 adds gated self-apply behind a no-write audit subagent, a tighten-only ratchet, and a fail-closed regression check.)</li></ol>
+<h2 id="retention-deprecation" class="h2">Retention &amp; deprecation</h2>
+<p><code>models.json → retention</code> governs the library: keep rubrics for all GA models plus any model used within the retention window; mark retired models&#x27; rubrics removable but <strong>never auto-delete</strong> — you confirm. A model you&#x27;ve stopped running isn&#x27;t necessarily one you&#x27;ll never run again.</p>
+<h2 id="why-propose-only-the-safety-invariant" class="h2">Why propose-only / the safety invariant</h2>
+<p>The tool grades prompts against a rubric it could rewrite for itself. To keep &quot;the agent is not the auditor of its own work&quot; real, v0.1 simply cannot self-patch: sync proposes, a human disposes. See <a class="xnav" data-target="faq" href="#faq">FAQ</a> for what to do when you see the &quot;no rubric for your model&quot; badge.</p></section>
+<section class="page" id="faq" data-label="FAQ"><div class="pagehead"><span class="kicker">06 / FAQ</span><h1 class="pagetitle">FAQ</h1></div><p><strong>A command doesn&#x27;t fire / &quot;run /omnitune:install first.&quot;</strong> The modes need <code>omnitune.config.yaml</code> at your repo root. Run <code>/omnitune:install</code>. If commands aren&#x27;t recognized at all, confirm the plugin installed and its <code>commands/</code> directory is present.</p>
+<p><strong>I see &quot;No tuned rubric for <code>&lt;model&gt;</code>&quot; badge.</strong> Your session is running a model the library doesn&#x27;t cover yet. The run still completed — it used the closest-family rubric. Run <code>/omnitune:sync</code> when convenient to derive a tuned rubric (propose-only; you apply it). See <a class="xnav" data-target="auto-sync" href="#auto-sync">Auto-Sync</a>.</p>
+<p><strong>A rubric says <code>source_status: derived-tier</code> — can I trust it?</strong> The Opus 4.8 rubric is sourced from live docs. The Sonnet 4.6 and Haiku 4.5 rubrics were authored from tier knowledge; their version-specific items are marked <code>(verify)</code>. They&#x27;re usable today, but run <code>/omnitune:sync</code> to replace the flagged items with sourced specifics before relying on them for precise effort/context-window decisions.</p>
+<p><strong>Mode B added something I didn&#x27;t ask for.</strong> It shouldn&#x27;t silently. Anything it adds is either cited to a config <code>context_pointer</code> or listed in an &quot;I assumed…&quot; ledger for you to confirm. If you see an uncited invented specific, that&#x27;s a fabrication-ledger bug — report it.</p>
+<p><strong>Mode B &quot;padded&quot; my short prompt.</strong> It shouldn&#x27;t — the prompt-class gate marks the brief-shaped dimensions N/A for <code>code</code>, <code>factual-terse</code>, <code>command</code>, and <code>adversarial-eval</code> classes. If a terse prompt got scope statements and success criteria it didn&#x27;t need, the class was likely misjudged; re-run and it will ask to classify.</p>
+<p><strong>I work offline / in CI.</strong> Set <code>model_sync.channel: manual</code>. Detection and any doc-fetch then run only on explicit <code>/omnitune:sync</code>. The plugin&#x27;s only network use is that fetch.</p>
+<p><strong>Does it phone home?</strong> No telemetry. The only network call is <code>/omnitune:sync</code> fetching Anthropic docs to derive a rubric, and that&#x27;s gated to Anthropic domains.</p>
+<p><strong>A skill got renamed and routing broke.</strong> Config can rot after renames. Re-run <code>/omnitune:install</code> (it re-drafts from the current repo) or, in v0.2, the <code>--check</code> lint asserts every <code>routing</code> skill and pointer path still resolves.</p>
+<p><strong>Multiple repos — I keep getting the same badge.</strong> State (<code>.sync-state.json</code>, model-usage) is per-repo today; a global cross-repo preference is a v1.0 item. For now, set <code>channel: manual</code> in repos where you don&#x27;t want the badge.</p>
+<p><strong>Can I audit omnitune with omnitune?</strong> Yes, but Mode A is forbidden from softening the plugin&#x27;s own fail-closed safety clauses (the never-self-commit invariant), even where the calm-register rule would otherwise flag their emphasis. Those are the safety exception.</p></section></div>
+    </div>
+  </main>
+</div>
+
+<script>
+const INDEX = [{"slug": "overview", "label": "Overview", "headings": [{"text": "Pages", "id": "pages"}, {"text": "The 60-second mental model", "id": "the-60-second-mental-model"}, {"text": "Design principles", "id": "design-principles"}]}, {"slug": "how-it-works", "label": "How It Works", "headings": [{"text": "The rubric library", "id": "the-rubric-library"}, {"text": "Mode A  /omnitune:tune-skill name", "id": "mode-a-omnitunetune-skill-name"}, {"text": "Mode B  /omnitune:tune-prompt text", "id": "mode-b-omnitunetune-prompt-text"}, {"text": "The two operational commands", "id": "the-two-operational-commands"}, {"text": "The decoupling contract", "id": "the-decoupling-contract"}]}, {"slug": "install", "label": "Install & Setup", "headings": [{"text": "1. Install the plugin", "id": "1-install-the-plugin"}, {"text": "2. Run /omnitune:install", "id": "2-run-omnituneinstall"}, {"text": "Edge cases the wizard handles", "id": "edge-cases-the-wizard-handles"}, {"text": "Verify", "id": "verify"}]}, {"slug": "configuration", "label": "Configuration", "headings": [{"text": "Worked example", "id": "worked-example"}, {"text": "How the fields drive the modes", "id": "how-the-fields-drive-the-modes"}, {"text": "Common edits", "id": "common-edits"}]}, {"slug": "auto-sync", "label": "Auto-Sync", "headings": [{"text": "Detection local zero-network", "id": "detection-local-zero-network"}, {"text": "Channels", "id": "channels"}, {"text": "Deriving a rubric /omnitune:sync  propose-only", "id": "deriving-a-rubric-omnitunesync-propose-only"}, {"text": "Retention & deprecation", "id": "retention-deprecation"}, {"text": "Why propose-only / the safety invariant", "id": "why-propose-only-the-safety-invariant"}]}, {"slug": "faq", "label": "FAQ", "headings": []}];
+const nav = document.getElementById('nav');
+const scroll = document.getElementById('scroll');
+const crumb = document.getElementById('crumb');
+const aside = document.getElementById('aside');
+const scrim = document.getElementById('scrim');
+
+function setPage(slug, hid){
+  const pages = document.querySelectorAll('.page');
+  let found=false;
+  pages.forEach(p=>{ const on = p.id===slug; p.classList.toggle('show',on); if(on) found=true; });
+  if(!found){ document.querySelector('.page').classList.add('show'); slug=document.querySelector('.page').id; }
+  document.querySelectorAll('.navlink').forEach(a=>a.classList.toggle('active',a.dataset.target===slug));
+  const lbl = document.querySelector('#'+CSS.escape(slug)).dataset.label;
+  crumb.textContent = lbl;
+  history.replaceState(null,'', '#'+slug + (hid?('::'+hid):''));
+  scroll.scrollTop = 0;
+  if(hid){ const el=document.getElementById(hid); if(el) setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),60); }
+  closeMenu();
+}
+nav.addEventListener('click',e=>{const a=e.target.closest('.navlink'); if(a){e.preventDefault(); setPage(a.dataset.target);}});
+document.addEventListener('click',e=>{const a=e.target.closest('a.xnav'); if(a){e.preventDefault(); setPage(a.dataset.target);}});
+
+// ---- search ----
+const q=document.getElementById('q'), results=document.getElementById('results');
+const flat=[];
+INDEX.forEach(p=>{ flat.push({page:p.label,slug:p.slug,text:p.label,id:''}); p.headings.forEach(h=>flat.push({page:p.label,slug:p.slug,text:h.text,id:h.id})); });
+let sel=-1, cur=[];
+function render(list){
+  cur=list; sel=-1;
+  if(!list.length){results.classList.remove('show');results.innerHTML='';return;}
+  results.innerHTML=list.slice(0,8).map(r=>`<a data-slug="${r.slug}" data-id="${r.id}"><span class="pg">${r.page}</span>${r.text}</a>`).join('');
+  results.classList.add('show');
+}
+q.addEventListener('input',()=>{
+  const v=q.value.trim().toLowerCase();
+  if(!v){render([]);return;}
+  render(flat.filter(r=>r.text.toLowerCase().includes(v)));
+});
+results.addEventListener('click',e=>{const a=e.target.closest('a'); if(a){setPage(a.dataset.slug,a.dataset.id||null); q.value='';render([]);}});
+q.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){q.value='';render([]);q.blur();}
+  if(!cur.length)return;
+  if(e.key==='ArrowDown'){e.preventDefault();sel=(sel+1)%Math.min(cur.length,8);}
+  else if(e.key==='ArrowUp'){e.preventDefault();sel=(sel-1+Math.min(cur.length,8))%Math.min(cur.length,8);}
+  else if(e.key==='Enter'){const r=cur[sel<0?0:sel]; if(r){setPage(r.slug,r.id||null);q.value='';render([]);}return;}
+  else return;
+  [...results.children].forEach((a,i)=>a.classList.toggle('sel',i===sel));
+});
+document.addEventListener('keydown',e=>{ if(e.key==='/' && document.activeElement!==q){e.preventDefault();q.focus();} });
+document.addEventListener('click',e=>{ if(!e.target.closest('.search')) render([]); });
+
+// ---- mobile menu ----
+const menubtn=document.getElementById('menubtn');
+function closeMenu(){aside.classList.remove('open');scrim.classList.remove('show');}
+menubtn&&menubtn.addEventListener('click',()=>{aside.classList.toggle('open');scrim.classList.toggle('show');});
+scrim.addEventListener('click',closeMenu);
+
+// ---- deep link on load ----
+(function(){
+  const h=location.hash.replace('#','');
+  if(h){const [slug,hid]=h.split('::'); if(document.getElementById(slug)) setPage(slug,hid||null);}
+})();
+</script>
+</body>
+</html>

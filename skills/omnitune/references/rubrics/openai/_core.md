@@ -11,13 +11,14 @@ sources:
   - https://developers.openai.com/codex/models
   - https://developers.openai.com/cookbook/examples/gpt-5/codex_prompting_guide
   - https://developers.openai.com/codex/guides/agents-md
+  - https://developers.openai.com/api/docs/guides/latest-model
 ---
 
 # Rubric Core — OpenAI (GPT-5 / Codex family)
 
-The provider-invariant prompt-engineering rules for OpenAI's GPT-5-class / Codex models. Each per-model rubric (`<model>.md`) reads this core first, then layers model-specific calibration. Source legend: `[CP]` codex/prompting · `[BP]` codex/learn/best-practices · `[MD]` codex/models · `[CG]` cookbook codex prompting guide · `[AG]` codex/guides/agents-md.
+The provider-invariant prompt-engineering rules for OpenAI's GPT-5-class / Codex models. Each per-model rubric (`<model>.md`) reads this core first, then layers model-specific calibration. Source legend: `[CP]` codex/prompting · `[BP]` codex/learn/best-practices · `[MD]` codex/models · `[CG]` cookbook codex prompting guide · `[AG]` codex/guides/agents-md · `[LM]` api/docs/guides/latest-model (Using GPT-5.5) · `[omnitune]` omnitune-internal invariant.
 
-**Controlling fact:** GPT-5.5-class Codex models reward an explicit, scoped contract and *minimal* scaffolding — start with the smallest prompt that preserves the contract; legacy over-specified prompts add noise and produce mechanical answers. `[CG]`
+**Controlling fact:** GPT-5.5 is a new model family — start from a minimal, scoped prompt and migrate legacy prompts rather than porting them verbatim. `[LM]`
 
 ## 1. Prompt contract
 
@@ -29,19 +30,18 @@ The provider-invariant prompt-engineering rules for OpenAI's GPT-5-class / Codex
 ## 2. Effort & verbosity (the two separate levers)
 
 - Set `reasoning.effort` to the task: low for fast, well-scoped work; medium/high for complex changes or debugging; xhigh for long, agentic, reasoning-heavy tasks. `[BP]`
-- Re-evaluate before escalating effort — efficient reasoning means low/medium now suffice more often than on older models. `[CG]`
-- Treat `text.verbosity` (low/medium/high) as a separate lever from effort; prefer a low default and raise it only when you need more exposition. `[CG]`
+- The effort ladder runs none → minimal → low → medium (default) → high → xhigh; re-evaluate before escalating, since efficient reasoning makes low/medium sufficient more often. `[LM]`
+- Treat `text.verbosity` (low/medium/high) as a separate lever from effort; the default is medium — prefer low and raise it only when you need more exposition. `[LM]`
 
 ## 3. Outcome-first, minimal scaffolding
 
-- Write the smallest prompt that still pins the contract; over-specification degrades GPT-5.5 into mechanical output. `[CG]`
-- Treat GPT-5.5 as a new model family, not a drop-in for 5.2/5.4 — migrate legacy prompts rather than porting them verbatim. `[CG]`
+- Write the smallest prompt that still pins the contract; GPT-5.5 rewards a scoped, minimal prompt. `[LM]`
+- Treat GPT-5.5 as a new model family, not a drop-in for 5.2/5.4 — migrate legacy prompts rather than porting them verbatim. `[LM]`
 - Lean on the model's metaprompting strength: ask it to critique and tighten your prompt or plan when a task is underspecified. `[CG]`
 
 ## 4. Structure & output
 
-- Prefer Structured Outputs (a response schema) over describing a schema in prose, and give explicit budgets (word/section/JSON-only). `[CG]`
-- Developer-vs-system message roles are real but low-leverage in Codex CLI (you rarely control the system message) — do not lead a Codex prompt with role mechanics. `[CG]`
+- Prefer Structured Outputs (a response schema) over describing the schema in prose, and give explicit budgets (word/section/JSON-only). `[LM]`
 
 ## 5. Tools, planning & verification
 
@@ -58,8 +58,8 @@ The provider-invariant prompt-engineering rules for OpenAI's GPT-5-class / Codex
 
 ## Audit floor-rule (model-invariant)
 
-A dimension scoring Critical caps the overall verdict at "Critical — do not pass," regardless of other dimensions. Dimensions that do not apply are recorded N/A and excluded. The verdict is a floor rule, never an arithmetic mean. `[BP]`
+A dimension scoring Critical caps the overall verdict at "Critical — do not pass," regardless of other dimensions. Dimensions that do not apply are recorded N/A and excluded. The verdict is a floor rule, never an arithmetic mean. `[omnitune]`
 
 ## Fail-closed safety clause (model-invariant)
 
-Never soften a safety-critical or fail-closed directive (destructive actions, PII, an allowlist/domain fence). When in doubt, fail closed and surface the question rather than proceeding. `[BP]`
+Never soften a safety-critical or fail-closed directive (destructive actions, PII, an allowlist/domain fence). When in doubt, fail closed and surface the question rather than proceeding. `[omnitune]`

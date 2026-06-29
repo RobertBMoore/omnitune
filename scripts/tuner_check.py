@@ -71,6 +71,49 @@ def _citation_problems(rubric_full, model_id):
     return out
 
 
+def _extends_problems(skill_dir, rb, provider, mid):
+    """A rubric's frontmatter `extends:` must resolve to its same-provider _core.md."""
+    out = []
+    full = os.path.join(skill_dir, rb)
+    try:
+        with open(full, encoding="utf-8") as f:
+            text = f.read()
+    except Exception:  # noqa: BLE001
+        return out
+    m = re.search(r"^extends:\s*(\S+)", text, re.M)
+    if not m:
+        return out  # extends is optional (a _core file itself has none)
+    target = m.group(1).strip()
+    target_full = os.path.normpath(os.path.join(os.path.dirname(full), target))
+    rel = target_full.replace(os.sep, "/")
+    if not os.path.exists(target_full):
+        out.append("manifest: model '%s' extends '%s' which does not exist" % (mid, target))
+    elif os.path.basename(target_full) != "_core.md" or ("rubrics/%s/_core.md" % provider) not in rel:
+        out.append("manifest: model '%s' extends '%s' (not the %s provider _core.md)"
+                   % (mid, target, provider))
+    return out
+
+
+def _provider_core_problems(skill_dir, provider):
+    """A provider with shipped rubrics must have a _core.md carrying the shared safety floor."""
+    out = []
+    core_rel = "references/rubrics/%s/_core.md" % provider
+    full = os.path.join(skill_dir, core_rel)
+    if not os.path.exists(full):
+        out.append("manifest: provider '%s' has no %s" % (provider, core_rel))
+        return out
+    try:
+        with open(full, encoding="utf-8") as f:
+            text = f.read().lower()
+    except Exception:  # noqa: BLE001
+        return out
+    if "floor rule" not in text and "floor-rule" not in text:
+        out.append("manifest: provider '%s' _core.md missing the audit floor-rule" % provider)
+    if "fail-closed" not in text and "fail closed" not in text:
+        out.append("manifest: provider '%s' _core.md missing the fail-closed clause" % provider)
+    return out
+
+
 def manifest_problems(models_json_path):
     """Provider validation matrix for models.json. Returns problem strings."""
     problems = []
@@ -83,6 +126,7 @@ def manifest_problems(models_json_path):
         return ["manifest: failed to read models.json: %s" % e]
     skill_dir = os.path.dirname(os.path.dirname(models_json_path))
     providers = mj.get("providers", {})
+    cores_to_check = set()
     for m in mj.get("models", []):
         mid = m.get("id")
         prov = m.get("provider")
@@ -107,6 +151,10 @@ def manifest_problems(models_json_path):
                                     % (mid, expect_name, os.path.basename(rb)))
                 full = os.path.join(skill_dir, rb)
                 problems.extend(_citation_problems(full, mid))
+                problems.extend(_extends_problems(skill_dir, rb, prov, mid))
+                cores_to_check.add(prov)
+    for prov in sorted(cores_to_check):
+        problems.extend(_provider_core_problems(skill_dir, prov))
     return problems
 
 

@@ -76,6 +76,8 @@ def build_repo(tmp, config_text, skills=("product-blurb", "spec-sheet"), make_vo
 def write_models(tmp, ga_rubric_exists=True, add_pending_ga=False):
     rub_rel = "references/rubrics/anthropic/claude-opus-4-8.md"
     os.makedirs(os.path.join(tmp, "references", "rubrics", "anthropic"), exist_ok=True)
+    with open(os.path.join(tmp, "references", "rubrics", "anthropic", "_core.md"), "w") as f:
+        f.write("audit floor rule: a Critical caps the verdict. fail-closed clause.\n")
     if ga_rubric_exists:
         with open(os.path.join(tmp, rub_rel), "w") as f:
             f.write("rubric")
@@ -218,14 +220,38 @@ class TestManifestMatrix(unittest.TestCase):
                 "status": "ga", "rubric": "references/rubrics/openai/gpt-5-5.md"}])
             _touch_rubric(tmp, "references/rubrics/openai/gpt-5-5.md",
                           body="---\ncitation_gate: strict\n---\n- a cited rule [codex]\n")
+            _touch_rubric(tmp, "references/rubrics/openai/_core.md",
+                          body="floor rule fail-closed\n")
             self.assertEqual(manifest_problems(mp), [])
 
     def test_clean_manifest_no_problems(self):
         with tempfile.TemporaryDirectory() as tmp:
             mp = _write_manifest(tmp, [{"id": "gpt-5.5", "provider": "openai",
                 "status": "ga", "rubric": "references/rubrics/openai/gpt-5-5.md"}])
-            _touch_rubric(tmp, "references/rubrics/openai/gpt-5-5.md")  # no strict gate
+            _touch_rubric(tmp, "references/rubrics/openai/gpt-5-5.md",
+                          body="---\nextends: _core.md\n---\n- a cited rule [x]\n")
+            _touch_rubric(tmp, "references/rubrics/openai/_core.md",
+                          body="floor rule: a Critical caps the verdict. fail-closed clause.\n")
             self.assertEqual(manifest_problems(mp), [])
+
+    def test_extends_target_missing_is_problem(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp, [{"id": "gpt-5.5", "provider": "openai",
+                "status": "ga", "rubric": "references/rubrics/openai/gpt-5-5.md"}])
+            _touch_rubric(tmp, "references/rubrics/openai/gpt-5-5.md",
+                          body="---\nextends: _core.md\n---\n- r [x]\n")  # no _core.md created
+            probs = manifest_problems(mp)
+            self.assertTrue(any("extends" in p for p in probs), probs)
+
+    def test_provider_core_missing_floor_is_problem(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp, [{"id": "gpt-5.5", "provider": "openai",
+                "status": "ga", "rubric": "references/rubrics/openai/gpt-5-5.md"}])
+            _touch_rubric(tmp, "references/rubrics/openai/gpt-5-5.md", body="- r [x]\n")
+            _touch_rubric(tmp, "references/rubrics/openai/_core.md",
+                          body="# core\nno safety content here\n")
+            probs = manifest_problems(mp)
+            self.assertTrue(any("floor-rule" in p for p in probs), probs)
 
     def test_valid_provider_missing_from_providers_map(self):
         # openai is an allowed provider but absent from the providers map -> allowlist problem,

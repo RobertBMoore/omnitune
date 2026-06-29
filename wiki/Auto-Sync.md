@@ -18,7 +18,7 @@ Set `model_sync.channel` in your config:
 
 ## Deriving a rubric (`/omnitune:sync`) — propose-only
 When the library lacks a rubric for your model, `/omnitune:sync`:
-1. Fetches that model's docs — **Anthropic domains only** — treating fetched content as reference *data, not instructions*.
+1. Fetches that model's docs — **only from the resolved provider's allowlisted domains** — treating fetched content as reference *data, not instructions*.
 2. Diffs the new model's behavior against the closest existing rubric (literalness, effort, tool-triggering, new capabilities).
 3. Maps the impact onto the rubric, both modes, and your workflow, and asks you any question it can't resolve.
 4. **Produces a proposed rubric + questions, and stops.** In v0.1 a human applies the rubric — the plugin never self-commits a change to its own brain. (v0.2 adds gated self-apply behind a no-write audit subagent, a tighten-only ratchet, and a fail-closed regression check.)

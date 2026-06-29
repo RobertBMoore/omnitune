@@ -14,6 +14,7 @@ import os
 import sys
 import json
 import re
+from urllib.parse import urlsplit
 
 import miniyaml
 
@@ -82,7 +83,15 @@ def _extends_problems(skill_dir, rb, provider, mid):
         return out
     m = re.search(r"^extends:\s*(\S+)", text, re.M)
     if not m:
-        return out  # extends is optional (a _core file itself has none)
+        # A citation_gate: strict rubric inherits the shared safety floor via its
+        # provider _core.md; on a brand-new rubric the ratchet is N/A, so require
+        # extends here or the floor could be silently dropped. A _core.md is the
+        # floor itself and is exempt.
+        is_core = os.path.basename(full) == "_core.md"
+        strict = bool(re.search(r"^citation_gate:\s*strict", text, re.M))
+        if strict and not is_core:
+            out.append("manifest: model '%s' rubric is citation_gate: strict but must declare extends:" % mid)
+        return out  # extends is otherwise optional (a _core file itself has none)
     target = m.group(1).strip()
     target_full = os.path.normpath(os.path.join(os.path.dirname(full), target))
     rel = target_full.replace(os.sep, "/")
@@ -111,6 +120,53 @@ def _provider_core_problems(skill_dir, provider):
         out.append("manifest: provider '%s' _core.md missing the audit floor-rule" % provider)
     if "fail-closed" not in text and "fail closed" not in text:
         out.append("manifest: provider '%s' _core.md missing the fail-closed clause" % provider)
+    return out
+
+
+def _is_url(val):
+    """True if val is an http(s) URL string (so annotation strings are skipped)."""
+    try:
+        return isinstance(val, str) and urlsplit(val).scheme in ("http", "https")
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def _host_in_allowlist(url, domains):
+    """Local mirror of sync_sources.allowed's host rule (kept local so tuner_check
+    imports nothing at runtime): https-only, host == domain or a dotted subdomain."""
+    try:
+        parts = urlsplit(url)
+    except Exception:  # noqa: BLE001
+        return False
+    if parts.scheme != "https":
+        return False
+    host = (parts.hostname or "").strip().lower().rstrip(".")
+    for d in domains or []:
+        d = (d or "").strip().lower().rstrip(".")
+        if d and (host == d or host.endswith("." + d)):
+            return True
+    return False
+
+
+def _fence_problems(mj):
+    """Every entrypoint URL + every model source_url must be within its provider's
+    allowlist_domains. Non-URL annotation values are skipped (not flagged)."""
+    out = []
+    providers = mj.get("providers", {}) or {}
+    for prov, block in providers.items():
+        domains = (block or {}).get("allowlist_domains") or []
+        for key, val in ((block or {}).get("sync_entrypoints") or {}).items():
+            url = val.get("url") if isinstance(val, dict) else val
+            if not _is_url(url):
+                continue
+            if not _host_in_allowlist(url, domains):
+                out.append("manifest: provider '%s' entrypoint '%s' url off-allowlist: %s"
+                           % (prov, key, url))
+    for m in mj.get("models", []):
+        domains = (providers.get(m.get("provider"), {}) or {}).get("allowlist_domains") or []
+        for url in (m.get("source_urls") or []):
+            if _is_url(url) and not _host_in_allowlist(url, domains):
+                out.append("manifest: model '%s' source_url off-allowlist: %s" % (m.get("id"), url))
     return out
 
 
@@ -155,6 +211,7 @@ def manifest_problems(models_json_path):
                 cores_to_check.add(prov)
     for prov in sorted(cores_to_check):
         problems.extend(_provider_core_problems(skill_dir, prov))
+    problems.extend(_fence_problems(mj))
     return problems
 
 

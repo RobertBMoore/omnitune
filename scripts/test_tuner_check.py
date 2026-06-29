@@ -219,7 +219,7 @@ class TestManifestMatrix(unittest.TestCase):
             mp = _write_manifest(tmp, [{"id": "gpt-5.5", "provider": "openai",
                 "status": "ga", "rubric": "references/rubrics/openai/gpt-5-5.md"}])
             _touch_rubric(tmp, "references/rubrics/openai/gpt-5-5.md",
-                          body="---\ncitation_gate: strict\n---\n- a cited rule [codex]\n")
+                          body="---\nextends: _core.md\ncitation_gate: strict\n---\n- a cited rule [codex]\n")
             _touch_rubric(tmp, "references/rubrics/openai/_core.md",
                           body="floor rule fail-closed\n")
             self.assertEqual(manifest_problems(mp), [])
@@ -263,6 +263,82 @@ class TestManifestMatrix(unittest.TestCase):
             probs = manifest_problems(mp)
             self.assertTrue(any("allowlist_domains" in p for p in probs), probs)
             self.assertFalse(any("not in" in p for p in probs), probs)
+
+
+class TestFenceIntegrity(unittest.TestCase):
+    def test_off_allowlist_source_url_flagged(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp,
+                [{"id": "gpt-5.5", "provider": "openai", "status": "limited", "rubric": None,
+                  "source_urls": ["https://evil.com/x"]}],
+                providers={"openai": {"allowlist_domains": ["developers.openai.com"]}})
+            probs = manifest_problems(mp)
+            self.assertTrue(any("off-allowlist" in p and "evil.com" in p for p in probs), probs)
+
+    def test_github_source_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp,
+                [{"id": "gpt-5.5", "provider": "openai", "status": "limited", "rubric": None,
+                  "source_urls": ["https://github.com/openai/codex"]}],
+                providers={"openai": {"allowlist_domains": ["developers.openai.com"]}})
+            probs = manifest_problems(mp)
+            self.assertTrue(any("github.com" in p for p in probs), probs)
+
+    def test_off_allowlist_entrypoint_flagged(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp,
+                [{"id": "gpt-5.5", "provider": "openai", "status": "limited", "rubric": None}],
+                providers={"openai": {"allowlist_domains": ["developers.openai.com"],
+                    "sync_entrypoints": {"bad": {"url": "https://evil.com/x", "role": "prompting"}}}})
+            probs = manifest_problems(mp)
+            self.assertTrue(any("evil.com" in p for p in probs), probs)
+
+    def test_cookbook_allowed_and_note_skipped(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp,
+                [{"id": "gpt-5.5", "provider": "openai", "status": "limited", "rubric": None,
+                  "source_urls": ["https://cookbook.openai.com/x"]}],
+                providers={"openai": {
+                    "allowlist_domains": ["developers.openai.com", "cookbook.openai.com"],
+                    "note": "a non-URL annotation that must be skipped",
+                    "sync_entrypoints": {
+                        "codex_models": {"url": "https://developers.openai.com/codex/models",
+                                         "role": "model-listing"}}}})
+            probs = manifest_problems(mp)
+            self.assertEqual([p for p in probs if "off-allowlist" in p], [])
+
+    def test_non_url_entrypoint_value_skipped(self):
+        # a legacy bare-string annotation left inside sync_entrypoints must not be flagged
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp,
+                [{"id": "gpt-5.5", "provider": "openai", "status": "limited", "rubric": None}],
+                providers={"openai": {"allowlist_domains": ["developers.openai.com"],
+                    "sync_entrypoints": {"comment": "Stable discovery URLs, not a URL"}}})
+            probs = manifest_problems(mp)
+            self.assertEqual([p for p in probs if "off-allowlist" in p], [])
+
+
+class TestFloorViaExtends(unittest.TestCase):
+    def test_strict_non_core_requires_extends(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp, [{"id": "gpt-5.5", "provider": "openai",
+                "status": "ga", "rubric": "references/rubrics/openai/gpt-5-5.md"}])
+            _touch_rubric(tmp, "references/rubrics/openai/gpt-5-5.md",
+                          body="---\ncitation_gate: strict\n---\n- a cited rule [x]\n")  # no extends
+            _touch_rubric(tmp, "references/rubrics/openai/_core.md",
+                          body="floor rule fail-closed\n")
+            probs = manifest_problems(mp)
+            self.assertTrue(any("extends" in p for p in probs), probs)
+
+    def test_strict_with_extends_ok(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp, [{"id": "gpt-5.5", "provider": "openai",
+                "status": "ga", "rubric": "references/rubrics/openai/gpt-5-5.md"}])
+            _touch_rubric(tmp, "references/rubrics/openai/gpt-5-5.md",
+                          body="---\nextends: _core.md\ncitation_gate: strict\n---\n- a cited rule [x]\n")
+            _touch_rubric(tmp, "references/rubrics/openai/_core.md",
+                          body="floor rule: a Critical caps the verdict. fail-closed clause.\n")
+            self.assertEqual([p for p in manifest_problems(mp) if "extends" in p], [])
 
 
 class TestAuditConfig(unittest.TestCase):

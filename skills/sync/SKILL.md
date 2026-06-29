@@ -61,6 +61,7 @@ v0.1 was propose-only. v0.2 lets the rubric be **applied automatically only behi
 4. **Fail-closed regression corpus.** If `model_sync.regression_corpus` has fewer than **5** items, the verify path returns **"cannot verify no-drift — manual review required"** and falls back to propose-only. An unseeded corpus is never a clean pass. (Corpus auto-seeds from `output.prompts/`.)
 5. **Post-apply lint** — `scripts/tuner_check.py` must pass after writing, or the change is reverted.
 6. **Commit only on a human signal the model cannot self-emit** — the operator's explicit approval. The audit subagent that drafted the patch is never the one that commits it.
+7. **Record lineage.** After the commit, append a `scripts/version_log.py` entry — `record("skills/omnitune/references/version-log.json", {date, model_id, provider, action, last_synced, source_urls, outcome})` — so "is this rubric current / where did it come from?" stays answerable (and the wiki can render it).
 
 State for the interrupt channel is persisted via `scripts/sync_state.py` (atomic writes, per-session keyed, tolerate-and-reset on corruption, snooze as an ISO instant) — safe under the concurrent sessions this kind of repo runs.
 

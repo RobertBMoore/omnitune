@@ -196,6 +196,43 @@ def _audit_config_problems(cfg):
     return out
 
 
+def _version_log_problems(skill_dir):
+    """Referential integrity for references/version-log.json (blocking)."""
+    out = []
+    log = os.path.join(skill_dir, "references", "version-log.json")
+    if not os.path.exists(log):
+        return out
+    try:
+        with open(log) as f:
+            d = json.load(f)
+    except Exception as e:  # noqa: BLE001
+        return ["version-log: failed to read: %s" % e]
+    if not isinstance(d.get("schema"), int):
+        out.append("version-log: schema must be an integer")
+    ids = set()
+    try:
+        with open(os.path.join(skill_dir, "references", "models.json")) as f:
+            for m in json.load(f).get("models", []):
+                if m.get("id"):
+                    ids.add(m["id"])
+    except Exception:  # noqa: BLE001
+        pass
+    for e in (d.get("entries") or []):
+        if not isinstance(e, dict):
+            out.append("version-log: an entry is not an object")
+            continue
+        for k in ("date", "model_id", "action"):
+            if not e.get(k):
+                out.append("version-log: entry missing '%s'" % k)
+        act = e.get("action")
+        if act and act not in {"add", "update", "deprecate"}:
+            out.append("version-log: entry '%s' bad action '%s'" % (e.get("model_id"), act))
+        mid = e.get("model_id")
+        if mid and ids and mid not in ids:
+            out.append("version-log: entry references unknown model '%s'" % mid)
+    return out
+
+
 def check(repo_root, config_text, models_json_path):
     """Return a list of human-readable problem strings (empty == clean)."""
     problems = []
@@ -245,6 +282,7 @@ def check(repo_root, config_text, models_json_path):
                 if rb and not os.path.exists(os.path.join(skill_dir, rb)):
                     problems.append("manifest: model '%s' rubric path missing: %s" % (m.get("id"), rb))
             problems.extend(manifest_problems(models_json_path))
+            problems.extend(_version_log_problems(skill_dir))
         except Exception as e:  # noqa: BLE001
             problems.append("manifest: failed to read models.json: %s" % e)
 

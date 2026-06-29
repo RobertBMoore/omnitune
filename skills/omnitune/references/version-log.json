@@ -1,0 +1,73 @@
+{
+  "entries": [
+    {
+      "action": "add",
+      "date": "2026-06-29",
+      "last_synced": "2026-06-09",
+      "model_id": "claude-fable-5",
+      "outcome": "shipped (seeded)",
+      "provider": "anthropic",
+      "source_urls": [
+        "https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5",
+        "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5",
+        "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "https://platform.claude.com/docs/en/about-claude/models/migration-guide"
+      ]
+    },
+    {
+      "action": "add",
+      "date": "2026-06-29",
+      "last_synced": "",
+      "model_id": "claude-opus-4-8",
+      "outcome": "shipped (seeded)",
+      "provider": "anthropic",
+      "source_urls": [
+        "https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-8",
+        "https://platform.claude.com/docs/en/about-claude/models/migration-guide",
+        "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+        "https://www.anthropic.com/news/claude-opus-4-8"
+      ]
+    },
+    {
+      "action": "add",
+      "date": "2026-06-29",
+      "last_synced": "",
+      "model_id": "claude-sonnet-4-6",
+      "outcome": "shipped (seeded)",
+      "provider": "anthropic",
+      "source_urls": [
+        "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+        "https://platform.claude.com/docs/en/about-claude/models/migration-guide"
+      ]
+    },
+    {
+      "action": "add",
+      "date": "2026-06-29",
+      "last_synced": "",
+      "model_id": "claude-haiku-4-5",
+      "outcome": "shipped (seeded)",
+      "provider": "anthropic",
+      "source_urls": [
+        "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-5",
+        "https://www.anthropic.com/news/claude-haiku-4-5",
+        "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"
+      ]
+    },
+    {
+      "action": "add",
+      "date": "2026-06-29",
+      "last_synced": "2026-04-23",
+      "model_id": "gpt-5.5",
+      "outcome": "shipped (seeded)",
+      "provider": "openai",
+      "source_urls": [
+        "https://developers.openai.com/codex/models",
+        "https://developers.openai.com/codex/prompting",
+        "https://developers.openai.com/codex/learn/best-practices"
+      ]
+    }
+  ],
+  "schema": 1
+}

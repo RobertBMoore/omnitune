@@ -1,6 +1,6 @@
 import os, tempfile, json, unittest
 import miniyaml
-from tuner_check import check, manifest_problems, _audit_config_problems
+from tuner_check import check, manifest_problems, _audit_config_problems, _version_log_problems
 
 EXAMPLE = '''project:
   name: "TrailGear"
@@ -290,6 +290,41 @@ class TestAuditConfig(unittest.TestCase):
     def test_non_integer(self):
         probs = _audit_config_problems({"model_sync": {"audit_round_cap": "three"}})
         self.assertTrue(any("audit_round_cap" in p for p in probs), probs)
+
+
+class TestVersionLog(unittest.TestCase):
+    def _setup(self, tmp, entries, models=None):
+        refs = os.path.join(tmp, "references")
+        os.makedirs(refs, exist_ok=True)
+        with open(os.path.join(refs, "models.json"), "w") as f:
+            json.dump({"models": models or [{"id": "gpt-5.5"}]}, f)
+        with open(os.path.join(refs, "version-log.json"), "w") as f:
+            json.dump({"schema": 1, "entries": entries}, f)
+        return tmp
+
+    def test_clean_log_ok(self):
+        with tempfile.TemporaryDirectory() as t:
+            self._setup(t, [{"date": "2026-06-29", "model_id": "gpt-5.5", "action": "add"}])
+            self.assertEqual(_version_log_problems(t), [])
+
+    def test_unknown_model_is_problem(self):
+        with tempfile.TemporaryDirectory() as t:
+            self._setup(t, [{"date": "2026-06-29", "model_id": "ghost", "action": "add"}])
+            self.assertTrue(any("unknown model" in p for p in _version_log_problems(t)))
+
+    def test_missing_field_is_problem(self):
+        with tempfile.TemporaryDirectory() as t:
+            self._setup(t, [{"model_id": "gpt-5.5", "action": "add"}])  # no date
+            self.assertTrue(any("missing 'date'" in p for p in _version_log_problems(t)))
+
+    def test_bad_action_is_problem(self):
+        with tempfile.TemporaryDirectory() as t:
+            self._setup(t, [{"date": "2026-06-29", "model_id": "gpt-5.5", "action": "bogus"}])
+            self.assertTrue(any("bad action" in p for p in _version_log_problems(t)))
+
+    def test_absent_log_ok(self):
+        with tempfile.TemporaryDirectory() as t:
+            self.assertEqual(_version_log_problems(t), [])
 
 
 if __name__ == "__main__":

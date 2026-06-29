@@ -16,6 +16,7 @@ the superpowers `codex-tools.md`; this table is scoped to the tools omnitune use
 | omnitune (Claude Code) | Codex equivalent |
 |---|---|
 | `Bash` (run `python3 scripts/*`) | your native shell tool |
+| `Glob` (audit-time cross-ref checks) | your native file-glob / `ls` |
 | `Read` / `Write` / `Edit` (Mode A edit loop) | your native file tools |
 | `Task` / dispatched subagent (sync v0.2 no-write audit subagent) | `spawn_agent` / `wait_agent` / `close_agent` (needs `multi_agent = true` in `~/.codex/config.toml`) |
 | `TodoWrite` | `update_plan` |
@@ -37,3 +38,9 @@ Then resolve the id through `scripts/resolve_model.py` as usual. A runtime
 `--model` / `/model` override is NOT written to `config.toml`, so when detection
 falls to tier 2–4 the run must badge the **assumed** model so the operator can
 correct it.
+
+`detect_model.py` is a best-effort hint: it reads project `.codex/config.toml`
+without the trust gate Codex applies and walks up to the filesystem root, so it
+can over-detect relative to Codex's own (trusted-project, project-root-bounded)
+resolution. That is acceptable precisely because the result is always badged and
+operator-correctable — never silently authoritative.

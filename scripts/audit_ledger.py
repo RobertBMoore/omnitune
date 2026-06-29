@@ -72,7 +72,9 @@ def _round_events(state):
 
 def record_round(path, round_no, reviews, author_id=None, min_reviews=2):
     """Append a round event. round_no must strictly increase (raises otherwise).
-    `complete` iff >= min_reviews distinct reviewers and the author is not among them.
+    `complete` iff >= min_reviews distinct reviewers, a non-empty author_id was
+    supplied, and the author is not among them (so a caller that forgets to
+    exclude itself can never launder a self-review into a clean round).
     Unknown severities coerce to 'low'."""
     state = _load(path)
     prev = max((r.get("round_no", 0) for r in _round_events(state)), default=0)
@@ -91,7 +93,7 @@ def record_round(path, round_no, reviews, author_id=None, min_reviews=2):
                              "severity": sev, "summary": fnd.get("summary", "")})
         norm.append({"reviewer_id": rid, "lens": rv.get("lens"), "findings": findings})
     distinct = set(i for i in ids if i)
-    complete = len(distinct) >= min_reviews and author_id not in distinct
+    complete = len(distinct) >= min_reviews and bool(author_id) and author_id not in distinct
     return _append(path, {"type": "round", "round_no": round_no,
                           "complete": bool(complete), "reviews": norm})
 

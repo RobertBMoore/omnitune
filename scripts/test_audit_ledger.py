@@ -52,6 +52,13 @@ class TestRecordAndStatus(unittest.TestCase):
             rounds = [e for e in al._load(p)["events"] if e["type"] == "round"]
             self.assertFalse(rounds[0]["complete"])
 
+    def test_missing_author_id_never_complete(self):
+        with tempfile.TemporaryDirectory() as t:
+            p = _ledger(t)
+            al.record_round(p, 1, [_review("a", "x", []), _review("b", "y", [])])  # no author_id
+            rounds = [e for e in al._load(p)["events"] if e["type"] == "round"]
+            self.assertFalse(rounds[0]["complete"])
+
     def test_unknown_severity_coerced_low(self):
         with tempfile.TemporaryDirectory() as t:
             p = _ledger(t)
@@ -100,8 +107,8 @@ class TestConvergence(unittest.TestCase):
     def test_clean_from_start_converges_at_round_2(self):
         with tempfile.TemporaryDirectory() as t:
             p = _ledger(t)
-            al.record_round(p, 1, self._two([]))
-            al.record_round(p, 2, self._two([]))
+            al.record_round(p, 1, self._two([]), author_id="author")
+            al.record_round(p, 2, self._two([]), author_id="author")
             r = al.convergence(p)
             self.assertEqual(r["verdict"], "CONVERGED")
             self.assertEqual(r["trailing_clean"], 2)
@@ -109,11 +116,12 @@ class TestConvergence(unittest.TestCase):
     def test_one_reconcile_converges_at_round_3(self):
         with tempfile.TemporaryDirectory() as t:
             p = _ledger(t)
-            al.record_round(p, 1, self._two([], [_f("safety:audit-floor", "critical")]))
+            al.record_round(p, 1, self._two([], [_f("safety:audit-floor", "critical")]),
+                            author_id="author")
             al.set_status(p, "safety:audit-floor", "reconciled", "restored floor-rule")
-            al.record_round(p, 2, self._two([]))
+            al.record_round(p, 2, self._two([]), author_id="author")
             self.assertEqual(al.convergence(p)["verdict"], "NOT_CONVERGED")
-            al.record_round(p, 3, self._two([]))
+            al.record_round(p, 3, self._two([]), author_id="author")
             r = al.convergence(p)
             self.assertEqual(r["verdict"], "CONVERGED")
             self.assertEqual(r["open_material"], [])
@@ -122,7 +130,8 @@ class TestConvergence(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             p = _ledger(t)
             for n in (1, 2, 3):
-                al.record_round(p, n, self._two([], [_f("safety:hole", "critical")]))
+                al.record_round(p, n, self._two([], [_f("safety:hole", "critical")]),
+                                author_id="author")
             r = al.convergence(p)
             self.assertEqual(r["verdict"], "CAP_EXCEEDED")
             self.assertIn("safety:hole", r["open_material"])
@@ -130,19 +139,19 @@ class TestConvergence(unittest.TestCase):
     def test_open_material_blocks_convergence(self):
         with tempfile.TemporaryDirectory() as t:
             p = _ledger(t)
-            al.record_round(p, 1, self._two([], [_f("safety:hole", "high")]))
-            al.record_round(p, 2, self._two([]))
-            al.record_round(p, 3, self._two([]))
+            al.record_round(p, 1, self._two([], [_f("safety:hole", "high")]), author_id="author")
+            al.record_round(p, 2, self._two([]), author_id="author")
+            al.record_round(p, 3, self._two([]), author_id="author")
             # never reconciled -> open_material non-empty -> CAP_EXCEEDED, not CONVERGED
             self.assertEqual(al.convergence(p)["verdict"], "CAP_EXCEEDED")
 
     def test_declined_counts_resolved_and_surfaced(self):
         with tempfile.TemporaryDirectory() as t:
             p = _ledger(t)
-            al.record_round(p, 1, self._two([], [_f("domain:nit", "high")]))
+            al.record_round(p, 1, self._two([], [_f("domain:nit", "high")]), author_id="author")
             al.set_status(p, "domain:nit", "declined", "not applicable to gpt-5.5")
-            al.record_round(p, 2, self._two([]))
-            al.record_round(p, 3, self._two([]))
+            al.record_round(p, 2, self._two([]), author_id="author")
+            al.record_round(p, 3, self._two([]), author_id="author")
             r = al.convergence(p)
             self.assertEqual(r["verdict"], "CONVERGED")
             self.assertIn("domain:nit", r["declined_material"])
@@ -150,8 +159,8 @@ class TestConvergence(unittest.TestCase):
     def test_low_medium_ignored_for_material_high(self):
         with tempfile.TemporaryDirectory() as t:
             p = _ledger(t)
-            al.record_round(p, 1, self._two([_f("structure:x", "medium")]))
-            al.record_round(p, 2, self._two([_f("structure:y", "low")]))
+            al.record_round(p, 1, self._two([_f("structure:x", "medium")]), author_id="author")
+            al.record_round(p, 2, self._two([_f("structure:y", "low")]), author_id="author")
             # no material (high+) findings, never reconciled -> still converges
             self.assertEqual(al.convergence(p)["verdict"], "CONVERGED")
 

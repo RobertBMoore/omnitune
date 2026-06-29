@@ -19,7 +19,7 @@ A model change is **not** a version-string swap, and detecting it is **not** a w
 At the start of every `/omnitune:tune-skill` or `/omnitune:tune-prompt` run:
 
 1. **Read the current session's model id** from the run context (e.g. `claude-opus-4-8`; in Nimbalyst / Claude Code it appears in the session system prompt as "The exact model ID is …"). **Normalize it before matching:** lowercase, then strip any bracketed suffix (e.g. `[1m]`) and any trailing `-YYYYMMDD` date snapshot — so `claude-opus-4-8[1m]` → `claude-opus-4-8` and `claude-haiku-4-5-20251001` → `claude-haiku-4-5`. If it can't be read, use `omnitune.config.model_sync.target_model`; if that's empty, use the manifest's newest GA model and badge the assumption.
-2. **Look up the normalized id** in `../omnitune/references/models.json` → `references/rubrics/<id>.md`.
+2. **Look up the normalized id** in `../omnitune/references/models.json` → `references/rubrics/<provider>/<id>.md`.
 3. **Match → use it.** Optionally badge if the manifest lists a newer GA model than the one in use (informational only).
 4. **Miss → this is the trigger.** Pick the closest-family rubric as a fallback, run on it (never block the user's work), and surface the badge:
    ```
@@ -38,7 +38,7 @@ When the library lacks a rubric for a model, derive one — **but do not write t
 2. **Behavioral diff.** Compare against the closest existing rubric. Classify each change: literalness, effort calibration, tool-triggering, subagent defaults, context window, new capabilities.
 3. **Map impact** onto (i) the rubric rules, (ii) Mode A's dimensions, (iii) Mode B's rewrite heuristics, (iv) the operator's domain workflow (`omnitune.config` → `house_rules`, `routing`).
 4. **Ask the operator** the few questions the diff can't resolve.
-5. **Emit the proposal:** a drafted `references/rubrics/<model>.md` (as a diff/preview), the source URLs fetched, and the open questions. Then either **stop here** (propose-only — the operator applies) or, in v0.2, route through **Gated self-apply** below. The plugin never commits a rubric without the ratchet passing and an explicit human approval.
+5. **Emit the proposal:** a drafted `references/rubrics/<provider>/<model>.md` (as a diff/preview), the source URLs fetched, and the open questions. Then either **stop here** (propose-only — the operator applies) or, in v0.2, route through **Gated self-apply** below. The plugin never commits a rubric without the ratchet passing and an explicit human approval.
 
 ## Retention & deprecation
 

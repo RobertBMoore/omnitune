@@ -23,7 +23,7 @@
       "status": "ga",
       "ga_date": "2026-06-09",
       "deprecated_date": null,
-      "rubric": "references/rubrics/claude-fable-5.md",
+      "rubric": "references/rubrics/anthropic/claude-fable-5.md",
       "rubric_note": "Synced from live docs 2026-06-14. Reverses two Opus-4.8 behaviors (more subagents; over-prescription degrades) + a refusal-trigger rule (no show-your-reasoning).",
       "source_urls": [
         "https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5",
@@ -50,7 +50,7 @@
       "status": "ga",
       "ga_date": null,
       "deprecated_date": null,
-      "rubric": "references/rubrics/claude-opus-4-8.md",
+      "rubric": "references/rubrics/anthropic/claude-opus-4-8.md",
       "source_urls": [
         "https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-8",
         "https://platform.claude.com/docs/en/about-claude/models/migration-guide",
@@ -64,7 +64,7 @@
       "status": "ga",
       "ga_date": null,
       "deprecated_date": null,
-      "rubric": "references/rubrics/claude-sonnet-4-6.md",
+      "rubric": "references/rubrics/anthropic/claude-sonnet-4-6.md",
       "source_urls": [
         "https://platform.claude.com/docs/en/about-claude/models/overview",
         "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
@@ -77,7 +77,7 @@
       "status": "ga",
       "ga_date": null,
       "deprecated_date": null,
-      "rubric": "references/rubrics/claude-haiku-4-5.md",
+      "rubric": "references/rubrics/anthropic/claude-haiku-4-5.md",
       "source_urls": [
         "https://platform.claude.com/docs/en/about-claude/models/overview",
         "https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-5",

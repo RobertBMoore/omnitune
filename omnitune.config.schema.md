@@ -23,7 +23,7 @@ The single customization point for omnitune. The core plugin reads this; it cont
 
 ## How the rubric is selected
 
-omnitune does **not** ask "is there a newer model in the world." At the start of each run it reads the model **this session is running**, matches it against `references/models.json`, and loads `references/rubrics/<model>.md`. A miss is the only sync trigger — and even then the run proceeds on the closest-family rubric with a badge, never blocked.
+omnitune does **not** ask "is there a newer model in the world." At the start of each run it reads the model **this session is running**, matches it against `references/models.json`, and loads `references/rubrics/<provider>/<model>.md`. A miss is the only sync trigger — and even then the run proceeds on the closest-family rubric with a badge, never blocked.
 
 ## Validation rules
 

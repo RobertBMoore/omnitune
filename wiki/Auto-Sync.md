@@ -5,7 +5,7 @@ omnitune does **not** scrape the web asking "is there a newer model?" It asks a 
 ## Detection (local, zero-network)
 At the start of every run:
 1. Read the model the session is running (e.g. `claude-opus-4-8`).
-2. Match it in `references/models.json` → load `references/rubrics/<model>.md`.
+2. Match it in `references/models.json` → load `references/rubrics/<provider>/<model>.md`.
 3. **Match → run silently.** **Miss → run on the closest-family rubric and show a non-blocking badge** suggesting `/omnitune:sync`. The run is never blocked.
 
 This means a missing rubric — not a network event — is the only trigger, and switching models per task (Opus for hard reasoning, Haiku for cheap bulk) "just works": each picks its own rubric.

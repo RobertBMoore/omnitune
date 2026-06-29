@@ -6,7 +6,7 @@ lastReviewed: 2026-06-14
 
 # Prompt Rewrite Protocol — omnitune Mode B
 
-Return a rewritten, model-optimized version of the user's raw prompt plus a short explanation of what changed — but only after it passes the QA loop. The rubric is the **session model's** rubric (`references/rubrics/<model>.md` + `_core.md`, selected upstream). Domain routing/pointers come from `omnitune.config`.
+Return a rewritten, model-optimized version of the user's raw prompt plus a short explanation of what changed — but only after it passes the QA loop. The rubric is the **session model's** rubric (`references/rubrics/<provider>/<model>.md` + `references/rubrics/<provider>/_core.md`, selected upstream). Domain routing/pointers come from `omnitune.config`.
 
 ## Step 0 — Prompt-class gate (run FIRST)
 
@@ -110,4 +110,4 @@ Saved to: <output.prompts>/<YYYY-MM-DD>-<slug>.md   (omit this line in standalon
 `r` submit as a new turn · `c` fenced code block · `e` ask what to change, redraft, re-run QA · `a` exit.
 
 ## Feedback loop
-If the same rewrite pattern recurs (e.g. always adding the same pointer for one skill), propose upgrading that target's `SKILL.md` so it handles the vague form natively. If the QA loop keeps failing the same dimension across unrelated prompts, propose tightening the rule in `_core.md` or this protocol.
+If the same rewrite pattern recurs (e.g. always adding the same pointer for one skill), propose upgrading that target's `SKILL.md` so it handles the vague form natively. If the QA loop keeps failing the same dimension across unrelated prompts, propose tightening the rule in the relevant provider's `_core.md` or this protocol.

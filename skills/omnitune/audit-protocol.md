@@ -6,13 +6,13 @@ lastReviewed: 2026-06-14
 
 # Audit Protocol — omnitune Mode A
 
-Score a target skill/agent file against the **session model's rubric** (`references/rubrics/<model>.md` + `_core.md`, selected upstream by the freshness/detection step). Each finding quotes a Core or model-rubric section/rule (e.g. "Core §1.2"). Domain specifics (voice, house rules) come from `omnitune.config` — never hardcoded.
+Score a target skill/agent file against the **session model's rubric** (`references/rubrics/<provider>/<model>.md` + `references/rubrics/<provider>/_core.md`, selected upstream by the freshness/detection step). Each finding quotes a Core or model-rubric section/rule (e.g. "Core §1.2"). Domain specifics (voice, house rules) come from `omnitune.config` — never hardcoded.
 
 ## Documentation router (Mode A)
 
 | Task | Read |
 |---|---|
-| Scoring a skill | this file → `references/rubrics/<session-model>.md` → `references/rubrics/_core.md` → `references/common-anti-patterns.md` → `references/skill-md-template.md` → target `SKILL.md` + the files its router points to |
+| Scoring a skill | this file → `references/rubrics/<provider>/<session-model>.md` → `references/rubrics/<provider>/_core.md` → `references/common-anti-patterns.md` → `references/skill-md-template.md` → target `SKILL.md` + the files its router points to |
 | Scoring an agent | this file → the two rubrics → `references/agent-md-template.md` → target agent file |
 | Writing a description finding | `references/description-authoring-guide.md` |
 

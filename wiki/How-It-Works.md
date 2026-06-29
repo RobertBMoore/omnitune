@@ -3,9 +3,9 @@
 omnitune has two user-facing modes and two operational commands, all reading one config file and a per-model rubric.
 
 ## The rubric library
-The plugin ships a library of rubrics, one per supported model, under `skills/omnitune/references/rubrics/`:
-- `_core.md` — the model-invariant prompt-engineering rules (shared by every model).
-- `claude-<model>.md` — each model's specific calibration (effort defaults, literalness, structure needs), layered on `_core`.
+The plugin ships a library of rubrics, organized per provider, under `skills/omnitune/references/rubrics/<provider>/`:
+- `<provider>/_core.md` — that provider's model-invariant prompt-engineering rules (e.g. `anthropic/_core.md`, `openai/_core.md`).
+- `<provider>/<model>.md` — each model's specific calibration (effort defaults, literalness, structure needs), layered on its provider `_core`.
 - `models.json` — the manifest: which models exist, their status (`ga`/`deprecated`/`retired`), and which rubric file each maps to.
 
 At the start of every run, the plugin reads **the model your session is running**, matches it in `models.json`, and loads that rubric. No network call, no "latest model" guess — it tunes for the model actually in use. (See [Auto-Sync](Auto-Sync.md).)

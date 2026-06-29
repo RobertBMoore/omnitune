@@ -158,6 +158,44 @@ def manifest_problems(models_json_path):
     return problems
 
 
+def _audit_config_problems(cfg):
+    """Validate model_sync.audit_* keys (blocking). Returns problem strings."""
+    out = []
+    ms = cfg.get("model_sync") if isinstance(cfg, dict) else None
+    if not isinstance(ms, dict):
+        return out
+
+    def _as_int(key):
+        v = ms.get(key)
+        if v in (None, ""):
+            return None
+        try:
+            return int(str(v).strip())
+        except Exception:  # noqa: BLE001
+            out.append("model_sync.%s must be an integer" % key)
+            return None
+
+    cr = _as_int("audit_clean_rounds")
+    cap = _as_int("audit_round_cap")
+    th = _as_int("audit_panel_threshold")
+    if cr is not None and cr < 1:
+        out.append("model_sync.audit_clean_rounds must be >= 1")
+    if cap is not None and cap < (cr if cr is not None else 2):
+        out.append("model_sync.audit_round_cap must be >= audit_clean_rounds")
+    if th is not None and th < 0:
+        out.append("model_sync.audit_panel_threshold must be >= 0")
+    sev = ms.get("audit_material_severity")
+    if sev not in (None, ""):
+        ranks = {"low": 0, "medium": 1, "high": 2, "critical": 3}
+        s = str(sev).strip().lower()
+        if s not in ranks:
+            out.append("model_sync.audit_material_severity must be low|medium|high|critical")
+        elif ranks[s] > ranks["high"]:
+            out.append("model_sync.audit_material_severity must not be stricter than "
+                       "'high' (loosening the audit needs explicit human sign-off)")
+    return out
+
+
 def check(repo_root, config_text, models_json_path):
     """Return a list of human-readable problem strings (empty == clean)."""
     problems = []
@@ -190,6 +228,8 @@ def check(repo_root, config_text, models_json_path):
     ch = _get(cfg, "model_sync.channel")
     if ch and ch not in VALID_CHANNELS:
         problems.append("model_sync.channel: '%s' not in %s" % (ch, sorted(VALID_CHANNELS)))
+
+    problems.extend(_audit_config_problems(cfg))
 
     if models_json_path and os.path.exists(models_json_path):
         try:

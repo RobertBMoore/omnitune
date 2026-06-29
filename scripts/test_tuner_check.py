@@ -1,6 +1,6 @@
 import os, tempfile, json, unittest
 import miniyaml
-from tuner_check import check, manifest_problems
+from tuner_check import check, manifest_problems, _audit_config_problems
 
 EXAMPLE = '''project:
   name: "TrailGear"
@@ -263,6 +263,33 @@ class TestManifestMatrix(unittest.TestCase):
             probs = manifest_problems(mp)
             self.assertTrue(any("allowlist_domains" in p for p in probs), probs)
             self.assertFalse(any("not in" in p for p in probs), probs)
+
+
+class TestAuditConfig(unittest.TestCase):
+    def test_valid_audit_keys_ok(self):
+        cfg = {"model_sync": {"audit_clean_rounds": 2, "audit_round_cap": 3,
+                              "audit_material_severity": "high", "audit_panel_threshold": 3}}
+        self.assertEqual(_audit_config_problems(cfg), [])
+
+    def test_absent_keys_ok(self):
+        self.assertEqual(_audit_config_problems({"model_sync": {"channel": "badge"}}), [])
+
+    def test_clean_rounds_below_one(self):
+        probs = _audit_config_problems({"model_sync": {"audit_clean_rounds": 0}})
+        self.assertTrue(any("audit_clean_rounds" in p for p in probs), probs)
+
+    def test_cap_below_clean_rounds(self):
+        probs = _audit_config_problems({"model_sync": {"audit_clean_rounds": 3,
+                                                       "audit_round_cap": 2}})
+        self.assertTrue(any("audit_round_cap" in p for p in probs), probs)
+
+    def test_material_too_strict(self):
+        probs = _audit_config_problems({"model_sync": {"audit_material_severity": "critical"}})
+        self.assertTrue(any("audit_material_severity" in p for p in probs), probs)
+
+    def test_non_integer(self):
+        probs = _audit_config_problems({"model_sync": {"audit_round_cap": "three"}})
+        self.assertTrue(any("audit_round_cap" in p for p in probs), probs)
 
 
 if __name__ == "__main__":

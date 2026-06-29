@@ -1,28 +1,30 @@
 {
-  "schema": 2,
-  "updated": "2026-06-28",
+  "schema": 3,
+  "updated": "2026-06-29",
   "note": "Model library manifest. omnitune selects a rubric by matching the CURRENT session's model id to an entry here (via scripts/resolve_model.py), then loading its rubric. Per-provider source domains + discovery URLs live under 'providers'. ga_date/deprecated_date are filled from docs when known; null = not yet recorded (do not fabricate). status: ga | limited | deprecated | retired.",
   "providers": {
     "anthropic": {
       "allowlist_domains": ["platform.claude.com", "docs.anthropic.com", "www.anthropic.com"],
+      "note": "Stable discovery URLs for /omnitune:sync. The model-specific 'what's new' page is discovered from the overview, not guessed. role: model-listing anchors two-key id confirmation; prompting carries rubric content; discovery is for model existence/dates only (not fetched as rubric content).",
       "sync_entrypoints": {
-        "comment": "Stable discovery URLs for /omnitune:sync. The model-specific 'what's new' page is discovered from the overview, not guessed.",
-        "models_overview": "https://platform.claude.com/docs/en/about-claude/models/overview",
-        "prompting_best_practices": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
-        "migration_guide": "https://platform.claude.com/docs/en/about-claude/models/migration-guide",
-        "models_api": "https://platform.claude.com/docs/en/api/models/list"
+        "models_overview": { "url": "https://platform.claude.com/docs/en/about-claude/models/overview", "role": "model-listing" },
+        "prompting_best_practices": { "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices", "role": "prompting" },
+        "migration_guide": { "url": "https://platform.claude.com/docs/en/about-claude/models/migration-guide", "role": "prompting" },
+        "models_api": { "url": "https://platform.claude.com/docs/en/api/models/list", "role": "discovery" }
       }
     },
     "openai": {
       "allowlist_domains": ["developers.openai.com", "platform.openai.com", "openai.com", "cookbook.openai.com"],
       "sync_entrypoints": {
-        "codex_models": "https://developers.openai.com/codex/models",
-        "codex_changelog": "https://developers.openai.com/codex/changelog",
-        "codex_prompting": "https://developers.openai.com/codex/prompting",
-        "codex_best_practices": "https://developers.openai.com/codex/learn/best-practices",
-        "codex_prompting_guide": "https://developers.openai.com/cookbook/examples/gpt-5/codex_prompting_guide"
+        "codex_models": { "url": "https://developers.openai.com/codex/models", "role": "model-listing" },
+        "codex_changelog": { "url": "https://developers.openai.com/codex/changelog", "role": "discovery" },
+        "codex_prompting": { "url": "https://developers.openai.com/codex/prompting", "role": "prompting" },
+        "codex_best_practices": { "url": "https://developers.openai.com/codex/learn/best-practices", "role": "prompting" },
+        "codex_prompting_guide": { "url": "https://developers.openai.com/cookbook/examples/gpt-5/codex_prompting_guide", "role": "prompting" },
+        "codex_agents_md": { "url": "https://developers.openai.com/codex/guides/agents-md", "role": "prompting" },
+        "latest_model": { "url": "https://developers.openai.com/api/docs/guides/latest-model", "role": "prompting" }
       },
-      "note": "cookbook.openai.com 308-redirects to developers.openai.com/cookbook — a fetcher must follow cross-host redirects. github.com/openai/codex is an authoritative CLI-behavior source but is secondary/manually-vetted, NOT in allowlist_domains. In D1 these URLs are the citation targets for the hand-authored rubric; auto-fetch is the sync follow-on."
+      "note": "cookbook.openai.com 308-redirects to developers.openai.com/cookbook — follow cross-host redirects, re-fencing each hop. github.com/openai/codex is authoritative for CLI behavior but is secondary/manually-vetted, NOT in allowlist_domains. role: model-listing anchors two-key id confirmation; prompting carries rubric content; discovery (changelog) is for model existence/dates only."
     }
   },
   "retention": {

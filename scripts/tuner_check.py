@@ -13,6 +13,7 @@ Exit code 0 = clean, 1 = problems found (printed to stderr).
 import os
 import sys
 import json
+import re
 
 import miniyaml
 
@@ -28,6 +29,85 @@ def _get(cfg, dotted):
             return None
         cur = cur[k]
     return cur
+
+
+ALLOWED_PROVIDERS = {"anthropic", "openai"}
+
+
+def _normalize_id(raw):
+    # Mirror resolve_model.normalize for the filename<->id check (kept local so
+    # tuner_check stays dependency-free even if run standalone).
+    s = (raw or "").strip().lower()
+    if s.startswith("ft:"):
+        s = s[3:].split(":", 1)[0]
+    if "/" in s:
+        s = s.split("/")[-1]
+    s = re.sub(r"\[.*?\]", "", s)
+    s = re.sub(r"-\d{4}-\d{2}-\d{2}$", "", s)
+    s = re.sub(r"-\d{8}$", "", s)
+    return s.strip()
+
+
+def _citation_problems(rubric_full, model_id):
+    """For a rubric whose frontmatter sets `citation_gate: strict`, every bullet
+    rule line must carry a citation token: a [tag], a URL, 'Core §', or '(verify)'."""
+    out = []
+    try:
+        with open(rubric_full, encoding="utf-8") as f:
+            text = f.read()
+    except Exception:  # noqa: BLE001
+        return out
+    fm = ""                                  # only honor the gate from the YAML frontmatter
+    if text.startswith("---"):
+        end = text.find("\n---", 3)
+        fm = text if end == -1 else text[:end]
+    if "citation_gate: strict" not in fm:
+        return out
+    cited = re.compile(r"\[[^\]]+\]|https?://|Core §|\(verify\)")
+    for ln in text.split("\n"):
+        st = ln.strip()
+        if st.startswith("- ") and len(st) > 8 and not cited.search(st):
+            out.append("citation: model '%s' rubric has an uncited rule: %s" % (model_id, st[:60]))
+    return out
+
+
+def manifest_problems(models_json_path):
+    """Provider validation matrix for models.json. Returns problem strings."""
+    problems = []
+    if not (models_json_path and os.path.exists(models_json_path)):
+        return problems
+    try:
+        with open(models_json_path) as f:
+            mj = json.load(f)
+    except Exception as e:  # noqa: BLE001
+        return ["manifest: failed to read models.json: %s" % e]
+    skill_dir = os.path.dirname(os.path.dirname(models_json_path))
+    providers = mj.get("providers", {})
+    for m in mj.get("models", []):
+        mid = m.get("id")
+        prov = m.get("provider")
+        if not prov:
+            problems.append("manifest: model '%s' has no provider" % mid)
+            continue
+        if prov not in ALLOWED_PROVIDERS:
+            problems.append("manifest: model '%s' provider '%s' not in %s"
+                            % (mid, prov, sorted(ALLOWED_PROVIDERS)))
+        if not (providers.get(prov, {}).get("allowlist_domains")):
+            problems.append("manifest: provider '%s' has no providers[].allowlist_domains" % prov)
+        rb = m.get("rubric")
+        if rb:
+            expect_dir = "references/rubrics/%s/" % prov
+            if not rb.startswith(expect_dir):
+                problems.append("manifest: model '%s' rubric not under provider dir %s: %s"
+                                % (mid, expect_dir, rb))
+            else:
+                expect_name = _normalize_id(mid).replace(".", "-") + ".md"
+                if os.path.basename(rb) != expect_name:
+                    problems.append("manifest: model '%s' rubric filename should be %s, got %s"
+                                    % (mid, expect_name, os.path.basename(rb)))
+                full = os.path.join(skill_dir, rb)
+                problems.extend(_citation_problems(full, mid))
+    return problems
 
 
 def check(repo_root, config_text, models_json_path):
@@ -76,6 +156,7 @@ def check(repo_root, config_text, models_json_path):
                 rb = m.get("rubric")
                 if rb and not os.path.exists(os.path.join(skill_dir, rb)):
                     problems.append("manifest: model '%s' rubric path missing: %s" % (m.get("id"), rb))
+            problems.extend(manifest_problems(models_json_path))
         except Exception as e:  # noqa: BLE001
             problems.append("manifest: failed to read models.json: %s" % e)
 

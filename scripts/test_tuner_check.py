@@ -1,6 +1,6 @@
 import os, tempfile, json, unittest
 import miniyaml
-from tuner_check import check
+from tuner_check import check, manifest_problems
 
 EXAMPLE = '''project:
   name: "TrailGear"
@@ -74,20 +74,25 @@ def build_repo(tmp, config_text, skills=("product-blurb", "spec-sheet"), make_vo
 
 
 def write_models(tmp, ga_rubric_exists=True, add_pending_ga=False):
-    rub_rel = "references/rubrics/claude-opus-4-8.md"
-    os.makedirs(os.path.join(tmp, "references", "rubrics"), exist_ok=True)
+    rub_rel = "references/rubrics/anthropic/claude-opus-4-8.md"
+    os.makedirs(os.path.join(tmp, "references", "rubrics", "anthropic"), exist_ok=True)
     if ga_rubric_exists:
         with open(os.path.join(tmp, rub_rel), "w") as f:
             f.write("rubric")
     models = [
-        {"id": "claude-opus-4-8", "status": "ga", "rubric": rub_rel},
-        {"id": "claude-opus-4-7", "status": "deprecated", "rubric": None},
+        {"id": "claude-opus-4-8", "provider": "anthropic", "family": "opus",
+         "status": "ga", "rubric": rub_rel},
+        {"id": "claude-opus-4-7", "provider": "anthropic", "family": "opus",
+         "status": "deprecated", "rubric": None},
     ]
     if add_pending_ga:
-        models.append({"id": "claude-fable-5", "status": "ga", "rubric": None})
+        models.append({"id": "claude-fable-5", "provider": "anthropic",
+                       "family": "fable", "status": "ga", "rubric": None})
     p = os.path.join(tmp, "references", "models.json")
     with open(p, "w") as f:
-        json.dump({"models": models}, f)
+        json.dump({"schema": 2,
+                   "providers": {"anthropic": {"allowlist_domains": ["x"]}},
+                   "models": models}, f)
     return p
 
 
@@ -144,6 +149,94 @@ class TestCheck(unittest.TestCase):
             mp = write_models(tmp)
             probs = check(tmp, cfg, mp)
             self.assertTrue(any("model_sync.channel" in p for p in probs), probs)
+
+
+def _write_manifest(tmp, models, providers=None):
+    refs = os.path.join(tmp, "references")
+    os.makedirs(refs, exist_ok=True)
+    mj = {"schema": 2, "providers": providers or {
+        "anthropic": {"allowlist_domains": ["platform.claude.com"]},
+        "openai": {"allowlist_domains": ["developers.openai.com"]},
+    }, "models": models}
+    p = os.path.join(refs, "models.json")
+    with open(p, "w") as f:
+        json.dump(mj, f)
+    return p
+
+
+def _touch_rubric(tmp, rel, body="- rule [src]\n"):
+    full = os.path.join(tmp, rel)
+    os.makedirs(os.path.dirname(full), exist_ok=True)
+    with open(full, "w") as f:
+        f.write(body)
+
+
+class TestManifestMatrix(unittest.TestCase):
+    def test_missing_provider_is_problem(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp, [{"id": "gpt-5.5", "status": "ga",
+                                        "rubric": "references/rubrics/openai/gpt-5-5.md"}])
+            _touch_rubric(tmp, "references/rubrics/openai/gpt-5-5.md")
+            probs = manifest_problems(mp)
+            self.assertTrue(any("provider" in p for p in probs), probs)
+
+    def test_provider_without_providers_entry_is_problem(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp,
+                [{"id": "x", "provider": "acme", "status": "limited", "rubric": None}])
+            probs = manifest_problems(mp)
+            self.assertTrue(any("acme" in p for p in probs), probs)
+
+    def test_rubric_outside_provider_dir_is_problem(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp, [{"id": "gpt-5.5", "provider": "openai",
+                "status": "ga", "rubric": "references/rubrics/gpt-5-5.md"}])
+            _touch_rubric(tmp, "references/rubrics/gpt-5-5.md")
+            probs = manifest_problems(mp)
+            self.assertTrue(any("provider dir" in p for p in probs), probs)
+
+    def test_filename_must_match_normalized_id(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp, [{"id": "gpt-5.5", "provider": "openai",
+                "status": "ga", "rubric": "references/rubrics/openai/gpt5.md"}])
+            _touch_rubric(tmp, "references/rubrics/openai/gpt5.md")
+            probs = manifest_problems(mp)
+            self.assertTrue(any("filename" in p for p in probs), probs)
+
+    def test_citation_gate_flags_uncited_rule(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp, [{"id": "gpt-5.5", "provider": "openai",
+                "status": "ga", "rubric": "references/rubrics/openai/gpt-5-5.md"}])
+            _touch_rubric(tmp, "references/rubrics/openai/gpt-5-5.md",
+                          body="---\ncitation_gate: strict\n---\n- a load-bearing rule with no source\n")
+            probs = manifest_problems(mp)
+            self.assertTrue(any("citation" in p for p in probs), probs)
+
+    def test_citation_gate_passes_cited_rule(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp, [{"id": "gpt-5.5", "provider": "openai",
+                "status": "ga", "rubric": "references/rubrics/openai/gpt-5-5.md"}])
+            _touch_rubric(tmp, "references/rubrics/openai/gpt-5-5.md",
+                          body="---\ncitation_gate: strict\n---\n- a cited rule [codex]\n")
+            self.assertEqual(manifest_problems(mp), [])
+
+    def test_clean_manifest_no_problems(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp, [{"id": "gpt-5.5", "provider": "openai",
+                "status": "ga", "rubric": "references/rubrics/openai/gpt-5-5.md"}])
+            _touch_rubric(tmp, "references/rubrics/openai/gpt-5-5.md")  # no strict gate
+            self.assertEqual(manifest_problems(mp), [])
+
+    def test_valid_provider_missing_from_providers_map(self):
+        # openai is an allowed provider but absent from the providers map -> allowlist problem,
+        # and NOT a "not in" problem (isolates the allowlist check from the allowed-set check).
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp,
+                [{"id": "gpt-5.5", "provider": "openai", "status": "limited", "rubric": None}],
+                providers={"anthropic": {"allowlist_domains": ["x"]}})
+            probs = manifest_problems(mp)
+            self.assertTrue(any("allowlist_domains" in p for p in probs), probs)
+            self.assertFalse(any("not in" in p for p in probs), probs)
 
 
 if __name__ == "__main__":

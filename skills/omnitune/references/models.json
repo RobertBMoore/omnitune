@@ -1,14 +1,29 @@
 {
-  "schema": 1,
-  "updated": "2026-06-14",
-  "note": "Model library manifest. omnitune selects a rubric by matching the CURRENT session's model id to an entry here, then loading its rubric. ga_date/deprecated_date are filled from docs when known; null = not yet recorded (do not fabricate). status: ga | limited | deprecated | retired.",
-  "sync_entrypoints": {
-    "comment": "Stable discovery URLs for /omnitune:sync. Fetch these (Anthropic domains only), then derive/verify a model rubric. The model-specific 'what's new' page is discovered from the overview, not guessed.",
-    "models_overview": "https://platform.claude.com/docs/en/about-claude/models/overview",
-    "prompting_best_practices": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
-    "migration_guide": "https://platform.claude.com/docs/en/about-claude/models/migration-guide",
-    "models_api": "https://platform.claude.com/docs/en/api/models/list",
-    "allowlist_domains": ["platform.claude.com", "docs.anthropic.com", "www.anthropic.com"]
+  "schema": 2,
+  "updated": "2026-06-28",
+  "note": "Model library manifest. omnitune selects a rubric by matching the CURRENT session's model id to an entry here (via scripts/resolve_model.py), then loading its rubric. Per-provider source domains + discovery URLs live under 'providers'. ga_date/deprecated_date are filled from docs when known; null = not yet recorded (do not fabricate). status: ga | limited | deprecated | retired.",
+  "providers": {
+    "anthropic": {
+      "allowlist_domains": ["platform.claude.com", "docs.anthropic.com", "www.anthropic.com"],
+      "sync_entrypoints": {
+        "comment": "Stable discovery URLs for /omnitune:sync. The model-specific 'what's new' page is discovered from the overview, not guessed.",
+        "models_overview": "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "prompting_best_practices": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+        "migration_guide": "https://platform.claude.com/docs/en/about-claude/models/migration-guide",
+        "models_api": "https://platform.claude.com/docs/en/api/models/list"
+      }
+    },
+    "openai": {
+      "allowlist_domains": ["developers.openai.com", "platform.openai.com", "openai.com", "cookbook.openai.com"],
+      "sync_entrypoints": {
+        "codex_models": "https://developers.openai.com/codex/models",
+        "codex_changelog": "https://developers.openai.com/codex/changelog",
+        "codex_prompting": "https://developers.openai.com/codex/prompting",
+        "codex_best_practices": "https://developers.openai.com/codex/learn/best-practices",
+        "codex_prompting_guide": "https://developers.openai.com/cookbook/examples/gpt-5/codex_prompting_guide"
+      },
+      "note": "cookbook.openai.com 308-redirects to developers.openai.com/cookbook — a fetcher must follow cross-host redirects. github.com/openai/codex is an authoritative CLI-behavior source but is secondary/manually-vetted, NOT in allowlist_domains. In D1 these URLs are the citation targets for the hand-authored rubric; auto-fetch is the sync follow-on."
+    }
   },
   "retention": {
     "keep_all_ga": true,
@@ -19,6 +34,7 @@
   "models": [
     {
       "id": "claude-fable-5",
+      "provider": "anthropic",
       "family": "fable",
       "status": "ga",
       "ga_date": "2026-06-09",
@@ -34,6 +50,7 @@
     },
     {
       "id": "claude-mythos-5",
+      "provider": "anthropic",
       "family": "mythos",
       "status": "limited",
       "ga_date": null,
@@ -46,6 +63,7 @@
     },
     {
       "id": "claude-opus-4-8",
+      "provider": "anthropic",
       "family": "opus",
       "status": "ga",
       "ga_date": null,
@@ -60,6 +78,7 @@
     },
     {
       "id": "claude-sonnet-4-6",
+      "provider": "anthropic",
       "family": "sonnet",
       "status": "ga",
       "ga_date": null,
@@ -73,6 +92,7 @@
     },
     {
       "id": "claude-haiku-4-5",
+      "provider": "anthropic",
       "family": "haiku",
       "status": "ga",
       "ga_date": null,
@@ -87,6 +107,7 @@
     },
     {
       "id": "claude-opus-4-7",
+      "provider": "anthropic",
       "family": "opus",
       "status": "deprecated",
       "ga_date": null,
@@ -94,6 +115,59 @@
       "rubric": null,
       "rubric_note": "Legacy/deprecated; no shipped rubric. Derived on demand via /omnitune:sync only if a session still runs this model.",
       "source_urls": []
+    },
+    {
+      "id": "gpt-5.4",
+      "provider": "openai",
+      "family": "gpt-5",
+      "status": "limited",
+      "ga_date": null,
+      "deprecated_date": null,
+      "rubric": null,
+      "rubric_note": "Codex flagship; derive on demand (no shipped rubric yet).",
+      "source_urls": ["https://developers.openai.com/codex/models"]
+    },
+    {
+      "id": "gpt-5.4-mini",
+      "provider": "openai",
+      "family": "gpt-5",
+      "status": "limited",
+      "ga_date": null,
+      "deprecated_date": null,
+      "rubric": null,
+      "rubric_note": "Fast/low-cost; OpenAI suggests it for subagents. Derive on demand.",
+      "source_urls": ["https://developers.openai.com/codex/models"]
+    },
+    {
+      "id": "gpt-5.3-codex-spark",
+      "provider": "openai",
+      "family": "gpt-5",
+      "status": "limited",
+      "ga_date": null,
+      "deprecated_date": null,
+      "rubric": null,
+      "rubric_note": "Text-only research preview. Derive on demand.",
+      "source_urls": ["https://developers.openai.com/codex/models"]
+    },
+    {
+      "id": "gpt-5.2",
+      "provider": "openai",
+      "family": "gpt-5",
+      "status": "deprecated",
+      "ga_date": null,
+      "deprecated_date": "2026-05-26",
+      "rubric": null,
+      "rubric_note": "Deprecated for ChatGPT sign-in 2026-05-26; may remain reachable via API key."
+    },
+    {
+      "id": "gpt-5.3-codex",
+      "provider": "openai",
+      "family": "gpt-5",
+      "status": "deprecated",
+      "ga_date": null,
+      "deprecated_date": "2026-05-26",
+      "rubric": null,
+      "rubric_note": "Deprecated for ChatGPT sign-in 2026-05-26; may remain reachable via API key."
     }
   ]
 }

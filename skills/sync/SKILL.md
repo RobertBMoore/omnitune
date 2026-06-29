@@ -18,7 +18,7 @@ A model change is **not** a version-string swap, and detecting it is **not** a w
 
 At the start of every `/omnitune:tune-skill` or `/omnitune:tune-prompt` run:
 
-1. **Read the current session's model id** from the run context (e.g. `claude-opus-4-8`; in Nimbalyst / Claude Code it appears in the session system prompt as "The exact model ID is …"). **Normalize it before matching:** lowercase, then strip any bracketed suffix (e.g. `[1m]`) and any trailing `-YYYYMMDD` date snapshot — so `claude-opus-4-8[1m]` → `claude-opus-4-8` and `claude-haiku-4-5-20251001` → `claude-haiku-4-5`. If it can't be read, use `omnitune.config.model_sync.target_model`; if that's empty, use the manifest's newest GA model and badge the assumption.
+1. **Read the current session's model id** from the run context (e.g. `claude-opus-4-8`; in Nimbalyst / Claude Code it appears in the session system prompt as "The exact model ID is …"). **Resolve it via `scripts/resolve_model.py`** — the single source of truth for normalization, provider routing, rubric selection, and fallback (e.g. `claude-opus-4-8[1m]` → `claude-opus-4-8`). If it can't be read, use `omnitune.config.model_sync.target_model`; if that's empty, use the manifest's newest GA model and badge the assumption.
 2. **Look up the normalized id** in `../omnitune/references/models.json` → `references/rubrics/<provider>/<id>.md`.
 3. **Match → use it.** Optionally badge if the manifest lists a newer GA model than the one in use (informational only).
 4. **Miss → this is the trigger.** Pick the closest-family rubric as a fallback, run on it (never block the user's work), and surface the badge:
@@ -62,6 +62,14 @@ State for the interrupt channel is persisted via `scripts/sync_state.py` (atomic
 ## Safety invariant (all versions)
 
 The tool must never grade its own rewrite of its own rubric **without a human in the loop and without the tighten-only ratchet passing.** A fully-silent self-patch is prohibited. v0.1 enforced this by abstinence (propose-only); v0.2 enforces it mechanically (no-write subagent + ratchet + corpus floor + human commit). Either way: the agent is not the unsupervised auditor of its own brain.
+
+## Hand-authored rubric floor
+
+A rubric written by a human (not derived by sync) is **not** exempt from the safety gates. Before it ships it must:
+1. Pass `scripts/tuner_check.py` clean, including the citation gate (`citation_gate: strict` rubrics: every rule carries a source tag or an explicit `(verify)`/`[unsourced]` marker).
+2. Carry the shared safety floor in its provider `_core.md` (the audit floor-rule + the fail-closed clause).
+3. Pass `scripts/rubric_ratchet.py OLD NEW` on every **future** edit (OLD = the prior committed version); a loosening needs `--approve-loosening` after a separate human sign-off. The ratchet is N/A only for the first commit (no OLD), never afterward.
+4. Be committed only by a human (no unattended self-commit).
 
 ## Definition of Done
 

@@ -16,6 +16,8 @@ import re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 WIKI = os.path.join(HERE, "..", "wiki")
+MODELS_JSON = os.path.join(HERE, "..", "skills", "omnitune", "references", "models.json")
+VERSION_LOG_JSON = os.path.join(HERE, "..", "skills", "omnitune", "references", "version-log.json")
 
 # Nav order + clean labels (filename -> (slug, nav label))
 PAGES = [
@@ -24,6 +26,7 @@ PAGES = [
     ("Install-Setup.md", "install", "Install & Setup"),
     ("Configuration.md", "configuration", "Configuration"),
     ("Auto-Sync.md", "auto-sync", "Auto-Sync"),
+    ("__models__", "models", "Models"),
     ("FAQ.md", "faq", "FAQ"),
 ]
 FILE_TO_SLUG = {f: s for f, s, _ in PAGES}
@@ -162,18 +165,50 @@ def md_to_html(md, headings_out):
     return "\n".join(out)
 
 
+def _models_section(models_path, log_path):
+    """Generated 'Models & lineage' table from models.json + version-log.json."""
+    try:
+        with open(models_path) as f:
+            models = json.load(f).get("models", [])
+    except Exception:  # noqa: BLE001
+        models = []
+    log = {}
+    try:
+        with open(log_path) as f:
+            for e in json.load(f).get("entries", []):
+                log[e.get("model_id")] = e  # entries oldest-first -> last wins = newest
+    except Exception:  # noqa: BLE001
+        pass
+    rows = []
+    for m in models:
+        e = log.get(m.get("id"), {})
+        srcs = e.get("source_urls") or m.get("source_urls") or []
+        synced = e.get("last_synced") or m.get("ga_date") or "—"
+        rows.append("<tr><td>%s</td><td><code>%s</code></td><td>%s</td><td>%s</td><td>%d</td></tr>"
+                    % (html.escape(m.get("provider", "")), html.escape(m.get("id", "")),
+                       html.escape(m.get("status", "")), html.escape(str(synced)), len(srcs)))
+    table = ('<div class="tablewrap"><table><thead><tr>'
+             '<th>Provider</th><th>Model</th><th>Status</th><th>Last synced</th><th>Sources</th>'
+             '</tr></thead><tbody>%s</tbody></table></div>') % "".join(rows)
+    return ('<p>Generated from <code>version-log.json</code> + <code>models.json</code> '
+            'at build time — never hand-edited, so it cannot drift from the library.</p>' + table)
+
+
 def build():
     sections, nav, index = [], [], []
     for idx, (fname, slug, label) in enumerate(PAGES):
-        with open(os.path.join(WIKI, fname), encoding="utf-8") as f:
-            md = f.read()
-        # pull first H1 as page title; render the rest
-        title = label
-        m = re.search(r"^#\s+(.*)$", md, re.M)
-        if m:
-            md = md.replace(m.group(0), "", 1)
-        headings = []
-        body = md_to_html(md.strip(), headings)
+        if fname == "__models__":
+            title, headings, body = label, [], _models_section(MODELS_JSON, VERSION_LOG_JSON)
+        else:
+            with open(os.path.join(WIKI, fname), encoding="utf-8") as f:
+                md = f.read()
+            # pull first H1 as page title; render the rest
+            title = label
+            m = re.search(r"^#\s+(.*)$", md, re.M)
+            if m:
+                md = md.replace(m.group(0), "", 1)
+            headings = []
+            body = md_to_html(md.strip(), headings)
         index.append({"slug": slug, "label": label, "headings": headings})
         active = " active" if idx == 0 else ""
         nav.append(

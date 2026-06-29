@@ -10,6 +10,9 @@ The plugin ships a library of rubrics, organized per provider, under `skills/omn
 
 At the start of every run, the plugin reads **the model your session is running**, matches it in `models.json`, and loads that rubric. No network call, no "latest model" guess — it tunes for the model actually in use. (See [Auto-Sync](Auto-Sync.md).)
 
+## Providers, Codex & lineage
+The library is **provider-aware** — Anthropic (Claude) and OpenAI (GPT-5 / Codex) rubrics, resolved by one tested resolver (`scripts/resolve_model.py`) that handles normalization, provider routing, and fallback. Under OpenAI's **Codex** harness (which has no Claude Code system prompt) the model is detected from `.codex/config.toml` via `scripts/detect_model.py`; Claude-Code→Codex tool mappings live in `references/codex-tools.md`. When the plugin derives a rubric, an **iterated independent-audit gate** (no-write reviewers run to mechanical convergence) plus the tighten-only ratchet gate it before any human commit, and every applied rubric is recorded in an append-only **version log** (`references/version-log.json`) — shown on the **Models** page, so the docs can't drift from the library.
+
 ## Mode A — `/omnitune:tune-skill <name>`
 Audits a `SKILL.md` or agent file against the session model's rubric across these dimensions: instruction hygiene, structural clarity, context economy, tool/permission alignment (agents), trigger-description fidelity, internal consistency, and register/voice (copy-focused targets only). Each finding cites a rubric section.
 

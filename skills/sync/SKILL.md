@@ -18,7 +18,7 @@ A model change is **not** a version-string swap, and detecting it is **not** a w
 
 At the start of every `/omnitune:tune-skill` or `/omnitune:tune-prompt` run:
 
-1. **Read the current session's model id** from the run context (e.g. `claude-opus-4-8`; in Nimbalyst / Claude Code it appears in the session system prompt as "The exact model ID is …"). **Resolve it via `scripts/resolve_model.py`** — the single source of truth for normalization, provider routing, rubric selection, and fallback (e.g. `claude-opus-4-8[1m]` → `claude-opus-4-8`). If it can't be read, use `omnitune.config.model_sync.target_model`; if that's empty, use the manifest's newest GA model and badge the assumption.
+1. **Read the current session's model id** by harness precedence (stop at the first hit): (1) the system-prompt model line — Claude Code / Nimbalyst show "The exact model ID is …"; (2) under Codex, `python3 scripts/detect_model.py` (reads `.codex/config.toml`; see `../omnitune/references/codex-tools.md`); (3) `omnitune.config.model_sync.target_model`; (4) the manifest's newest GA model, badging the assumption. **Resolve it via `scripts/resolve_model.py`** — the single source of truth for normalization, provider routing, rubric selection, and fallback (e.g. `claude-opus-4-8[1m]` → `claude-opus-4-8`).
 2. **Look up the normalized id** in `../omnitune/references/models.json` → `references/rubrics/<provider>/<id>.md`.
 3. **Match → use it.** Optionally badge if the manifest lists a newer GA model than the one in use (informational only).
 4. **Miss → this is the trigger.** Pick the closest-family rubric as a fallback, run on it (never block the user's work), and surface the badge:

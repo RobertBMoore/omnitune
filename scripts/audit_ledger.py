@@ -145,7 +145,7 @@ def convergence(path, clean_rounds=2, cap=3, material="high"):
         for e in reversed(rounds):
             new_material = sum(1 for fp, r in first_material_round.items()
                                if r == e.get("round_no"))
-            if e.get("complete") and new_material == 0:
+            if e.get("complete") and new_material == 0 and not open_material:
                 trailing += 1
             else:
                 break

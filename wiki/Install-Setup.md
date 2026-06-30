@@ -11,7 +11,7 @@ Quickest path — add the marketplace and install (user scope = available in all
 
 - Marketplace: `omnitune`, tracking the `main` channel. Commands register namespaced: `/omnitune:tune-prompt`, `/omnitune:tune-skill`, `/omnitune:install`, `/omnitune:sync`.
 - **Auto-update** is a one-time per-user toggle: `/plugin` → Marketplaces → `omnitune` → Enable auto-update.
-- **Teams:** commit [`docs/install/team-settings.json`](../docs/install/team-settings.json) into a repo's `.claude/settings.json` to prompt collaborators on trust; or roll out hands-off org-wide with [`deploy/managed-settings.json`](../deploy/managed-settings.json) (see [`RELEASING.md`](../RELEASING.md)).
+- **Teams:** commit `docs/install/team-settings.json` into a repo's `.claude/settings.json` to prompt collaborators on trust; or roll out hands-off org-wide with `deploy/managed-settings.json` (see `RELEASING.md`).
 
 ## 2. Use it immediately — no setup required
 Both modes work the moment the plugin is installed, with **zero config**:
@@ -26,7 +26,7 @@ In standalone mode the tool reads the model **your session is running** (includi
 Config is **optional enrichment**, not a prerequisite — add it (next) only when you want repo-aware routing, context pointers, saved report/prompt paths, and house-style awareness.
 
 ## 3. (Optional) Run `/omnitune:install` for repo-aware mode
-Optional — the modes already work without it (above). Run it when you want omnitune to learn your repo: routing by skill, context pointers, house rules, and where to save reports/prompts. Setup is an **interview that audits its own understanding before writing anything** — it drafts your config from the repo, then asks you to confirm. It never writes `omnitune.config.yaml` from guesses.
+Optional — the modes already work without it (above). Run it when you want omnitune to learn your repo: routing by skill, context pointers, house rules, and where to save reports/prompts. Setup is an interview that audits its own understanding before writing anything — it drafts your config from the repo, then asks you to confirm. It never writes omnitune.config.yaml from guesses.
 
 What it does, in order:
 1. **Detect + draft.** Reads your `CLAUDE.md`/`AGENTS.md`/`README.md`, lists your skills, and **drafts the technical fields for you** — the routing keyword table and context-pointers — by reading the repo. You don't author routing tables blind.

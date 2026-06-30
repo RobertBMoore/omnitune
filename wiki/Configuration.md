@@ -1,6 +1,6 @@
 # Configuration
 
-Everything repo-specific lives in `omnitune.config.yaml` at your repo root. The plugin core holds no domain knowledge of its own. `/omnitune:install` generates this file; you can also hand-edit it. Full field reference: [`omnitune.config.schema.md`](../omnitune.config.schema.md).
+Everything repo-specific lives in `omnitune.config.yaml` at your repo root. The plugin core holds no domain knowledge of its own. `/omnitune:install` generates this file; you can also hand-edit it. Full field reference: `omnitune.config.schema.md`.
 
 ## Worked example
 ```yaml
@@ -27,7 +27,7 @@ model_sync:
   snooze_default: "24h"
   regression_corpus: "tuner/regression/"
 ```
-(A fuller fictional TrailGear example ships in [`omnitune.config.example.yaml`](../omnitune.config.example.yaml) — nothing is baked into the core.)
+(A fuller fictional TrailGear example ships in `omnitune.config.example.yaml` — nothing is baked into the core.)
 
 ## How the fields drive the modes
 - **`routing[]`** — Mode B matches your raw prompt's words against these keywords to pick the target skill. Empty is valid (Mode B then runs without target context).

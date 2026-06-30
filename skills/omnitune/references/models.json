@@ -139,9 +139,13 @@
       "status": "limited",
       "ga_date": null,
       "deprecated_date": null,
-      "rubric": null,
-      "rubric_note": "Codex flagship; derive on demand (no shipped rubric yet).",
-      "source_urls": ["https://developers.openai.com/codex/models"]
+      "rubric": "references/rubrics/openai/gpt-5-4.md",
+      "rubric_note": "Prior Codex flagship; rubric derived 2026-06-29 (D6) via hand-authored floor + audit. Superseded as the recommended default by gpt-5.5.",
+      "source_urls": [
+        "https://developers.openai.com/codex/models",
+        "https://developers.openai.com/codex/learn/best-practices",
+        "https://developers.openai.com/api/docs/guides/latest-model"
+      ]
     },
     {
       "id": "gpt-5.4-mini",

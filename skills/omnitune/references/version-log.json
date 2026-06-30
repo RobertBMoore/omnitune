@@ -67,6 +67,19 @@
         "https://developers.openai.com/codex/prompting",
         "https://developers.openai.com/codex/learn/best-practices"
       ]
+    },
+    {
+      "action": "add",
+      "date": "2026-06-29",
+      "last_synced": "2026-06-29",
+      "model_id": "gpt-5.4",
+      "outcome": "derived via /omnitune:sync (D6) \u2014 hand-authored floor; human-committed",
+      "provider": "openai",
+      "source_urls": [
+        "https://developers.openai.com/codex/models",
+        "https://developers.openai.com/codex/learn/best-practices",
+        "https://developers.openai.com/api/docs/guides/latest-model"
+      ]
     }
   ],
   "schema": 1

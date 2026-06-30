@@ -2,7 +2,7 @@
 model: claude-sonnet-4-6
 family: sonnet
 status: ga
-source_status: synced-from-docs
+source_status: derived-tier
 lastSynced: 2026-06-14
 lastReviewed: 2026-06-14
 sources:

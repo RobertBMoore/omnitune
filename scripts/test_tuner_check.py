@@ -318,6 +318,36 @@ class TestFenceIntegrity(unittest.TestCase):
             self.assertEqual([p for p in probs if "off-allowlist" in p], [])
 
 
+class TestSourceStatus(unittest.TestCase):
+    def _mk(self, tmp, status_line):
+        mp = _write_manifest(tmp, [{"id": "gpt-5.5", "provider": "openai",
+            "status": "ga", "rubric": "references/rubrics/openai/gpt-5-5.md"}])
+        _touch_rubric(tmp, "references/rubrics/openai/gpt-5-5.md",
+                      body="---\nextends: _core.md\n%scitation_gate: strict\n---\n- r [x]\n" % status_line)
+        _touch_rubric(tmp, "references/rubrics/openai/_core.md", body="floor rule fail-closed\n")
+        return mp
+
+    def test_invalid_source_status_flagged(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            probs = manifest_problems(self._mk(tmp, "source_status: bogus\n"))
+            self.assertTrue(any("source_status" in p for p in probs), probs)
+
+    def test_derived_tier_ok(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            probs = manifest_problems(self._mk(tmp, "source_status: derived-tier\n"))
+            self.assertEqual([p for p in probs if "source_status" in p], [])
+
+    def test_synced_from_docs_ok(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            probs = manifest_problems(self._mk(tmp, "source_status: synced-from-docs\n"))
+            self.assertEqual([p for p in probs if "source_status" in p], [])
+
+    def test_absent_source_status_ok(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            probs = manifest_problems(self._mk(tmp, ""))
+            self.assertEqual([p for p in probs if "source_status" in p], [])
+
+
 class TestFloorViaExtends(unittest.TestCase):
     def test_strict_non_core_requires_extends(self):
         with tempfile.TemporaryDirectory() as tmp:

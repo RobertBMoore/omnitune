@@ -72,6 +72,26 @@ def _citation_problems(rubric_full, model_id):
     return out
 
 
+VALID_SOURCE_STATUS = {"synced-from-docs", "derived-tier"}
+
+
+def _source_status_problems(rubric_full, mid):
+    """A rubric's frontmatter `source_status`, if present, must name a known
+    provenance: `synced-from-docs` (from live/version docs) or `derived-tier`
+    (authored from tier/family knowledge, version-specific items marked (verify))."""
+    out = []
+    try:
+        with open(rubric_full, encoding="utf-8") as f:
+            text = f.read()
+    except Exception:  # noqa: BLE001
+        return out
+    m = re.search(r"^source_status:\s*(\S+)", text, re.M)
+    if m and m.group(1).strip() not in VALID_SOURCE_STATUS:
+        out.append("manifest: model '%s' rubric source_status '%s' not in %s"
+                   % (mid, m.group(1).strip(), sorted(VALID_SOURCE_STATUS)))
+    return out
+
+
 def _extends_problems(skill_dir, rb, provider, mid):
     """A rubric's frontmatter `extends:` must resolve to its same-provider _core.md."""
     out = []
@@ -208,6 +228,7 @@ def manifest_problems(models_json_path):
                 full = os.path.join(skill_dir, rb)
                 problems.extend(_citation_problems(full, mid))
                 problems.extend(_extends_problems(skill_dir, rb, prov, mid))
+                problems.extend(_source_status_problems(full, mid))
                 cores_to_check.add(prov)
     for prov in sorted(cores_to_check):
         problems.extend(_provider_core_problems(skill_dir, prov))

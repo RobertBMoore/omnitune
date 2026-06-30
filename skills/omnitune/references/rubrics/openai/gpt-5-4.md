@@ -3,7 +3,7 @@ model: gpt-5.4
 provider: openai
 family: gpt-5
 status: limited
-source_status: synced-from-docs
+source_status: derived-tier
 citation_gate: strict
 extends: _core.md
 lastSynced: 2026-06-29

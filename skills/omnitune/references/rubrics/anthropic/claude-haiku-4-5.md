@@ -3,7 +3,7 @@ model: claude-haiku-4-5
 model_id_full: claude-haiku-4-5-20251001
 family: haiku
 status: ga
-source_status: synced-from-docs
+source_status: derived-tier
 lastSynced: 2026-06-14
 lastReviewed: 2026-06-14
 sources:

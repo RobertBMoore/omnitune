@@ -15,7 +15,7 @@ jobs:
           python-version: "3.11"
       - name: Unit tests (dependency-free)
         working-directory: scripts
-        run: python3 -m unittest test_tuner_check test_rubric_ratchet test_sync_state test_validate_plugin test_check_public_clean test_resolve_model test_detect_model test_audit_ledger test_version_log test_build_wiki test_sync_sources
+        run: python3 -m unittest test_tuner_check test_rubric_ratchet test_sync_state test_validate_plugin test_check_public_clean test_resolve_model test_detect_model test_audit_ledger test_version_log test_build_wiki test_sync_sources test_agents_md
       - name: Plugin + marketplace manifest lint (blocking)
         run: python3 scripts/validate_plugin.py .
       - name: Public-clean sweep (blocking; generic patterns — private denylist is local-only)

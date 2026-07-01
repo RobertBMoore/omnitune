@@ -7,6 +7,7 @@
 ### Capabilities
 - Rewrite a prompt / audit a skill → `.omnitune/skills/omnitune/SKILL.md`.
 - Derive a rubric for the current model → `.omnitune/skills/sync/SKILL.md`.
+- (Optional) configure omnitune for **this** repo, guided → `.omnitune/skills/install/SKILL.md` — a short interview that drafts and writes `omnitune.config.yaml` at **this** repo's root (routing, context pointers, output paths). Without it, tune/sync run standalone on the model rubric alone.
 
 Detect the session model per `.omnitune/AGENTS.md` (Model detection), then resolve with `python3 .omnitune/scripts/resolve_model.py`.
 

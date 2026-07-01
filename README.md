@@ -46,6 +46,8 @@ Everything repo-specific lives in `omnitune.config.yaml`. Copy `omnitune.config.
 
 Browsable docs live in [`wiki/`](wiki/) — open [`wiki/index.html`](wiki/index.html) for the offline single-page version. Design rationale is in [`docs/design/`](docs/design/).
 
+**Using omnitune under Codex (in your own repo):** see [`docs/codex-consumer-setup.md`](docs/codex-consumer-setup.md).
+
 ## Contributing
 
 Issues and PRs welcome — see [`CONTRIBUTING.md`](CONTRIBUTING.md).

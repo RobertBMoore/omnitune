@@ -15,10 +15,10 @@ Setup is an **interview that audits its own understanding before writing anythin
 ## Workflow (run in order)
 
 ### 1. Detect + draft
-Scan the host repo without writing anything, then **draft the config yourself** — including the technical fields. The operator should validate a draft, not author one from scratch.
+Scan the host repo without writing anything, then **draft the config yourself** — including the technical fields. The operator validates a draft; they never author one from scratch.
 - Read `CLAUDE.md` / `AGENTS.md` / `README.md` for domain + conventions.
 - List candidate skill roots (`skills/`, `.claude/skills/`) and agent dirs (`.claude/agents/`).
-- Sample `SKILL.md` files to infer naming + routing style.
+- Read a representative `SKILL.md` from **each** skill root (or ≥3 if there are many) to infer naming + routing style.
 - **Draft `routing[]`** — for each skill, propose the keyword phrases a user would type, inferred from its name + description + first-action section.
 - **Draft `context_pointers[]`** — infer which files each skill cites (voice, brand, design docs).
 - **Draft** output paths, and note candidate `house_rules` / `reserved_decisions` files.

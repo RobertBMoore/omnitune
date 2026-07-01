@@ -1,4 +1,5 @@
 import os
+import re
 import tempfile
 import unittest
 
@@ -50,6 +51,30 @@ class TestMerge(unittest.TestCase):
             second = open(p, encoding="utf-8").read()
             self.assertEqual(first, second)
             self.assertIn("BLOCK", second)
+
+
+class TestTemplate(unittest.TestCase):
+    TPL = "deploy/codex/AGENTS.omnitune.md"
+
+    def _text(self):
+        with open(os.path.join(ROOT, self.TPL), encoding="utf-8") as f:
+            return f.read()
+
+    def test_operative_safety_phrases(self):
+        low = self._text().lower()
+        for p in ["never self-commit", "propose-only", "off-allowlist hop",
+                  "multi_agent", "author_id", ".omnitune/skills/sync/skill.md"]:
+            self.assertIn(p, low, "template missing operative phrase: %s" % p)
+
+    def test_omnitune_paths_resolve_after_prefix_strip(self):
+        text = self._text()
+        toks = set(re.findall(r"\.omnitune/[\w./-]+\.(?:py|md|json)", text))
+        missing = []
+        for t in sorted(toks):
+            rel = t[len(".omnitune/"):]
+            if not os.path.exists(os.path.join(ROOT, rel)):
+                missing.append(t)
+        self.assertEqual(missing, [], "template names omnitune paths that don't exist: %s" % missing)
 
 
 if __name__ == "__main__":

@@ -75,6 +75,12 @@ class TestInferProvider(unittest.TestCase):
     def test_openai_chatgpt(self):
         self.assertEqual(infer_provider("chatgpt-4o-latest"), "openai")
 
+    def test_xai_grok(self):
+        self.assertEqual(infer_provider("grok-build-0.1"), "xai")
+
+    def test_xai_grok_dotted(self):
+        self.assertEqual(infer_provider("grok-4.3"), "xai")
+
     def test_unknown(self):
         self.assertEqual(infer_provider("mistral-large"), "unknown")
 
@@ -147,6 +153,31 @@ class TestResolve(unittest.TestCase):
         self.assertEqual(
             set(r.keys()),
             {"provider", "normalized_id", "rubric_path", "fallback_tier", "badge_reason"})
+
+    def test_exact_xai_grok_build(self):
+        manifest = {
+            "schema": 3,
+            "providers": {"xai": {"allowlist_domains": ["docs.x.ai"]}},
+            "models": [
+                {"id": "grok-build-0.1", "provider": "xai", "family": "grok-build",
+                 "status": "ga", "rubric": "references/rubrics/xai/grok-build-0-1.md"},
+                {"id": "grok-4.3", "provider": "xai", "family": "grok-4",
+                 "status": "ga", "rubric": None},
+            ],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            p = os.path.join(tmp, "models.json")
+            with open(p, "w") as f:
+                json.dump(manifest, f)
+            r = resolve("grok-build-0.1", p)
+            self.assertEqual(r["provider"], "xai")
+            self.assertEqual(r["fallback_tier"], "exact")
+            self.assertEqual(r["rubric_path"], "references/rubrics/xai/grok-build-0-1.md")
+            # grok-4.3 (different family, no rubric) falls to the xai core, not cross-provider.
+            r2 = resolve("grok-4.3", p)
+            self.assertEqual(r2["provider"], "xai")
+            self.assertEqual(r2["fallback_tier"], "core")
+            self.assertEqual(r2["rubric_path"], "references/rubrics/xai/_core.md")
 
     def test_family_fallback_prefers_higher_minor(self):
         manifest = {

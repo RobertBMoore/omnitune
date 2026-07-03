@@ -25,6 +25,14 @@
         "latest_model": { "url": "https://developers.openai.com/api/docs/guides/latest-model", "role": "prompting" }
       },
       "note": "cookbook.openai.com 308-redirects to developers.openai.com/cookbook — follow cross-host redirects, re-fencing each hop. github.com/openai/codex is authoritative for CLI behavior but is secondary/manually-vetted, NOT in allowlist_domains. role: model-listing anchors two-key id confirmation; prompting carries rubric content; discovery (changelog) is for model existence/dates only."
+    },
+    "xai": {
+      "allowlist_domains": ["docs.x.ai", "x.ai"],
+      "sync_entrypoints": {
+        "models": { "url": "https://docs.x.ai/developers/models", "role": "model-listing" },
+        "rest_models": { "url": "https://docs.x.ai/developers/rest-api-reference/inference/models", "role": "discovery" }
+      },
+      "note": "Grok API is OpenAI-/Anthropic-SDK-compatible. docs.x.ai carries the model docs; the live /v1/models listing is the id source of truth (aliases like grok-latest move). role: model-listing anchors two-key id confirmation; discovery is for model existence/dates only. A prompting entrypoint is added on the next sync once the exact docs.x.ai prompting-guide path is confirmed live."
     }
   },
   "retention": {
@@ -188,6 +196,43 @@
       "deprecated_date": "2026-05-26",
       "rubric": null,
       "rubric_note": "Deprecated for ChatGPT sign-in 2026-05-26; may remain reachable via API key."
+    },
+    {
+      "id": "grok-build-0.1",
+      "provider": "xai",
+      "family": "grok-build",
+      "status": "ga",
+      "ga_date": "2026-05-29",
+      "deprecated_date": null,
+      "rubric": "references/rubrics/xai/grok-build-0-1.md",
+      "rubric_note": "xAI's dedicated agentic-coding model (public beta 2026-05-29); successor to grok-code-fast-1 for coding. Rubric hand-authored from tier/family knowledge (derived-tier); version-specific numbers marked (verify) pending a docs.x.ai sync.",
+      "source_urls": [
+        "https://docs.x.ai/developers/models",
+        "https://docs.x.ai/developers/rest-api-reference/inference/models"
+      ]
+    },
+    {
+      "id": "grok-4.3",
+      "provider": "xai",
+      "family": "grok-4",
+      "status": "ga",
+      "ga_date": "2026-04-30",
+      "deprecated_date": null,
+      "rubric": null,
+      "rubric_note": "Current xAI flagship (1M context, reasoning + non-reasoning). Derive-on-demand: resolves via closest-family fallback + badge until a rubric is synced. Kept as a clean drop-in for the general-purpose line.",
+      "source_urls": [
+        "https://docs.x.ai/developers/models"
+      ]
+    },
+    {
+      "id": "grok-code-fast-1",
+      "provider": "xai",
+      "family": "grok-code",
+      "status": "deprecated",
+      "ga_date": null,
+      "deprecated_date": "2026-05-15",
+      "rubric": null,
+      "rubric_note": "Prior speedy coding model; xAI routes its traffic to grok-build-0.1. Sunsetting on some channels (e.g. Oracle OCI retire 2026-08-15). No shipped rubric."
     }
   ]
 }

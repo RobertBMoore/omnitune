@@ -12,6 +12,7 @@ import re
 PROVIDER_PREFIXES = [
     (re.compile(r"^claude[-_]"), "anthropic"),
     (re.compile(r"^(gpt[-_]|chatgpt[-_]|o\d)"), "openai"),
+    (re.compile(r"^grok[-_.]"), "xai"),
 ]
 
 

@@ -10,14 +10,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0            # full history so the ratchet gate can diff against the base ref
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - name: Unit tests (dependency-free)
         working-directory: scripts
-        run: python3 -m unittest test_tuner_check test_rubric_ratchet test_sync_state test_validate_plugin test_check_public_clean test_resolve_model test_detect_model test_audit_ledger test_version_log test_build_wiki test_sync_sources test_agents_md test_agents_merge test_regression_corpus
+        run: python3 -m unittest test_tuner_check test_rubric_ratchet test_ratchet_gate test_hook_guard test_sync_state test_validate_plugin test_check_public_clean test_resolve_model test_detect_model test_audit_ledger test_version_log test_build_wiki test_sync_sources test_agents_md test_agents_merge test_regression_corpus
       - name: Plugin + marketplace manifest lint (blocking)
         run: python3 scripts/validate_plugin.py .
+      - name: Config + model-manifest consistency on the real repo (blocking)
+        run: python3 scripts/tuner_check.py .
+      - name: Rubric tighten-only ratchet gate (blocking; loosening needs a human-approved override)
+        env:
+          BASE_REF: ${{ github.base_ref || 'main' }}
+        run: |
+          BASE="origin/$BASE_REF"
+          git rev-parse --verify "$BASE" >/dev/null 2>&1 || BASE="HEAD~1"
+          python3 scripts/ratchet_gate.py --base "$BASE" .
       - name: Public-clean sweep (blocking; generic patterns — private denylist is local-only)
         run: python3 scripts/check_public_clean.py .
       # Best-effort: the canonical CLI check. Non-blocking because `claude` may

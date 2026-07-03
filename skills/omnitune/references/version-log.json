@@ -80,6 +80,18 @@
         "https://developers.openai.com/codex/learn/best-practices",
         "https://developers.openai.com/api/docs/guides/latest-model"
       ]
+    },
+    {
+      "action": "add",
+      "date": "2026-07-03",
+      "last_synced": "",
+      "model_id": "grok-build-0.1",
+      "outcome": "hand-authored floor (derived-tier); version-specific claims marked (verify) pending docs.x.ai sync; human-committed",
+      "provider": "xai",
+      "source_urls": [
+        "https://docs.x.ai/developers/models",
+        "https://docs.x.ai/developers/rest-api-reference/inference/models"
+      ]
     }
   ],
   "schema": 1

@@ -32,7 +32,7 @@ def _get(cfg, dotted):
     return cur
 
 
-ALLOWED_PROVIDERS = {"anthropic", "openai"}
+ALLOWED_PROVIDERS = {"anthropic", "openai", "xai"}
 
 
 def _normalize_id(raw):

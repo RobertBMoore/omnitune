@@ -12,6 +12,10 @@ omnitune/.model-usage.json
 omnitune/.audit-ledger-*.json
 *.tmp
 
+# Rubric-change approval marker: a local, per-change human sign-off for the
+# tighten-only / propose-only guards. Committing it would silently disable them.
+.omnitune-approve-rubric
+
 # Dogfood output artifacts (Mode A reports / Mode B saved prompts)
 reports/
 docs/prompts/

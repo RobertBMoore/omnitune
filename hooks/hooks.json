@@ -1,0 +1,27 @@
+{
+  "description": "omnitune fail-closed guards: rubrics are propose-only (never self-committed) and tighten-only. These enforce mechanically what the skills state in prose. Approve an intended change with OMNITUNE_APPROVE_RUBRIC=1 or a .omnitune-approve-rubric file at the repo root.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hook_guard.py self-commit",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hook_guard.py rubric-write",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

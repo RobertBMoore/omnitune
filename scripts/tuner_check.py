@@ -92,6 +92,32 @@ def _source_status_problems(rubric_full, mid):
     return out
 
 
+def _source_alignment_problems(rubric_full, mid, manifest_urls):
+    """Every URL a rubric's frontmatter `sources:` cites must appear in the
+    manifest entry's source_urls — otherwise the citation trail breaks at the
+    manifest (the drift class two independent panel reviewers hit 2026-07-03)."""
+    out = []
+    try:
+        with open(rubric_full, encoding="utf-8") as f:
+            text = f.read()
+    except Exception:  # noqa: BLE001
+        return out
+    if not text.startswith("---"):
+        return out
+    end = text.find("\n---", 3)
+    fm = text if end == -1 else text[:end]
+    m = re.search(r"^sources:\s*\n((?:\s+-\s+\S+\n?)+)", fm, re.M)
+    if not m:
+        return out
+    cited = re.findall(r"-\s+(\S+)", m.group(1))
+    known = set(manifest_urls or [])
+    for url in cited:
+        if url not in known:
+            out.append("manifest: model '%s' rubric cites a source missing from its "
+                       "manifest source_urls: %s" % (mid, url))
+    return out
+
+
 def _extends_problems(skill_dir, rb, provider, mid):
     """A rubric's frontmatter `extends:` must resolve to its same-provider _core.md."""
     out = []
@@ -229,6 +255,7 @@ def manifest_problems(models_json_path):
                 problems.extend(_citation_problems(full, mid))
                 problems.extend(_extends_problems(skill_dir, rb, prov, mid))
                 problems.extend(_source_status_problems(full, mid))
+                problems.extend(_source_alignment_problems(full, mid, m.get("source_urls")))
                 cores_to_check.add(prov)
     for prov in sorted(cores_to_check):
         problems.extend(_provider_core_problems(skill_dir, prov))

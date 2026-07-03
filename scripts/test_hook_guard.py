@@ -157,6 +157,133 @@ class TestRubricWriteGuard(unittest.TestCase):
             self.assertEqual(code, 0)
 
 
+MANIFEST = "skills/omnitune/references/models.json"
+VLOG = "skills/omnitune/references/version-log.json"
+
+
+def _manifest_text(rubric="references/rubrics/anthropic/a.md", dup=False):
+    models = [{"id": "m1", "provider": "anthropic", "status": "ga", "rubric": rubric}]
+    if dup:
+        models.append(dict(models[0]))
+    return json.dumps({"schema": 3, "providers": {"anthropic": {}}, "models": models})
+
+
+class TestStateWriteGuard(unittest.TestCase):
+    """H1: models.json integrity; version-log.json + hooks.json append/edit fences."""
+
+    def test_unrelated_file_allowed(self):
+        code, _ = _run("state-write", {"tool_name": "Write",
+                       "tool_input": {"file_path": "/tmp/x.txt", "content": "hi"}, "cwd": "."})
+        self.assertEqual(code, 0)
+
+    def test_manifest_write_valid_allowed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, "skills/omnitune/references/rubrics/anthropic/a.md", "# r\n")
+            code, err = _run("state-write", {"tool_name": "Write",
+                             "tool_input": {"file_path": os.path.join(tmp, MANIFEST),
+                                            "content": _manifest_text()}, "cwd": tmp})
+            self.assertEqual(code, 0, err)
+
+    def test_manifest_write_invalid_json_blocked(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            code, err = _run("state-write", {"tool_name": "Write",
+                             "tool_input": {"file_path": os.path.join(tmp, MANIFEST),
+                                            "content": "{not json"}, "cwd": tmp})
+            self.assertEqual(code, 2)
+            self.assertIn("JSON", err)
+
+    def test_manifest_duplicate_ids_blocked(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, "skills/omnitune/references/rubrics/anthropic/a.md", "# r\n")
+            code, err = _run("state-write", {"tool_name": "Write",
+                             "tool_input": {"file_path": os.path.join(tmp, MANIFEST),
+                                            "content": _manifest_text(dup=True)}, "cwd": tmp})
+            self.assertEqual(code, 2)
+            self.assertIn("duplicate", err)
+
+    def test_manifest_missing_rubric_file_blocked(self):
+        with tempfile.TemporaryDirectory() as tmp:  # rubric file NOT created
+            code, err = _run("state-write", {"tool_name": "Write",
+                             "tool_input": {"file_path": os.path.join(tmp, MANIFEST),
+                                            "content": _manifest_text()}, "cwd": tmp})
+            self.assertEqual(code, 2)
+            self.assertIn("rubric", err)
+
+    def test_manifest_edit_applies_replacement(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, "skills/omnitune/references/rubrics/anthropic/a.md", "# r\n")
+            _write(tmp, MANIFEST, _manifest_text())
+            code, _ = _run("state-write", {"tool_name": "Edit",
+                           "tool_input": {"file_path": os.path.join(tmp, MANIFEST),
+                                          "old_string": '"status": "ga"',
+                                          "new_string": '"status": "deprecated"'}, "cwd": tmp})
+            self.assertEqual(code, 0)
+
+    def test_version_log_write_blocked_without_marker(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            code, err = _run("state-write", {"tool_name": "Write",
+                             "tool_input": {"file_path": os.path.join(tmp, VLOG),
+                                            "content": "{}"}, "cwd": tmp})
+            self.assertEqual(code, 2)
+            self.assertIn("append-only", err)
+
+    def test_version_log_write_allowed_with_marker(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, hook_guard.APPROVE_FILE, "")
+            code, _ = _run("state-write", {"tool_name": "Write",
+                           "tool_input": {"file_path": os.path.join(tmp, VLOG),
+                                          "content": "{}"}, "cwd": tmp})
+            self.assertEqual(code, 0)
+
+    def test_hooks_json_write_blocked_without_marker(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            code, err = _run("state-write", {"tool_name": "Edit",
+                             "tool_input": {"file_path": os.path.join(tmp, "hooks/hooks.json"),
+                                            "old_string": "a", "new_string": "b"}, "cwd": tmp})
+            self.assertEqual(code, 2)
+
+    def test_marker_bypasses_manifest_check(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, hook_guard.APPROVE_FILE, "")
+            code, _ = _run("state-write", {"tool_name": "Write",
+                           "tool_input": {"file_path": os.path.join(tmp, MANIFEST),
+                                          "content": "{not json"}, "cwd": tmp})
+            self.assertEqual(code, 0)
+
+
+class TestRubricDeleteGuard(unittest.TestCase):
+    """H1: rm / git rm of a rubric file is operator-approved only."""
+
+    def test_plain_rm_of_rubric_blocked(self):
+        code, err = _run("rubric-delete", {"tool_input": {
+            "command": "rm skills/omnitune/references/rubrics/anthropic/a.md"}, "cwd": "."})
+        self.assertEqual(code, 2)
+        self.assertIn("delet", err)
+
+    def test_git_rm_of_rubric_blocked(self):
+        code, _ = _run("rubric-delete", {"tool_input": {
+            "command": "git rm skills/omnitune/references/rubrics/xai/g.md"}, "cwd": "."})
+        self.assertEqual(code, 2)
+
+    def test_unrelated_rm_allowed(self):
+        code, _ = _run("rubric-delete", {"tool_input": {"command": "rm /tmp/scratch.txt"},
+                                         "cwd": "."})
+        self.assertEqual(code, 0)
+
+    def test_non_delete_command_allowed(self):
+        code, _ = _run("rubric-delete", {"tool_input": {
+            "command": "cat skills/omnitune/references/rubrics/anthropic/a.md"}, "cwd": "."})
+        self.assertEqual(code, 0)
+
+    def test_marker_allows_delete(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _write(tmp, hook_guard.APPROVE_FILE, "")
+            code, _ = _run("rubric-delete", {"tool_input": {
+                "command": "git rm skills/omnitune/references/rubrics/anthropic/a.md"},
+                "cwd": tmp})
+            self.assertEqual(code, 0)
+
+
 class TestFailOpen(unittest.TestCase):
     def test_bad_dispatch_returns_zero(self):
         self.assertEqual(hook_guard.main(["hook_guard.py", "bogus"]), 0)

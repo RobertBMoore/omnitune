@@ -155,7 +155,112 @@ def _new_text_for(payload, cwd, rel, old):
     return None
 
 
-DISPATCH = {"self-commit": guard_self_commit, "rubric-write": guard_rubric_write}
+MANIFEST_SUFFIX = "skills/omnitune/references/models.json"
+VERSION_LOG_SUFFIX = "skills/omnitune/references/version-log.json"
+HOOKS_JSON_SUFFIX = "hooks/hooks.json"
+DELETE_RE = re.compile(
+    r"\b(?:git\s+rm|rm)\b[^|;&]*skills/omnitune/references/rubrics/[^\s'\"]+\.md")
+
+
+def _norm_target(path, cwd):
+    if not path:
+        return ""
+    return path.replace("\\", "/")
+
+
+def _manifest_result_text(payload, target):
+    """Post-write manifest text. Write -> content; Edit -> apply replacement to
+    the CURRENT on-disk text (unlike rubric-write, which diffs against HEAD)."""
+    tool = payload.get("tool_name")
+    ti = payload.get("tool_input") or {}
+    if tool == "Write":
+        return ti.get("content")
+    if tool == "Edit":
+        try:
+            with open(target, encoding="utf-8") as f:
+                cur = f.read()
+        except OSError:
+            return None
+        old_s, new_s = ti.get("old_string"), ti.get("new_string")
+        if old_s is None or new_s is None:
+            return None
+        if ti.get("replace_all"):
+            return cur.replace(old_s, new_s)
+        return cur.replace(old_s, new_s, 1)
+    return None
+
+
+def _check_manifest(text, cwd):
+    """Referential-integrity check for models.json. Returns a reason or None."""
+    try:
+        mj = json.loads(text)
+    except Exception:  # noqa: BLE001
+        return "the edit leaves models.json as invalid JSON"
+    if not isinstance(mj.get("models"), list) or not isinstance(mj.get("providers"), dict):
+        return "models.json must keep its 'models' list and 'providers' map"
+    ids = [m.get("id") for m in mj["models"]]
+    dups = sorted({i for i in ids if i and ids.count(i) > 1})
+    if dups:
+        return "duplicate model id(s): %s" % ", ".join(dups)
+    for m in mj["models"]:
+        rp = m.get("rubric")
+        if rp and not os.path.exists(os.path.join(cwd or ".", "skills", "omnitune", rp)):
+            return "model '%s' points at a missing rubric file: %s" % (m.get("id"), rp)
+    return None
+
+
+def guard_state_write(payload):
+    """H1: fence writes to omnitune state files. models.json gets an integrity
+    check; version-log.json and hooks/hooks.json are deny-without-marker
+    (the log is append-only via scripts/version_log.py; hook config changes
+    take code review, not automation)."""
+    ti = payload.get("tool_input") or {}
+    cwd = payload.get("cwd") or os.getcwd()
+    target = _norm_target(ti.get("file_path"), cwd)
+    if not target:
+        return _allow()
+    if _approved(cwd):
+        return _allow()
+    if target.endswith(VERSION_LOG_SUFFIX):
+        return _deny("version-log.json is append-only lineage — record entries via "
+                     "scripts/version_log.py, never Write/Edit; set %s=1 or add %s "
+                     "after human review." % (APPROVE_ENV, APPROVE_FILE))
+    if target.endswith(HOOKS_JSON_SUFFIX):
+        return _deny("hooks/hooks.json configures the fail-closed guards themselves — "
+                     "changes take human review; set %s=1 or add %s first."
+                     % (APPROVE_ENV, APPROVE_FILE))
+    if target.endswith(MANIFEST_SUFFIX):
+        new = _manifest_result_text(payload, target)
+        if new is None:
+            return _allow()  # cannot reconstruct: fail-open (CI tuner_check backstops)
+        reason = _check_manifest(new, cwd)
+        if reason:
+            return _deny("models.json integrity: %s. Fix the edit, or set %s=1 / add %s "
+                         "after human review." % (reason, APPROVE_ENV, APPROVE_FILE))
+    return _allow()
+
+
+def guard_rubric_delete(payload):
+    """H1: deleting a rubric (rm / git rm) is operator-approved only — the
+    retention policy says flag for removal, never auto-delete."""
+    ti = payload.get("tool_input") or {}
+    cmd = ti.get("command") or ""
+    cwd = payload.get("cwd") or os.getcwd()
+    if not cmd or not DELETE_RE.search(cmd):
+        return _allow()
+    if _approved(cwd):
+        return _allow()
+    return _deny("this command deletes a rubric — retention is operator-confirmed "
+                 "(never auto-delete); set %s=1 or add %s after human review."
+                 % (APPROVE_ENV, APPROVE_FILE))
+
+
+DISPATCH = {
+    "self-commit": guard_self_commit,
+    "rubric-write": guard_rubric_write,
+    "state-write": guard_state_write,
+    "rubric-delete": guard_rubric_delete,
+}
 
 
 def main(argv):

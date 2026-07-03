@@ -234,6 +234,45 @@ class TestManifestMatrix(unittest.TestCase):
                           body="floor rule: a Critical caps the verdict. fail-closed clause.\n")
             self.assertEqual(manifest_problems(mp), [])
 
+    def test_rubric_source_missing_from_manifest_is_problem(self):
+        # A URL the rubric frontmatter cites must appear in the manifest entry's
+        # source_urls — the drift class two panel reviewers hit on 2026-07-03.
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp, [{"id": "gpt-5.5", "provider": "openai",
+                "status": "ga", "rubric": "references/rubrics/openai/gpt-5-5.md",
+                "source_urls": ["https://developers.openai.com/one"]}])
+            _touch_rubric(tmp, "references/rubrics/openai/gpt-5-5.md",
+                          body="---\nextends: _core.md\nsources:\n"
+                               "  - https://developers.openai.com/one\n  - https://developers.openai.com/two\n"
+                               "---\n- a cited rule [x]\n")
+            _touch_rubric(tmp, "references/rubrics/openai/_core.md",
+                          body="floor rule: a Critical caps the verdict. fail-closed clause.\n")
+            probs = manifest_problems(mp)
+            self.assertTrue(any("source" in p and "two" in p for p in probs), probs)
+
+    def test_rubric_sources_subset_of_manifest_ok(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp, [{"id": "gpt-5.5", "provider": "openai",
+                "status": "ga", "rubric": "references/rubrics/openai/gpt-5-5.md",
+                "source_urls": ["https://developers.openai.com/one", "https://developers.openai.com/two"]}])
+            _touch_rubric(tmp, "references/rubrics/openai/gpt-5-5.md",
+                          body="---\nextends: _core.md\nsources:\n"
+                               "  - https://developers.openai.com/one\n"
+                               "---\n- a cited rule [x]\n")
+            _touch_rubric(tmp, "references/rubrics/openai/_core.md",
+                          body="floor rule: a Critical caps the verdict. fail-closed clause.\n")
+            self.assertEqual(manifest_problems(mp), [])
+
+    def test_rubric_without_sources_frontmatter_ok(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            mp = _write_manifest(tmp, [{"id": "gpt-5.5", "provider": "openai",
+                "status": "ga", "rubric": "references/rubrics/openai/gpt-5-5.md"}])
+            _touch_rubric(tmp, "references/rubrics/openai/gpt-5-5.md",
+                          body="---\nextends: _core.md\n---\n- a cited rule [x]\n")
+            _touch_rubric(tmp, "references/rubrics/openai/_core.md",
+                          body="floor rule: a Critical caps the verdict. fail-closed clause.\n")
+            self.assertEqual(manifest_problems(mp), [])
+
     def test_extends_target_missing_is_problem(self):
         with tempfile.TemporaryDirectory() as tmp:
             mp = _write_manifest(tmp, [{"id": "gpt-5.5", "provider": "openai",

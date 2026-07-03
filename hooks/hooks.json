@@ -1,5 +1,5 @@
 {
-  "description": "omnitune fail-closed guards: rubrics are propose-only (never self-committed) and tighten-only. These enforce mechanically what the skills state in prose. Approve an intended change with OMNITUNE_APPROVE_RUBRIC=1 or a .omnitune-approve-rubric file at the repo root.",
+  "description": "omnitune fail-closed guards: rubrics are propose-only (never self-committed), tighten-only, and operator-deleted only; omnitune state files (models.json integrity, append-only version-log.json, hooks.json itself) are fenced. These enforce mechanically what the skills state in prose. Approve an intended change with OMNITUNE_APPROVE_RUBRIC=1 or a .omnitune-approve-rubric file at the repo root.",
   "hooks": {
     "PreToolUse": [
       {
@@ -8,6 +8,11 @@
           {
             "type": "command",
             "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hook_guard.py self-commit",
+            "timeout": 15
+          },
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hook_guard.py rubric-delete",
             "timeout": 15
           }
         ]
@@ -18,6 +23,11 @@
           {
             "type": "command",
             "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hook_guard.py rubric-write",
+            "timeout": 15
+          },
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hook_guard.py state-write",
             "timeout": 15
           }
         ]

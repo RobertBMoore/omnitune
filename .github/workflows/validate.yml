@@ -22,6 +22,8 @@ jobs:
         run: python3 scripts/validate_plugin.py .
       - name: Config + model-manifest consistency on the real repo (blocking)
         run: python3 scripts/tuner_check.py .
+      - name: Wiki HTML freshness (blocking; committed wiki/index.html must match a fresh build)
+        run: python3 scripts/build_wiki_html.py --check
       - name: Rubric tighten-only ratchet gate (blocking; loosening needs a human-approved override)
         env:
           BASE_REF: ${{ github.base_ref || 'main' }}

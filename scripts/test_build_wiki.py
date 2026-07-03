@@ -41,5 +41,51 @@ class TestModelsSection(unittest.TestCase):
         self.assertIn("<table>", out)  # empty table, no crash
 
 
+class TestCheckMode(unittest.TestCase):
+    """--check compares a fresh build against wiki/index.html (CI freshness gate)."""
+
+    FRESH = "<html>fresh</html>"
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self._wiki, self._build = bw.WIKI, bw.build
+        bw.WIKI = self._tmp.name
+        bw.build = lambda: self.FRESH  # build() has its own tests; isolate the CLI logic
+        self.out = os.path.join(self._tmp.name, "index.html")
+
+    def tearDown(self):
+        bw.WIKI, bw.build = self._wiki, self._build
+        self._tmp.cleanup()
+
+    def test_check_ok_when_committed_html_is_fresh(self):
+        with open(self.out, "w", encoding="utf-8") as f:
+            f.write(self.FRESH)
+        self.assertEqual(bw.main(["--check"]), 0)
+
+    def test_check_fails_when_committed_html_is_stale(self):
+        with open(self.out, "w", encoding="utf-8") as f:
+            f.write("<html>old</html>")
+        self.assertEqual(bw.main(["--check"]), 1)
+
+    def test_check_fails_when_html_missing(self):
+        self.assertEqual(bw.main(["--check"]), 1)
+
+    def test_check_does_not_write(self):
+        with open(self.out, "w", encoding="utf-8") as f:
+            f.write("<html>old</html>")
+        bw.main(["--check"])
+        with open(self.out, encoding="utf-8") as f:
+            self.assertEqual(f.read(), "<html>old</html>")
+
+    def test_default_mode_writes_file(self):
+        self.assertEqual(bw.main([]), 0)
+        with open(self.out, encoding="utf-8") as f:
+            self.assertEqual(f.read(), self.FRESH)
+
+    def test_unknown_flag_fails_instead_of_writing(self):
+        self.assertEqual(bw.main(["--help"]), 2)
+        self.assertFalse(os.path.exists(self.out))
+
+
 if __name__ == "__main__":
     unittest.main()

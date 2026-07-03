@@ -6,13 +6,16 @@ Single-sourced from wiki/*.md. Renders the markdown subset used by the wiki
 into one offline-capable HTML page with sidebar nav, cross-page search, and a
 "tuning console" aesthetic. Dependency-free.
 
-Run:  python3 scripts/build_wiki_html.py      (from the repo root)
+Run:    python3 scripts/build_wiki_html.py           (from the repo root)
+Check:  python3 scripts/build_wiki_html.py --check   (CI freshness gate: exit 1 if
+        the committed wiki/index.html no longer matches a fresh build)
 Out:  wiki/index.html
 """
 import html
 import json
 import os
 import re
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 WIKI = os.path.join(HERE, "..", "wiki")
@@ -476,8 +479,31 @@ scrim.addEventListener('click',closeMenu);
 </html>
 """
 
-if __name__ == "__main__":
+def main(argv=None):
+    args = list(sys.argv[1:] if argv is None else argv)
+    unknown = [a for a in args if a != "--check"]
+    if unknown:
+        print("usage: build_wiki_html.py [--check]", file=sys.stderr)
+        return 2
     out = os.path.join(WIKI, "index.html")
+    fresh = build()
+    if "--check" in args:
+        try:
+            with open(out, encoding="utf-8") as f:
+                on_disk = f.read()
+        except OSError:
+            on_disk = None
+        if on_disk != fresh:
+            print("stale: wiki/index.html does not match its sources — "
+                  "regenerate with: python3 scripts/build_wiki_html.py", file=sys.stderr)
+            return 1
+        print("wiki/index.html is fresh")
+        return 0
     with open(out, "w", encoding="utf-8") as f:
-        f.write(build())
+        f.write(fresh)
     print("wrote", os.path.relpath(out, os.path.join(HERE, "..")), "(%d bytes)" % os.path.getsize(out))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

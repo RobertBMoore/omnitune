@@ -92,6 +92,69 @@
         "https://docs.x.ai/developers/models",
         "https://docs.x.ai/developers/rest-api-reference/inference/models"
       ]
+    },
+    {
+      "action": "add",
+      "date": "2026-07-03",
+      "last_synced": "2026-07-03",
+      "model_id": "claude-sonnet-5",
+      "outcome": "shipped (synced; 3-round independent panel, operator-approved)",
+      "provider": "anthropic",
+      "source_urls": [
+        "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "https://platform.claude.com/docs/en/about-claude/models/whats-new-sonnet-5",
+        "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5",
+        "https://platform.claude.com/docs/en/about-claude/models/migration-guide",
+        "https://platform.claude.com/docs/en/build-with-claude/adaptive-thinking"
+      ]
+    },
+    {
+      "action": "add",
+      "date": "2026-07-03",
+      "last_synced": "2026-07-03",
+      "model_id": "grok-4.3",
+      "outcome": "shipped (derived-tier; xAI publishes no prompting guide as of 2026-07-03)",
+      "provider": "xai",
+      "source_urls": [
+        "https://docs.x.ai/developers/models",
+        "https://docs.x.ai/developers/models/grok-4.3",
+        "https://docs.x.ai/developers/rest-api-reference/inference/models"
+      ]
+    },
+    {
+      "action": "update",
+      "date": "2026-07-03",
+      "last_synced": "2026-07-03",
+      "model_id": "claude-sonnet-4-6",
+      "outcome": "verify resolved (effort default=high, sourced); max output corrected 64k->128k; marked Legacy tier; budget_tokens deprecation noted",
+      "provider": "anthropic",
+      "source_urls": [
+        "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5"
+      ]
+    },
+    {
+      "action": "update",
+      "date": "2026-07-03",
+      "last_synced": "2026-07-03",
+      "model_id": "claude-opus-4-8",
+      "outcome": "128k hard-max noted alongside 64k starting headroom; source tags corrected ([EF]/[OV] added to legend)",
+      "provider": "anthropic",
+      "source_urls": [
+        "https://platform.claude.com/docs/en/build-with-claude/effort",
+        "https://platform.claude.com/docs/en/about-claude/models/overview"
+      ]
+    },
+    {
+      "action": "update",
+      "date": "2026-07-03",
+      "last_synced": "2026-07-03",
+      "model_id": "gpt-5.5",
+      "outcome": "provider _core.md corrected (applies family-wide): effort ladder has no 'minimal' level; text.verbosity levels corrected to low/medium (default medium)",
+      "provider": "openai",
+      "source_urls": [
+        "https://developers.openai.com/api/docs/guides/latest-model"
+      ]
     }
   ],
   "schema": 1

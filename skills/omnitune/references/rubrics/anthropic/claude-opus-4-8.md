@@ -12,12 +12,13 @@ sources:
   - https://www.anthropic.com/news/claude-opus-4-8
   - https://platform.claude.com/docs/en/build-with-claude/effort
   - https://platform.claude.com/docs/en/build-with-claude/adaptive-thinking
+  - https://platform.claude.com/docs/en/about-claude/models/overview
 extends: _core.md
 ---
 
 # Rubric — Claude Opus 4.8
 
-Read `_core.md` first; this file adds the Opus-4.8-specific calibration. Source legend: `[BP]` best practices · `[WN]` what's new in 4.8 · `[MG]` migration guide · `[News]` anthropic.com/news/claude-opus-4-8.
+Read `_core.md` first; this file adds the Opus-4.8-specific calibration. Source legend: `[BP]` best practices · `[WN]` what's new in 4.8 · `[MG]` migration guide · `[News]` anthropic.com/news/claude-opus-4-8 · `[EF]` effort guide · `[OV]` models overview.
 
 **Controlling fact:** Opus 4.8 performs well on existing 4.7 prompts but is **more literal**, **calibrates length to judged complexity**, **favors reasoning over tool calls** (with better tool-trigger reliability than 4.7), and **respects effort strictly** — effort matters more than on any prior Opus. Most audit findings trace to one of these. `[BP]`
 
@@ -34,7 +35,7 @@ Read `_core.md` first; this file adds the Opus-4.8-specific calibration. Source 
 ## Model-specific calibration (overrides/augments _core)
 
 - **Literalness is high, especially at low effort.** Core §1 (scope, positive framing, no hedges) is **HIGH severity** on this model — ambiguity yields narrow compliant output, not helpful inference. `[BP]`
-- **Effort is the primary quality lever.** `xhigh` for coding/agentic; minimum `high` for intelligence-sensitive work; `medium` for cost-sensitive; `low` only for scoped latency-sensitive work. `max` can overthink — test first. At `max`/`xhigh`, start max output tokens at 64k. If reasoning feels shallow, raise effort rather than prompting "think carefully." `[BP][MG]`
+- **Effort is the primary quality lever.** `xhigh` for coding/agentic; minimum `high` for intelligence-sensitive work; `medium` for cost-sensitive; `low` only for scoped latency-sensitive work. `max` can overthink — test first. At `max`/`xhigh`, start max output tokens at 64k `[EF]` (a starting headroom, not the ceiling — the hard max is 128k `[OV]`). If reasoning feels shallow, raise effort rather than prompting "think carefully." `[BP]`
 - **Adaptive thinking** (`thinking:{type:"adaptive"}`, off unless set); manual `budget_tokens` is **rejected (400)** — migrate to adaptive thinking + effort. `[WN][MG]`
 - **Tool-triggering is reliable;** raise effort (not aggressive prose) to increase tool use. `[BP]`
 - **Subagents: fewer by default** — steer explicitly when you want parallel fan-out; rein in single-file delegation. `[BP]`

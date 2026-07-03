@@ -1,6 +1,6 @@
 {
   "schema": 3,
-  "updated": "2026-06-29",
+  "updated": "2026-07-03",
   "note": "Model library manifest. omnitune selects a rubric by matching the CURRENT session's model id to an entry here (via scripts/resolve_model.py), then loading its rubric. Per-provider source domains + discovery URLs live under 'providers'. ga_date/deprecated_date are filled from docs when known; null = not yet recorded (do not fabricate). status: ga | limited | deprecated | retired.",
   "providers": {
     "anthropic": {
@@ -32,7 +32,7 @@
         "models": { "url": "https://docs.x.ai/developers/models", "role": "model-listing" },
         "rest_models": { "url": "https://docs.x.ai/developers/rest-api-reference/inference/models", "role": "discovery" }
       },
-      "note": "Grok API is OpenAI-/Anthropic-SDK-compatible. docs.x.ai carries the model docs; the live /v1/models listing is the id source of truth (aliases like grok-latest move). role: model-listing anchors two-key id confirmation; discovery is for model existence/dates only. A prompting entrypoint is added on the next sync once the exact docs.x.ai prompting-guide path is confirmed live."
+      "note": "Grok API is OpenAI-/Anthropic-SDK-compatible. docs.x.ai carries the model docs; the live /v1/models listing is the id source of truth (aliases like grok-latest move). role: model-listing anchors two-key id confirmation; discovery is for model existence/dates only. Checked 2026-07-03: no prompting guide is published on docs.x.ai (models + model-detail pages) — add a prompting entrypoint when one appears."
     }
   },
   "retention": {
@@ -83,7 +83,27 @@
         "https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-8",
         "https://platform.claude.com/docs/en/about-claude/models/migration-guide",
         "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
-        "https://www.anthropic.com/news/claude-opus-4-8"
+        "https://www.anthropic.com/news/claude-opus-4-8",
+        "https://platform.claude.com/docs/en/build-with-claude/effort",
+        "https://platform.claude.com/docs/en/build-with-claude/adaptive-thinking",
+        "https://platform.claude.com/docs/en/about-claude/models/overview"
+      ]
+    },
+    {
+      "id": "claude-sonnet-5",
+      "provider": "anthropic",
+      "family": "sonnet",
+      "status": "ga",
+      "ga_date": null,
+      "deprecated_date": null,
+      "rubric": "references/rubrics/anthropic/claude-sonnet-5.md",
+      "rubric_note": "Synced from live docs 2026-07-03. Drop-in successor to sonnet-4-6 with reversals: adaptive thinking default-on, manual extended thinking + non-default sampling params return 400, new tokenizer ~+30% tokens, strict effort compliance. GA date not stated on docs (intro pricing through 2026-08-31).",
+      "source_urls": [
+        "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "https://platform.claude.com/docs/en/about-claude/models/whats-new-sonnet-5",
+        "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5",
+        "https://platform.claude.com/docs/en/about-claude/models/migration-guide",
+        "https://platform.claude.com/docs/en/build-with-claude/adaptive-thinking"
       ]
     },
     {
@@ -94,10 +114,12 @@
       "ga_date": null,
       "deprecated_date": null,
       "rubric": "references/rubrics/anthropic/claude-sonnet-4-6.md",
+      "rubric_note": "Moved to the overview's Legacy tier (observed 2026-07-03); still generally available, not deprecated. claude-sonnet-5 is the drop-in successor.",
       "source_urls": [
         "https://platform.claude.com/docs/en/about-claude/models/overview",
         "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
-        "https://platform.claude.com/docs/en/about-claude/models/migration-guide"
+        "https://platform.claude.com/docs/en/about-claude/models/migration-guide",
+        "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5"
       ]
     },
     {
@@ -137,7 +159,8 @@
       "source_urls": [
         "https://developers.openai.com/codex/models",
         "https://developers.openai.com/codex/prompting",
-        "https://developers.openai.com/codex/learn/best-practices"
+        "https://developers.openai.com/codex/learn/best-practices",
+        "https://developers.openai.com/api/docs/guides/latest-model"
       ]
     },
     {
@@ -218,10 +241,12 @@
       "status": "ga",
       "ga_date": "2026-04-30",
       "deprecated_date": null,
-      "rubric": null,
-      "rubric_note": "Current xAI flagship (1M context, reasoning + non-reasoning). Derive-on-demand: resolves via closest-family fallback + badge until a rubric is synced. Kept as a clean drop-in for the general-purpose line.",
+      "rubric": "references/rubrics/xai/grok-4-3.md",
+      "rubric_note": "Derived-tier rubric added 2026-07-03: platform facts sourced from docs.x.ai model pages (1M context, function calling, structured outputs, reasoning, cached-input pricing); prompting guidance derived and tagged (verify) — xAI publishes no prompting guide as of 2026-07-03.",
       "source_urls": [
-        "https://docs.x.ai/developers/models"
+        "https://docs.x.ai/developers/models",
+        "https://docs.x.ai/developers/models/grok-4.3",
+        "https://docs.x.ai/developers/rest-api-reference/inference/models"
       ]
     },
     {

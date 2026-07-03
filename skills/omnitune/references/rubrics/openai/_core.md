@@ -3,8 +3,8 @@ provider: openai
 applies_to: current OpenAI GPT-5 / Codex family
 source_status: synced-from-docs
 citation_gate: strict
-lastSynced: 2026-06-28
-lastReviewed: 2026-06-28
+lastSynced: 2026-07-03
+lastReviewed: 2026-07-03
 sources:
   - https://developers.openai.com/codex/prompting
   - https://developers.openai.com/codex/learn/best-practices
@@ -30,8 +30,8 @@ The provider-invariant prompt-engineering rules for OpenAI's GPT-5-class / Codex
 ## 2. Effort & verbosity (the two separate levers)
 
 - Set `reasoning.effort` to the task: low for fast, well-scoped work; medium/high for complex changes or debugging; xhigh for long, agentic, reasoning-heavy tasks. `[BP]`
-- The effort ladder runs none → minimal → low → medium (default) → high → xhigh; re-evaluate before escalating, since efficient reasoning makes low/medium sufficient more often. `[LM]`
-- Treat `text.verbosity` (low/medium/high) as a separate lever from effort; the default is medium — prefer low and raise it only when you need more exposition. `[LM]`
+- The effort ladder runs none → low → medium (default) → high → xhigh — there is no `minimal` level; reserve `none` for calls where low latency matters more than intelligence. Re-evaluate before escalating, since efficient reasoning makes low/medium sufficient more often. `[LM]`
+- Treat `text.verbosity` as a separate lever from effort; the documented levels are low and medium (medium is the default) — prefer low, and raise back to medium only when you need more exposition. `[LM]`
 
 ## 3. Outcome-first, minimal scaffolding
 

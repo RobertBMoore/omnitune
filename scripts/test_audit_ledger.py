@@ -2,6 +2,7 @@ import os
 import tempfile
 import unittest
 
+import audit_ledger
 import audit_ledger as al
 
 
@@ -185,6 +186,66 @@ class TestConvergence(unittest.TestCase):
                 f.write("[]")  # wrong shape
             r = al.convergence(p)
             self.assertEqual(r["verdict"], "NOT_CONVERGED")
+
+
+class CarryForward(unittest.TestCase):
+    def setUp(self):
+        import tempfile
+        self.d = tempfile.mkdtemp()
+        self.p = os.path.join(self.d, "ledger.json")
+        audit_ledger.reset(self.p)
+
+    def _round(self, n, findings, author="author"):
+        reviews = [{"reviewer_id": "rev-a", "findings": findings},
+                   {"reviewer_id": "rev-b", "findings": []}]
+        audit_ledger.record_round(self.p, n, reviews, author_id=author)
+
+    def test_open_finding_carried(self):
+        fp = audit_ledger.fingerprint("wrong-value", "file.md-10")
+        self._round(1, [{"fingerprint": fp, "severity": "high", "summary": "bad number"}])
+        cf = audit_ledger.carry_forward(self.p)
+        self.assertEqual([f["fingerprint"] for f in cf], [fp])
+        self.assertEqual(cf[0]["summary"], "bad number")
+        self.assertEqual(cf[0]["severity"], "high")
+
+    def test_reconciled_and_declined_excluded(self):
+        fp1 = audit_ledger.fingerprint("wrong-value", "f.md-1")
+        fp2 = audit_ledger.fingerprint("style", "f.md-2")
+        self._round(1, [{"fingerprint": fp1, "severity": "high", "summary": "x"},
+                        {"fingerprint": fp2, "severity": "low", "summary": "y"}])
+        audit_ledger.set_status(self.p, fp1, "reconciled", "fixed")
+        audit_ledger.set_status(self.p, fp2, "declined", "wontfix")
+        self.assertEqual(audit_ledger.carry_forward(self.p), [])
+
+    def test_reopened_included(self):
+        fp = audit_ledger.fingerprint("wrong-value", "f.md-10")
+        self._round(1, [{"fingerprint": fp, "severity": "high", "summary": "x"}])
+        audit_ledger.set_status(self.p, fp, "reconciled", "fixed")
+        audit_ledger.set_status(self.p, fp, "open")
+        self.assertEqual([f["fingerprint"] for f in audit_ledger.carry_forward(self.p)], [fp])
+
+    def test_empty_ledger(self):
+        self.assertEqual(audit_ledger.carry_forward(self.p), [])
+
+    def test_includes_low_and_material_subset_matches_convergence(self):
+        hi = audit_ledger.fingerprint("wrong-value", "a-1")
+        lo = audit_ledger.fingerprint("nit", "b-2")
+        self._round(1, [{"fingerprint": hi, "severity": "high", "summary": "h"},
+                        {"fingerprint": lo, "severity": "low", "summary": "l"}])
+        cf = {f["fingerprint"] for f in audit_ledger.carry_forward(self.p)}
+        self.assertEqual(cf, {hi, lo})
+        conv = audit_ledger.convergence(self.p)
+        mat = {f["fingerprint"] for f in audit_ledger.carry_forward(self.p)
+               if audit_ledger._rank(f["severity"]) >= 2}
+        self.assertEqual(mat, set(conv["open_material"]))
+
+    def test_latest_round_detail_wins(self):
+        fp = audit_ledger.fingerprint("wrong-value", "a-1")
+        self._round(1, [{"fingerprint": fp, "severity": "medium", "summary": "first"}])
+        self._round(2, [{"fingerprint": fp, "severity": "high", "summary": "second"}])
+        cf = audit_ledger.carry_forward(self.p)
+        self.assertEqual(cf[0]["summary"], "second")
+        self.assertEqual(cf[0]["severity"], "high")
 
 
 if __name__ == "__main__":

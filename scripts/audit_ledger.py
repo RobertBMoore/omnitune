@@ -166,3 +166,35 @@ def convergence(path, clean_rounds=2, cap=3, material="high"):
     except Exception as e:  # noqa: BLE001 - convergence must never raise
         return {"verdict": "NOT_CONVERGED", "trailing_clean": 0, "rounds": 0,
                 "open_material": [], "declined_material": [], "error": str(e)}
+
+
+def carry_forward(path):
+    """Still-open findings (newest status != reconciled/declined) as the next
+    round's re-review set: sorted [{fingerprint, summary, severity}], using each
+    fingerprint's most-recent round detail. Reuses the same newest-status-wins
+    rule as convergence(), so the two never disagree. Never raises. Includes ALL
+    severities (the panel re-reviews everything still open); convergence()'s
+    material-only open_material is a subset."""
+    try:
+        events = _load(path)["events"]
+        current_status = {}
+        for e in events:
+            if e.get("type") == "status":
+                current_status[e.get("fingerprint")] = e.get("status")
+        detail = {}
+        for e in events:
+            if e.get("type") != "round":
+                continue
+            for rv in e.get("reviews") or []:
+                for f in rv.get("findings") or []:
+                    fp = f.get("fingerprint")
+                    if fp is None:
+                        continue
+                    detail[fp] = {"fingerprint": fp,
+                                  "summary": f.get("summary", ""),
+                                  "severity": f.get("severity", "low")}
+        out = [detail[fp] for fp in detail
+               if current_status.get(fp, "open") == "open"]
+        return sorted(out, key=lambda d: (-_rank(d["severity"]), d["fingerprint"]))
+    except Exception:  # noqa: BLE001 - carry-forward must never block a run
+        return []

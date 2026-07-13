@@ -12,9 +12,9 @@ Codex has no plugin system, so omnitune ships to your repo as a git submodule pl
    ```
    python3 .omnitune/scripts/agents_merge.py
    ```
-3. **(Optional) repo-aware config — guided:** follow `.omnitune/skills/install/SKILL.md` — a short interview that drafts and writes `omnitune.config.yaml` at your repo root (routing, context pointers, output paths). Without any config, tune/sync run standalone on the model rubric alone.
+3. **(Optional) repo-aware config — guided:** follow `.omnitune/skills/install/SKILL.md` — a short interview that drafts and writes `omnitune.config.yaml` at your repo root (routing, context pointers, output paths). Tune/sync work without config; Mode C combines the session rubric with its built-in pack contract. Set `output.packs` when you want a default Mode C save location.
 
-Now a Codex session in this repo auto-loads the omnitune block and can run `tune-prompt`, `tune-skill`, and `sync` — following `.omnitune/skills/*/SKILL.md` (paths prefixed with `.omnitune/`), behind omnitune's safety invariants.
+Now a Codex session in this repo auto-loads the omnitune block and can run `tune-prompt`, `tune-skill`, `tune-goal`, and `sync` — following `.omnitune/skills/*/SKILL.md` (paths prefixed with `.omnitune/`), behind omnitune's safety invariants.
 
 ## Update
 ```

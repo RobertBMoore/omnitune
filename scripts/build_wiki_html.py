@@ -26,6 +26,7 @@ VERSION_LOG_JSON = os.path.join(HERE, "..", "skills", "omnitune", "references", 
 PAGES = [
     ("Home.md", "overview", "Overview"),
     ("How-It-Works.md", "how-it-works", "How It Works"),
+    ("Tune-Goal.md", "tune-goal", "Tune Goal"),
     ("Install-Setup.md", "install", "Install & Setup"),
     ("Configuration.md", "configuration", "Configuration"),
     ("Auto-Sync.md", "auto-sync", "Auto-Sync"),

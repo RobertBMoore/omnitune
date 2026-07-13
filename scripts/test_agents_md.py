@@ -25,6 +25,11 @@ class TestReferentialIntegrity(unittest.TestCase):
         missing = [t for t in paths if not os.path.exists(os.path.join(ROOT, t))]
         self.assertEqual(missing, [], "AGENTS.md references missing paths: %s" % missing)
 
+    def test_tune_goal_protocol_is_routed(self):
+        text = _read("AGENTS.md")
+        self.assertIn("tune-goal", text)
+        self.assertIn("skills/omnitune/tune-goal-protocol.md", text)
+
 
 class TestSafetyPhrases(unittest.TestCase):
     def test_operative_phrases_present(self):

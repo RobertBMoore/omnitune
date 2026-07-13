@@ -171,6 +171,17 @@
         "https://platform.claude.com/docs/en/managed-agents/memory",
         "https://platform.claude.com/docs/en/managed-agents/dreams"
       ]
+    },
+    {
+      "action": "update",
+      "date": "2026-07-13",
+      "last_synced": "2026-07-13",
+      "model_id": "claude-fable-5",
+      "outcome": "scaffolding follow-up: added send-to-user tool + don't-end-on-a-promise items (dropped from the WS1 refresh as out-of-scope); 2-reviewer panel clean",
+      "provider": "anthropic",
+      "source_urls": [
+        "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5"
+      ]
     }
   ],
   "schema": 1

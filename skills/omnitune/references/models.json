@@ -1,6 +1,6 @@
 {
   "schema": 3,
-  "updated": "2026-07-03",
+  "updated": "2026-07-13",
   "note": "Model library manifest. omnitune selects a rubric by matching the CURRENT session's model id to an entry here (via scripts/resolve_model.py), then loading its rubric. Per-provider source domains + discovery URLs live under 'providers'. ga_date/deprecated_date are filled from docs when known; null = not yet recorded (do not fabricate). status: ga | limited | deprecated | retired.",
   "providers": {
     "anthropic": {
@@ -55,7 +55,9 @@
         "https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5",
         "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5",
         "https://platform.claude.com/docs/en/about-claude/models/overview",
-        "https://platform.claude.com/docs/en/about-claude/models/migration-guide"
+        "https://platform.claude.com/docs/en/about-claude/models/migration-guide",
+        "https://platform.claude.com/docs/en/managed-agents/dreams",
+        "https://platform.claude.com/docs/en/managed-agents/memory"
       ]
     },
     {

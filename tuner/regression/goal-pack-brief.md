@@ -23,9 +23,10 @@ builder/auditor agent definitions with tools allowlists and the report contract;
 state-file contracts (CURRENT ≤25 lines, MILESTONES, append-only LOG, DECISIONS,
 BACKLOG, session registry, ~8KB continuity buffer); a guardrails digest; a
 numbered operator pre-flight checklist including the quiet hours above; a
-reflection clause (milestone close or 24h, whichever first); and runnable
-record_check + staleness-watchdog gate scripts configured for `milestone/*` tags
-and the gates named in the brief. Every specific beyond this brief is laddered as
+reflection clause (milestone close or 24h, whichever first) carrying the
+local-Dream contract — bounded input, an adopt-or-discard lesson store, and an
+append-only drift audit; and runnable record_check + staleness-watchdog gate
+scripts configured for `milestone/*` tags and the gates named in the brief. Every specific beyond this brief is laddered as
 an assumption. A rubric or reference change that drops a pack component or
 demotes a mechanized gate to policy prose is exactly the drift this baseline
 catches.

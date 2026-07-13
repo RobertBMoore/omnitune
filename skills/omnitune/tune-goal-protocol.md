@@ -41,7 +41,10 @@ Read, in order:
 1. `references/orchestration-pack.md` — end to end: the pack contract (components
    a-g), gates G1-G4, binding rules B1-B14, the reflection clause, the
    traceability table.
-2. `references/rubrics/<provider>/<session-model>.md` + `_core.md` — the rubric
+2. `references/reflection-protocol.md` — the local-Dream contract (points R1-R7)
+   the pack's reflection clause inherits; read when emitting component (b)/(g)
+   so the clause is complete, not a stub.
+3. `references/rubrics/<provider>/<session-model>.md` + `_core.md` — the rubric
    selected upstream by `SKILL.md` step 2.
 
 The rubric, never this protocol, supplies the model-shaped values: the delegation

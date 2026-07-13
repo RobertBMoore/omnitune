@@ -186,8 +186,8 @@ third leg of external checking: deterministic gates catch bookkeeping decay,
 scheduled fresh-context reflection catches judgment drift, and the dumb scheduled
 watchdog catches orchestrator death. External checking is a cadence, not a
 resident: no standing co-operator agent is added. The full reflection contract
-ships as its own reference protocol in this `references/` directory; packs point
-at it once it exists.
+is `reflection-protocol.md` in this directory (points `R1`–`R7`); every pack's
+reflection clause points at it.
 
 ## Traceability
 

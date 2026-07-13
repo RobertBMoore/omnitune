@@ -5,8 +5,9 @@ import unittest
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CORPUS = os.path.join(ROOT, "tuner", "regression")
 FLOOR = 5
-CLASSES = {"command", "code", "factual-terse", "creative-brief", "adversarial-eval", "skill-audit"}
-MODES = {"A", "B"}
+CLASSES = {"command", "code", "factual-terse", "creative-brief", "adversarial-eval",
+           "skill-audit", "goal-pack"}
+MODES = {"A", "B", "C"}
 
 
 def _fixtures():

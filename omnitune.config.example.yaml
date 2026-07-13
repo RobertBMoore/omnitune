@@ -33,6 +33,7 @@ reserved_decisions: "reference/executive-decisions.md"
 output:
   reports: "reports/"
   prompts: "docs/prompts/"
+  packs: "packs/"   # optional — Mode C orchestration packs; omit to be asked per run
 
 model_sync:
   channel: "badge"

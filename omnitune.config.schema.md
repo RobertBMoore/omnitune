@@ -16,6 +16,7 @@ The single customization point for omnitune. The core plugin reads this; it cont
 | `reserved_decisions` | no | Path to decisions the tuner must **surface, not pre-empt**. `''` if none. |
 | `output.reports` | yes | Where Mode A writes audit reports. |
 | `output.prompts` | yes | Where Mode B saves rewritten prompts. |
+| `output.packs` | no | Where Mode C writes orchestration packs (one dated subdirectory per pack). When absent, Mode C asks for a target directory or presents the pack in chat with an offer to save — it never blocks. |
 | `model_sync.channel` | yes | `badge` (default; non-blocking notice), `interrupt` (just-in-time halt with update/skip/defer/snooze), or `manual` (only on `/omnitune:sync`). |
 | `model_sync.target_model` | no | Override session-model detection (headless/CI where the model id can't be read). `""` = auto-detect from the session. |
 | `model_sync.snooze_default` | no | Default snooze window — only used when `channel: interrupt`. |

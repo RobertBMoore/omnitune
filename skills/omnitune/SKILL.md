@@ -1,16 +1,22 @@
 ---
 name: omnitune
 description: >-
-  Audits a repo's skills/agents and rewrites ad-hoc user prompts against the
-  CURRENT Anthropic model's prompt-engineering best practices. Repo-agnostic:
-  all domain knowledge comes from omnitune.config.yaml, never hardcoded. Two modes.
+  Audits a repo's skills/agents, rewrites ad-hoc user prompts, and turns project
+  briefs into launch-ready orchestration packs against the CURRENT Anthropic
+  model's prompt-engineering best practices. Repo-agnostic: all domain knowledge
+  comes from omnitune.config.yaml, never hardcoded. Three modes.
   Mode A (file audit): severity-ranked report across 7 dimensions with
   interactive diff edits on a skill/agent file. Mode B (prompt rewrite): takes a
   raw prompt and returns an improved version with context, register, and success
   criteria filled in, self-scored against the model rubric in a QA loop before
-  presenting. Triggers on "tune the X skill", "audit X against best practices",
-  "improve this prompt", "rewrite this prompt", "/omnitune:tune-skill", "/omnitune:tune-prompt".
-lastReviewed: 2026-06-27
+  presenting. Mode C (tune-goal): takes a project brief and emits a launch pack
+  (goal prompt, constitution, agent definitions, state-file contracts, guardrails
+  digest, pre-flight checklist, gate scripts) per the orchestration pack contract.
+  Triggers on "tune the X skill", "audit X against best practices",
+  "improve this prompt", "rewrite this prompt", "build a launch pack for this
+  project", "turn this brief into an orchestration pack", "tune this goal",
+  "/omnitune:tune-skill", "/omnitune:tune-prompt", "/omnitune:tune-goal".
+lastReviewed: 2026-07-13
 ---
 
 # omnitune — Agent Skill
@@ -32,8 +38,9 @@ This skill uses Claude Code tool names and Claude Code / Nimbalyst model detecti
 Read, in order:
 1. `audit-protocol.md` (this dir) — the audit rubric + dimensions
 2. `prompt-rewrite-protocol.md` (this dir) — the Mode B checklist + QA loop (incl. fabrication ledger + prompt-class gate)
-3. `references/rubrics/<provider>/<session-model>.md` — the rubric for the model this session runs (selected in step 2 above)
-4. `references/common-anti-patterns.md` — the smell catalog
+3. `tune-goal-protocol.md` (this dir) — the Mode C brief-intake gate + pack emission + self-check (read, with `references/orchestration-pack.md`, only when Mode C is selected)
+4. `references/rubrics/<provider>/<session-model>.md` — the rubric for the model this session runs (selected in step 2 above)
+5. `references/common-anti-patterns.md` — the smell catalog
 
 ## Mode selection
 
@@ -41,6 +48,7 @@ Read, in order:
 |---|---|
 | `/omnitune:tune-skill <name>` or a prompt naming a skill/agent file to tune | Mode A — file audit |
 | `/omnitune:tune-prompt "<text>"` or a prompt containing a raw prompt to rewrite | Mode B — prompt rewrite |
+| `/omnitune:tune-goal "<brief>"` or a prompt asking to turn a project brief/goal into a launch or orchestration pack | Mode C — orchestration pack |
 | `/omnitune:sync` | Hand off to `../sync/SKILL.md` |
 | no `omnitune.config.yaml` present | Run in **standalone mode** (rubric-only; still works). Note that `/omnitune:install` adds repo-aware routing |
 
@@ -58,6 +66,10 @@ If ambiguous, ask before proceeding.
 
 Follow `prompt-rewrite-protocol.md` end-to-end. **With config:** target detection uses `routing[]` and context pointers use `context_pointers[]`. **Standalone (no config):** skip routing/pointers and rewrite from the rubric alone (all added specifics laddered). The draft is not presented until it passes the QA loop. Save the result to `<output.prompts>/YYYY-MM-DD-<slug>.md` when configured; in standalone mode present it in chat and offer to save.
 
+## Mode C — Orchestration Pack (tune-goal)
+
+Follow `tune-goal-protocol.md` end-to-end. The knowledge source is `references/orchestration-pack.md` (provider-shared, model-agnostic); model-specific steering (delegation defaults, effort, verbosity) comes from the session model's rubric selected above — never hardcoded. **With config:** save the pack under `<output.packs>/` when configured (a user-named target directory always wins). **Standalone (no config):** present the pack structure in chat and offer to save. The pack is not presented until the protocol's self-check pass succeeds (every invariant encoded as a mechanized gate or binding rule; the emitted gate scripts compile).
+
 ## Decoupling contract
 
 This skill must never name a specific company, campaign, brand, persona, or domain file. Every such reference is read from `omnitune.config.yaml`. If you find yourself wanting to hardcode a domain noun, it belongs in config instead. (See `omnitune.config.schema.md`.)
@@ -66,4 +78,5 @@ This skill must never name a specific company, campaign, brand, persona, or doma
 
 - **Mode A:** report written; interactive loop completed; summary printed.
 - **Mode B:** draft passed the QA loop; fabrication ledger surfaced any added constraints; presented (and saved to `<output.prompts>/` when configured); user picked run/copy/edit/abandon.
-- **Either:** the rubric was selected by the session model; on a miss, the operator saw the non-blocking badge (or the interrupt, if opted in) before output was produced.
+- **Mode C:** brief gaps asked as numbered questions; pack emitted with all seven contract components; self-check passed (traceability walk + gate scripts compile); pre-flight checklist, reserved decisions, and assumptions surfaced.
+- **Any mode:** the rubric was selected by the session model; on a miss, the operator saw the non-blocking badge (or the interrupt, if opted in) before output was produced.

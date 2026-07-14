@@ -75,6 +75,21 @@ class TestValidatePlugin(unittest.TestCase):
             build(tmp, plugin={"name": "other-plugin"})
             self.assertTrue(any("'name' must be 'omnitune'" in p for p in validate(tmp)))
 
+    def test_hooks_references_standard_file_is_problem(self):
+        # manifest.hooks pointing at the auto-loaded hooks/hooks.json double-loads
+        # it and fails the plugin ("Duplicate hooks file detected").
+        for ref in ("./hooks/hooks.json", "hooks/hooks.json"):
+            with tempfile.TemporaryDirectory() as tmp:
+                build(tmp, plugin={"name": "omnitune", "hooks": ref})
+                probs = validate(tmp)
+                self.assertTrue(any("auto-loaded" in p for p in probs), (ref, probs))
+
+    def test_hooks_additional_file_is_ok(self):
+        # Referencing an ADDITIONAL hook file (not the standard one) is allowed.
+        with tempfile.TemporaryDirectory() as tmp:
+            build(tmp, plugin={"name": "omnitune", "hooks": "./hooks/extra.json"})
+            self.assertEqual(validate(tmp), [])
+
     def test_invalid_marketplace_json(self):
         with tempfile.TemporaryDirectory() as tmp:
             build(tmp)

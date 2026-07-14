@@ -76,6 +76,23 @@ def validate(repo_root):
         if "version" in plug:
             problems.append("plugin: plugin.json must NOT pin 'version' — it silently "
                             "blocks updates (see distribution design D2)")
+        # The standard hooks/hooks.json is auto-loaded by Claude Code. Naming it
+        # again in manifest.hooks double-loads it and fails the whole plugin at
+        # load time ("Duplicate hooks file detected"), so its commands/skills
+        # never register. manifest.hooks must reference ONLY additional hook files.
+        hooks_field = plug.get("hooks")
+        hook_refs = hooks_field if isinstance(hooks_field, list) else [hooks_field]
+        for ref in hook_refs:
+            if not isinstance(ref, str):
+                continue
+            norm = ref[2:] if ref.startswith("./") else ref
+            if norm == "hooks/hooks.json":
+                problems.append(
+                    "plugin: 'hooks' must NOT reference the standard "
+                    "hooks/hooks.json — it is auto-loaded, so a manifest reference "
+                    "double-loads it and fails the plugin at load time. Omit 'hooks' "
+                    "(the standard file still loads) or point it only at ADDITIONAL "
+                    "hook files.")
 
     return problems
 

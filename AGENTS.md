@@ -1,6 +1,6 @@
 # AGENTS.md — operating omnitune under Codex
 
-**omnitune** is a model-agnostic prompt/skill tuner (shipped as a Claude Code plugin). You are running under **Codex**, which does not load Claude Code plugins — so this file is your entry point: it maps omnitune's Claude-Code-authored skills onto Codex and states the rules you must not break.
+**omnitune** is a model-agnostic prompt/skill/goal tuner (shipped as a Claude Code plugin). You are running under **Codex**, which does not load Claude Code plugins — so this file is your entry point: it maps omnitune's Claude-Code-authored skills onto Codex and states the rules you must not break.
 
 **Scope:** this guide is for the **omnitune repo itself**. Using omnitune inside a *consumer* repo under Codex is the pending follow-on (**D2b-2**) and works differently. If this file appears in a repo that is **not omnitune**, do not follow it.
 
@@ -18,6 +18,7 @@ Harness-independent; they hold under Codex exactly as under Claude Code. When in
 ## 2. What omnitune does & where each protocol lives
 
 - **tune-prompt** (Mode B — rewrite a prompt) & **tune-skill** (Mode A — audit a skill/agent) → `skills/omnitune/SKILL.md`.
+- **tune-goal** (Mode C — turn a project brief into an orchestration pack) → `skills/omnitune/SKILL.md`, then `skills/omnitune/tune-goal-protocol.md`.
 - **sync** (derive a rubric for the current model) → `skills/sync/SKILL.md`.
 - **install** (build `omnitune.config.yaml` by interview) → `skills/install/SKILL.md`.
 

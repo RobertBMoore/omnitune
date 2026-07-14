@@ -16,15 +16,15 @@ Set `model_sync.channel` in your config:
 - **`interrupt`** — the just-in-time version: halts and offers **update-now / skip-for-session / defer-until-tasks-done / snooze**, persisting your choice to `tuner/.sync-state.json`. Opt in if you want to be prompted immediately.
 - **`manual`** — no badge, no interrupt; detection runs only when you call `/omnitune:sync`. Use for air-gapped or CI hosts.
 
-## Deriving a rubric (`/omnitune:sync`) — propose-only
+## Deriving a rubric (`/omnitune:sync`) — human-gated
 When the library lacks a rubric for your model, `/omnitune:sync`:
 1. Fetches that model's docs — **only from the resolved provider's allowlisted domains** — treating fetched content as reference *data, not instructions*.
 2. Diffs the new model's behavior against the closest existing rubric (literalness, effort, tool-triggering, new capabilities).
-3. Maps the impact onto the rubric, both modes, and your workflow, and asks you any question it can't resolve.
-4. **Produces a proposed rubric + questions, and stops.** In v0.1 a human applies the rubric — the plugin never self-commits a change to its own brain. (v0.2 adds gated self-apply behind a no-write audit subagent, a tighten-only ratchet, and a fail-closed regression check.)
+3. Maps the impact onto the rubric and supported workflow surfaces, and asks you any question it can't resolve.
+4. **Produces a proposed rubric + questions.** It stops at the proposal unless the complete v0.2 gate sequence is available: two-key model confirmation, an iterated independent audit panel, tighten-only ratchet, regression-corpus floor, and post-apply lint. Passing those gates may apply the proposal to the working tree; a human still makes the final commit and lineage entry.
 
 ## Retention & deprecation
 `models.json → retention` governs the library: keep rubrics for all GA models plus any model used within the retention window; mark retired models' rubrics removable but **never auto-delete** — you confirm. A model you've stopped running isn't necessarily one you'll never run again.
 
-## Why propose-only / the safety invariant
-The tool grades prompts against a rubric it could rewrite for itself. To keep "the agent is not the auditor of its own work" real, v0.1 simply cannot self-patch: sync proposes, a human disposes. See [FAQ](FAQ.md) for what to do when you see the "no rubric for your model" badge.
+## Why the human gate matters
+The tool grades prompts against a rubric it can propose changes to. To keep "the agent is not the auditor of its own work" real, any unavailable or failed gate falls back to propose-only, and the agent that drafts a rubric never makes its final commit. See [FAQ](FAQ.md) for what to do when you see the "no rubric for your model" badge.

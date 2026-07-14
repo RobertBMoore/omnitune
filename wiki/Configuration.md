@@ -1,6 +1,6 @@
 # Configuration
 
-Everything repo-specific lives in `omnitune.config.yaml` at your repo root. The plugin core holds no domain knowledge of its own. `/omnitune:install` generates this file; you can also hand-edit it. Full field reference: `omnitune.config.schema.md`.
+The plugin core holds no domain knowledge of its own. Per-run project specifics come only from the user's prompt/brief or optional `omnitune.config.yaml`; persistent repo defaults live in that root-level config. `/omnitune:install` generates the file, and you can also hand-edit it. Full field reference: `omnitune.config.schema.md`.
 
 ## Worked example
 ```yaml
@@ -21,6 +21,7 @@ reserved_decisions: ""            # decisions to SURFACE not pre-empt; "" if non
 output:
   reports: "reports/"
   prompts: "docs/prompts/"
+  packs: "docs/orchestration/"      # optional Mode C default
 model_sync:
   channel: "badge"                # badge (default) | interrupt | manual
   target_model: ""                # override session-model detection (headless/CI)
@@ -34,10 +35,12 @@ model_sync:
 - **`context_pointers[]`** — when a target is detected, Mode B cites these files. This is also what the fabrication ledger checks "cited" against.
 - **`house_rules`** — Mode A's voice dimension (D7) and Mode B's caveats read this. If empty, D7 scores N/A.
 - **`reserved_decisions`** — Mode B surfaces (never pre-empts) any decision in this file that a rewrite touches.
-- **`output.*`** — where reports and rewritten prompts are saved.
+- **`output.reports` / `output.prompts`** — where Mode A reports and Mode B rewrites are saved.
+- **`output.packs`** — optional default root for Mode C packs. Each run gets a dated subdirectory; a target named in the brief wins. If omitted, Mode C works in chat and offers to save.
 
 ## Common edits
 - **Add a skill to routing:** append a `routing[]` entry with the phrases users would type for it.
 - **Add a voice/style source:** set `house_rules` to its path; Mode A will start scoring copy skills against it.
+- **Set a default pack directory:** add `output.packs`; use a repository-relative path that is safe to commit, and keep secrets out of briefs and generated packs.
 - **Turn off model notices:** set `model_sync.channel: manual` (air-gapped/CI). See [Auto-Sync](Auto-Sync.md).
 - **CI config check:** run the install wizard's `--check` (v0.2) to assert every `routing` skill and pointer path still resolves — catches silent config rot after renames.

@@ -8,7 +8,7 @@
     {
       "name": "omnitune",
       "source": "./",
-      "description": "Keep your prompts and skills in tune with the current best practices of whatever AI model you're running. Audits skills/agents and rewrites ad-hoc prompts; model-agnostic, repo-agnostic, self-updating. Open-sourced by Digital Research Group.",
+      "description": "Tune prompts, reusable skills, and complex project goals for the AI model you're running. Audits skills/agents, rewrites ad-hoc prompts, and turns briefs into orchestration packs; model-agnostic, repo-agnostic, with human-gated model sync. Open-sourced by Digital Research Group.",
       "author": {
         "name": "Digital Research Group"
       },

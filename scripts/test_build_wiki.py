@@ -16,6 +16,11 @@ def _files(tmp, models, entries):
     return mp, lp
 
 
+class TestPageRegistry(unittest.TestCase):
+    def test_tune_goal_page_is_in_navigation(self):
+        self.assertIn(("Tune-Goal.md", "tune-goal", "Tune Goal"), bw.PAGES)
+
+
 class TestModelsSection(unittest.TestCase):
     def test_renders_row_per_model(self):
         with tempfile.TemporaryDirectory() as t:

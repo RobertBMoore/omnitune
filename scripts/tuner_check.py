@@ -3,7 +3,7 @@
 
 Validates that omnitune.config.yaml is internally consistent and that the plugin's
 model manifest is intact, so silent config rot (a renamed skill, a moved voice
-file, a GA model with no rubric) fails a build instead of degrading Mode A/B at
+file, a GA model with no rubric) fails a build instead of degrading Modes A/B/C at
 runtime. Dependency-free (uses the bundled miniyaml).
 
 Usage:

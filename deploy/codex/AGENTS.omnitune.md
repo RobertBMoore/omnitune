@@ -1,13 +1,13 @@
-## omnitune (Codex) — tune prompts & skills for the model you're running
+## omnitune (Codex) — tune prompts, skills & goals for the model you're running
 
-**omnitune is available in this repo as a git submodule at `.omnitune/`** (a model-agnostic prompt/skill tuner). To tune or sync **this** repo under Codex, follow omnitune's protocols below. For the full Claude Code→Codex tool mapping and model-detection precedence, read `.omnitune/AGENTS.md` (omnitune's own operating guide).
+**omnitune is available in this repo as a git submodule at `.omnitune/`** (a model-agnostic prompt/skill/goal tuner). To tune or sync **this** repo under Codex, follow omnitune's protocols below. For the full Claude Code→Codex tool mapping and model-detection precedence, read `.omnitune/AGENTS.md` (omnitune's own operating guide).
 
 **Path translation (important):** omnitune's `SKILL.md` protocols are written relative to the omnitune repo, which lives here at `.omnitune/`. When a protocol says `scripts/…` or `references/…`, run it as `.omnitune/scripts/…` / `.omnitune/skills/omnitune/references/…`. Your own (optional) `omnitune.config.yaml` lives at **this** repo's root, not under `.omnitune/`.
 
 ### Capabilities
-- Rewrite a prompt / audit a skill → `.omnitune/skills/omnitune/SKILL.md`.
+- Rewrite a prompt / audit a skill / turn a project brief into an orchestration pack → `.omnitune/skills/omnitune/SKILL.md`.
 - Derive a rubric for the current model → `.omnitune/skills/sync/SKILL.md`.
-- (Optional) configure omnitune for **this** repo, guided → `.omnitune/skills/install/SKILL.md` — a short interview that drafts and writes `omnitune.config.yaml` at **this** repo's root (routing, context pointers, output paths). Without it, tune/sync run standalone on the model rubric alone.
+- (Optional) configure omnitune for **this** repo, guided → `.omnitune/skills/install/SKILL.md` — a short interview that drafts and writes `omnitune.config.yaml` at **this** repo's root (routing, context pointers, output paths). Tune/sync work without config; Mode C combines the session rubric with its built-in pack contract. `output.packs` supplies a default Mode C destination.
 
 Detect the session model per `.omnitune/AGENTS.md` (Model detection), then resolve with `python3 .omnitune/scripts/resolve_model.py`.
 

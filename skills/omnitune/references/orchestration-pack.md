@@ -165,7 +165,10 @@ Template: `pack-templates/record_check.py` (stdlib-only python3; CONFIG dict at
 the top). Fails on:
 
 - C1 — uncommitted files under `verification/` or `audits/`
-- C2 — a milestone tag without a filed per-auditor audit report under `audits/`
+- C2 — a milestone tag without a filed per-auditor audit report under `audits/`,
+  **proportional to the scale tier** (`tier` CONFIG): Program requires one per
+  tag; Squad only for `user_facing_milestones`; Solo/Pair requires none (the gate
+  battery satisfies it). Absent tier behaves as Program.
 - C3 — CURRENT-block HEAD SHA missing or ≠ `git rev-parse HEAD`
 - C4 — MILESTONES table disagreeing with git tags (a closed row without its tag;
   a milestone tag whose row is missing or not closed)
@@ -258,6 +261,37 @@ resident: no standing co-operator agent is added. The full reflection contract
 is `reflection-protocol.md` in this directory (points `R1`–`R7`); every pack's
 reflection clause points at it.
 
+## Scale tiers
+
+The field evidence validates exactly **one** scale — a 152-spawn program build.
+**Program tier is that contract, unchanged.** The two smaller tiers are new and
+**strip** apparatus rather than the contract adding any: a solo/pair v1 must not
+ship program-grade machinery marked READY. Two Step-0 intake facts select the
+tier — **max concurrent writers/agents** and **horizon in days**. Scale tier and
+model tier are independent dials (a lean pair may still run its builder on the
+cheap model — see `delegation-tiers.md`).
+
+| Tier | Selector | Team | State files | Reflection | Watchdog | Audit-per-tag (C2) |
+|---|---|---|---|---|---|---|
+| **Solo/Pair** | ≤1 concurrent writer, or ≤~3 days | orchestrator + 1 builder; a **combined** code/UX auditor only on user-facing/risky milestones | d1–d5 (CURRENT, MILESTONES, LOG, DECISIONS, BACKLOG) — drop registry + buffer | **off** — session-close append only; operator reviews at milestone close | optional | **none** — satisfied by the gate battery (lint/test/e2e green at HEAD) |
+| **Squad** (default) | 2–4 concurrent writers, or ~1–3 weeks | + parallel domain builders on isolated worktrees; dedicated code + UX auditors | + d6 session registry | milestone-close | on | user-facing / risky milestones only |
+| **Program** | 5+ concurrent agents, or 3+ weeks | full role taxonomy (security / code-quality / ux / domain-parity) | all seven (+ d7 continuity buffer) | milestone-close or 24h | required | every tag, all auditor roles |
+
+**Always-on at every tier (the recording + safety spine — never stripped):**
+components (a) goal prompt, (b) constitution, (e) guardrails digest, (f)
+pre-flight checklist, (g) gate scripts; state files d1–d5; G1 record_check
+(C1/C3–C7), G2 red-gate consumption, G3 regression-harness contract; the topology
+correctness invariants (X1–X5); binding rules B1–B12, B14.
+
+**Tier-gated (emit only when the tier warrants it):** d6 session registry and B7
+stand-down handshake (Squad+); d7 continuity buffer (Program); the scheduled
+reflection cadence and G4 watchdog (Squad+; optional at Solo/Pair); G1-C2
+audit-per-tag and dedicated auditor roles (proportional per the table — set
+record_check's `tier` and `user_facing_milestones`); the per-milestone
+fresh-context verifier and milestone-0 fitness review (Squad+ for risky work).
+Marking a component tier-gated never weakens it *within* its tier — Program is the
+current contract, intact.
+
 ## Traceability
 
 Every audit finding (P0-1..P3-9) and every template rule (T1..T15) maps to the
@@ -271,7 +305,7 @@ parses this table; no row may be missing or empty.
 | P0-3 | G1 C3 (CURRENT SHA = git HEAD) + B1 (CURRENT updated in the merge commit) |
 | P1-3 | G1 C4 (MILESTONES table must agree with git tags) |
 | P1-4 | State-file contract d7 (continuity buffer newest-first, rotated daily, ~8KB hard cap) |
-| P1-5 | G1 C2 (a milestone tag blocks without a filed per-auditor audit report) |
+| P1-5 | G1 C2 (a milestone tag blocks without a filed per-auditor audit report; proportional to the scale tier — Program every tag, Squad user-facing, Solo/Pair none) |
 | P1-6 | G1 C5 (closed milestone requires a LOG entry) + C6 (CURRENT line cap) |
 | P2-7 | G1 C1 (uncommitted verification/ or audits/ files fail the gate) |
 | P2-8 | G1 C7 (state-file line-length cap ~500 chars) |

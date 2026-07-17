@@ -11,6 +11,7 @@ every reflection-contract point R1..R7 in its contract table with a non-empty
 cell, and be pointed at by orchestration-pack.md's reflection clause — so
 demoting the local-Dream contract to prose, or dropping a contract point, fails.
 """
+import importlib.util
 import os
 import py_compile
 import re
@@ -187,6 +188,98 @@ class TestTopologyContract(unittest.TestCase):
                          "tune-goal-protocol.md still carries the deleted-layer false promise")
         self.assertIn("delegation-tiers.md", text,
                       "tune-goal-protocol.md Step 1 must load the delegation-tier layer")
+
+
+class TestScaleTiers(unittest.TestCase):
+    """The scale-tier layer: Program = the field-validated contract unchanged;
+    Solo/Pair and Squad strip apparatus. Both the pack contract and the Step-0
+    intake must name the three tiers so a pair build is never handed program
+    apparatus marked READY."""
+
+    def test_pack_defines_three_tiers(self):
+        with open(REF, encoding="utf-8") as f:
+            text = f.read()
+        self.assertIn("Scale tiers", text, "orchestration-pack.md must define a Scale tiers section")
+        for tier in ("Solo/Pair", "Squad", "Program"):
+            self.assertIn(tier, text, "Scale tiers section must name the %s tier" % tier)
+
+    def test_intake_collects_team_design_facts(self):
+        with open(PROTOCOL, encoding="utf-8") as f:
+            text = f.read()
+        for tier in ("Solo/Pair", "Squad", "Program"):
+            self.assertIn(tier, text, "Step 0 intake must let the operator pick the %s tier" % tier)
+        self.assertIn("Runtime model set", text,
+                      "Step 0 intake must ask which model(s) the team runs on")
+
+
+def _load_record_check():
+    """Load a fresh copy of the record_check pack template as a module."""
+    path = os.path.join(TEMPLATES, "record_check.py")
+    spec = importlib.util.spec_from_file_location("record_check_under_test", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _rc_git(root, *args):
+    env = dict(os.environ, GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t",
+               GIT_COMMITTER_NAME="t", GIT_COMMITTER_EMAIL="t@t")
+    return subprocess.run(["git", "-C", root, *args], capture_output=True,
+                          text=True, env=env)
+
+
+def _mk_tagged_repo(root, tags):
+    """A minimal git repo with one empty commit and the given milestone tags."""
+    _rc_git(root, "init", "-q")
+    _rc_git(root, "commit", "-q", "--allow-empty", "-m", "root")
+    for t in tags:
+        _rc_git(root, "tag", t)
+
+
+class TestRecordCheckTierProportionality(unittest.TestCase):
+    """G1-C2 (audit-per-tag) is proportional to the scale tier: program requires
+    an audit report per tag (the current contract, unchanged); squad requires one
+    only for user-facing milestones; solo-pair is satisfied by the gate battery
+    and requires none. Guards against a two-person build being gate-blocked on a
+    scaffold audit it never needed."""
+
+    def _c2_fails(self, tier, tags, user_facing=None):
+        with tempfile.TemporaryDirectory() as td:
+            _mk_tagged_repo(td, tags)
+            rc = _load_record_check()
+            rc.CONFIG["tier"] = tier
+            if user_facing is not None:
+                rc.CONFIG["user_facing_milestones"] = user_facing
+            fails, _warns = rc.run_checks(td)
+            return [f for f in fails if f.startswith("C2")]
+
+    def test_program_tier_requires_audit_per_tag(self):
+        c2 = self._c2_fails("program", ["milestone/M0"])
+        self.assertTrue(any("M0" in f for f in c2),
+                        "program tier must require an audit report for every tag")
+
+    def test_default_tier_is_program(self):
+        # No tier key set at all — backward-compatible default is program.
+        with tempfile.TemporaryDirectory() as td:
+            _mk_tagged_repo(td, ["milestone/M0"])
+            rc = _load_record_check()
+            rc.CONFIG.pop("tier", None)
+            fails, _ = rc.run_checks(td)
+            self.assertTrue(any(f.startswith("C2") and "M0" in f for f in fails),
+                            "absent tier must behave as program (current contract unchanged)")
+
+    def test_solo_pair_tier_requires_no_audit(self):
+        c2 = self._c2_fails("solo-pair", ["milestone/M0", "milestone/M1"])
+        self.assertEqual(c2, [],
+                         "solo-pair tier must not gate a tag on a missing audit report")
+
+    def test_squad_tier_only_gates_user_facing(self):
+        c2 = self._c2_fails("squad", ["milestone/M0", "milestone/M1"],
+                            user_facing=["M1"])
+        self.assertTrue(any("M1" in f for f in c2),
+                        "squad tier must require an audit for a user-facing milestone")
+        self.assertFalse(any("M0" in f for f in c2),
+                         "squad tier must not require an audit for a non-user-facing milestone")
 
 
 if __name__ == "__main__":

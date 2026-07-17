@@ -17,7 +17,7 @@ The pack is not presented until it passes the self-check pass (step 3).
 
 ## Step 0 — Brief intake gate (run FIRST)
 
-The input is a project brief. A pack needs, at minimum:
+The input is a project brief. A pack needs, at minimum — **recording / operations facts:**
 
 1. **Deploy target** — stage names, deploy command, and the dev URL verification runs against.
 2. **Gate commands** — lint / test / e2e commands, and the required environment each must name (the skip-as-pass rule needs the names).
@@ -26,8 +26,19 @@ The input is a project brief. A pack needs, at minimum:
 5. **Milestone shape** — the phases/milestones, or enough scope to propose them.
 6. **Target directory** — where the pack files land (see step 2 defaults).
 
+And **team-design facts** (garbage-in for topology without them — a perfect emitter still cannot tier a team it was never told can run cheaply, split workstreams it was never told are independent, or right-size apparatus for a scale it never asked about):
+
+7. **Scale** — max concurrent writers/agents **and** horizon in days. These pick the **tier**: **Solo/Pair** (≤1 concurrent writer or ≤~3 days), **Squad** (2–4 writers or ~1–3 weeks, the default), **Program** (5+ agents or 3+ weeks). The tier gates which components, state files, gates, and roles emit (see `orchestration-pack.md` → *Scale tiers*).
+8. **Workstream independence** — which workstreams have independent context (can run in parallel on isolated worktrees) vs must serialize. Drives role count and decomposition (topology X1/X5/X6).
+9. **Required specializations** — which audit/domain roles the brief needs (security, code-quality, ux, domain-parity). Absent roles are not emitted; a named risk domain with no owner is a gap to surface.
+10. **Runtime model set** — which model(s)/provider(s) each role will **run** on (accept a multi-provider set: Claude + GPT + Grok). This is independent of the generating session's model and selects each role's `model:`/`effort:` from `delegation-tiers.md` and its fan-out posture from that model's rubric (topology X2/X3/X7). Default to the session model only where a role is unpinned.
+11. **Audit rigor** — how much milestone auditing the operator wants; sets record_check's `tier` and (at Squad) which milestones are user-facing/risky (C2 proportionality).
+
 If the brief lacks any of these, ask **numbered questions** so answers map to
-items — do not proceed on invented values. **Fabrication-ledger discipline (as in
+items — do not proceed on invented values. When scale is unstated, **propose a
+tier from what the brief implies (default Squad) and ladder it** ("I assumed:
+Squad tier — 2–4 writers, ~2 weeks — confirm or correct"); never silently apply
+Program apparatus to a pair build. **Fabrication-ledger discipline (as in
 Mode B) is non-negotiable:** every specific in the emitted pack (name, command,
 URL, cadence, cap, owner) is either **(a) cited** to the brief or
 `omnitune.config`, or **(b) laddered** in an Assumptions block ("I assumed: <X> —

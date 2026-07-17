@@ -10,7 +10,9 @@ fixture gap).
 
 Checks (any FAIL -> exit 1):
   C1  uncommitted files under verification/ or audits/
-  C2  a milestone tag without a filed per-auditor audit report
+  C2  a milestone tag without a filed per-auditor audit report (proportional to
+      the scale tier: program = every tag; squad = user-facing milestones only;
+      solo-pair = none, satisfied by the gate battery)
   C3  CURRENT-block HEAD SHA missing or != git HEAD
   C4  MILESTONES table disagrees with git tags
   C5  a closed milestone with no LOG entry
@@ -37,6 +39,14 @@ CONFIG = {
     # Auditor names required per milestone tag (audits/<M>-<auditor>.md each).
     # Empty list = require at least one audits/<M>-*.md per tag.
     "auditors": [],
+    # Scale tier — makes C2 (audit-per-tag) proportional to team scale:
+    #   "program"   every tag requires an audit report (the current contract);
+    #   "squad"     only tags whose milestone id is in user_facing_milestones;
+    #   "solo-pair" no tag requires an audit — the gate battery (lint/test/e2e
+    #               green at HEAD) satisfies the requirement when no auditor role
+    #               exists. Absent/unknown value behaves as "program".
+    "tier": "program",
+    "user_facing_milestones": [],  # milestone ids (e.g. ["M2", "M4"]) — squad tier
     "closed_statuses": {"done", "closed", "complete", "merged", "shipped", "tagged"},
     "current_heading": "## CURRENT",
     "milestones_heading": "## MILESTONES",
@@ -105,11 +115,19 @@ def run_checks(root):
     rc, tag_out = _git(root, "tag", "--list", cfg["tag_prefix"] + "*")
     tags = [t for t in tag_out.splitlines() if t.strip()] if rc == 0 else []
 
-    # C2 — per-auditor audit report per milestone tag
+    # C2 — per-auditor audit report per milestone tag, proportional to tier
+    tier = str(cfg.get("tier", "program")).lower()
+    user_facing = {m.lower() for m in cfg.get("user_facing_milestones", [])}
     audits_dir = os.path.join(root, cfg["audits_dir"])
     filed = os.listdir(audits_dir) if os.path.isdir(audits_dir) else []
     for tag in tags:
         mid = tag[len(cfg["tag_prefix"]):]
+        # solo-pair: the gate battery satisfies the audit requirement — no file
+        # is gated. squad: only user-facing/risky milestones require an audit.
+        if tier == "solo-pair":
+            continue
+        if tier == "squad" and mid.lower() not in user_facing:
+            continue
         if cfg["auditors"]:
             for auditor in cfg["auditors"]:
                 want = "%s-%s.md" % (mid, auditor)

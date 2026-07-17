@@ -44,5 +44,12 @@ Read `_core.md` first; this file adds the Opus-4.8-specific calibration. Source 
 - **Frontend house style** defaults to cream/off-white (~`#F4F1EA`), serif display, terracotta/amber — wrong for dashboards/fintech/healthcare and persistent. Specify a concrete palette/type system or instruct "propose 4 distinct directions before building." `[BP]`
 - **Prefilled assistant responses rejected (400) since 4.6** — use Structured Outputs, system-prompt instructions, XML output tags, or tool calling. `[BP]`
 
+## Delegation defaults (Mode C teams)
+When Opus 4.8 runs a role in a Mode C team, this is its fan-out posture (the tier layer in `references/delegation-tiers.md` sets who runs what):
+- **Tier position:** frontier — orchestrate and hard-audit. Opus 4.8's literalness and strong self-correction (~4x fewer of its own flaws pass) make it the right lead for high-stakes control and correctness review. `[BP][News]`
+- **Fan-out: fewer by default.** Opus 4.8 "spawns fewer subagents by default — steer explicitly when you want parallel fan-out; rein in single-file delegation." Do not stack async-peer scaffolding it does not want; when you need parallelism, ask for it by name. `[BP]`
+- **Dispatch: blocking-then-integrate is fine.** Collect-verdicts-then-fix-wave (throughput serialization) is an acceptable Opus-era default here; it is not a hard invariant — a pack targeting a more-async model may relax it. The correctness invariant (one writer per file/branch) always holds.
+- **Workers: disposable is fine.** Opus 4.8 does not need long-lived context-holding subagents to perform; the disposable-worker default is well-matched. Raise builder/auditor effort to `xhigh` for coding and high-autonomy roles.
+
 ## Severity emphasis for Mode A on this model
 Core §1.1/§1.2/§1.3 (scope, framing, aggression) and §3.5 (suggest-vs-act) are the highest-yield findings; effort-default/level drift (§4) is the most common MEDIUM. `[BP]`

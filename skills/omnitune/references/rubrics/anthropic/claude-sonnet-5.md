@@ -49,5 +49,12 @@ Read `_core.md` first; this file adds the Sonnet-5 calibration. Sourced from the
 - **Interactive coding products:** use `xhigh`/`high` effort and put task, intent, and constraints in the *first* turn — progressive disclosure across turns reduces token efficiency and sometimes performance. `[PS]`
 - **Recency:** knowledge is reliable through Jan 2026 — supply anything newer in-context.
 
+## Delegation defaults (Mode C teams)
+When Sonnet 5 runs a role in a Mode C team, this is its fan-out posture (the tier layer in `references/delegation-tiers.md` sets who runs what):
+- **Tier position:** workhorse — the default builder/implementer tier ("best combination of speed and intelligence," strongest Sonnet at coding and agentic tasks). Also a capable code-quality auditor. `[WN][PS]`
+- **More agentic by default:** reaches for tools and runs self-verification loops readily; `high`/`xhigh` effort substantially increases tool use. As a builder it needs less delegation scaffolding than prior Sonnets — don't over-prescribe its loop. `[PS]`
+- **Literal:** state each role's scope and Done-when explicitly; it "does not silently generalize an instruction from one item to another." A vague dispatch brief yields narrow output. `[PS]`
+- **Effort:** `xhigh`/`high` for the hardest build/audit work; `medium`/`low` for scoped subtasks. Put task, intent, and constraints in the first dispatch turn — progressive disclosure across turns costs efficiency. `[PS]`
+
 ## Severity emphasis for Mode A on this model
 Core §1.1 (explicit scope — literalism), §1.8 (declared verbosity target). Model-specific findings to flag: hard-coded `budget_tokens` or non-default sampling params (400s), forced interim-progress scaffolding, token budgets tuned to the 4.6 tokenizer, qualitative severity bars in review harnesses, and unhandled `stop_reason: "refusal"`.

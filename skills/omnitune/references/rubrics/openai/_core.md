@@ -63,3 +63,12 @@ A dimension scoring Critical caps the overall verdict at "Critical — do not pa
 ## Fail-closed safety clause (model-invariant)
 
 Never soften a safety-critical or fail-closed directive (destructive actions, PII, an allowlist/domain fence). When in doubt, fail closed and surface the question rather than proceeding. `[omnitune]`
+
+## Delegation defaults (Mode C teams)
+
+When Mode C composes a team on OpenAI models, this rubric supplies the fan-out posture; `references/delegation-tiers.md` supplies who runs what.
+- The orchestrator–worker pattern generalizes here as **manager / agents-as-tools** (a central orchestrator invokes specialists as tools) or **handoffs** (a peer transfers control to a specialist). Pick the manager pattern when only the result matters; handoffs when a specialist owns the next turn. `[omnitune]`
+- Tiering is the same lever: a capable orchestrator with cheaper specialist workers; route subagent / high-volume / latency-sensitive steps to a smaller model and reserve the flagship for the lead and hard reviews. `[BP]`
+- Codex agent definitions live in `AGENTS.md`-style files; the abstraction (role + tools + when-to-delegate + model) matches a Claude agent `.md`, so the four-part dispatch brief (goal · context · constraints · done-when) travels unchanged. `[AG]`
+- Mixed-provider teams (OpenAI + Claude + Grok) run under a model-agnostic layer — per-agent model / a custom provider / LiteLLM — not a native single-vendor orchestrator; omnitune's provider-neutral pack is that substrate. `[omnitune]`
+- Cross-provider feature parity is not guaranteed (structured outputs, multimodal input, hosted search differ): do not assume a capability is portable across a mixed team's roles. `[LM]`

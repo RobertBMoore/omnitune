@@ -35,5 +35,11 @@ Read `_core.md` first; this file adds the Haiku-4.5 calibration. Specs below are
 - **Context: 200k, not 1M.** Flag any long-context prompt that assumes an Opus/Sonnet window. Apply Core §2 (long-data-at-top + `<quotes>`) aggressively when inputs are large.
 - **Recency: Feb 2025 cutoff** — the strongest recency-assumption risk of the current models; supply recent facts.
 
+## Delegation defaults (Mode C teams)
+When Haiku 4.5 runs a role in a Mode C team, this is its fan-out posture (the tier layer in `references/delegation-tiers.md` sets who runs what):
+- **Tier position:** cheap — the explore/triage/classify/scaffold leg ("the cheap leg of a multi-model workflow"; fastest, most economical). Route read-only exploration, first-pass triage, lint/docs, and scaffolding here; keep frontier/workhorse tiers for judgment-heavy build and hard-audit roles.
+- **Dispatch is more prescriptive, not less:** give a Haiku role numbered steps, a declared output shape, and concrete examples — do not rely on it to derive a multi-step plan (Core §4 is reversed here). Its dispatch brief carries more structure than a frontier role's.
+- **Do not hand it work outside its window:** 200k context (not 1M) and a Feb-2025 cutoff — never assign a Haiku role a 1M-token long-context task or one that turns on post-cutoff facts without supplying them in the dispatch.
+
 ## Severity emphasis for Mode A on this model
 Structure (Core §2) and example sufficiency are highest-yield; an under-specified, example-free prompt that passes on Opus can fail on Haiku. Flag Opus/Sonnet-window assumptions (1M context) and post-Feb-2025 recency assumptions.

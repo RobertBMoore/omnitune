@@ -23,6 +23,15 @@ the orchestrator, labor in disposable subagents, evidence over memory — and wh
 decayed was recording. Every failure was preventable at launch-pack time. This
 file therefore encodes recording discipline as machinery, not advice.
 
+The audit examined *recording* on a team a human had already designed well, so it
+had nothing to say about how to design a team from a brief — which is exactly what
+Mode C must do. The team-design half of this contract (*The topology contract*
+below, points `X1`..) is therefore restored and **parameterized** from the field
+*template* the earlier refactor deleted, not from the audit: the role taxonomy,
+the per-role model/effort tiering (via `delegation-tiers.md`), and the
+serialization rules. The two halves are peers — a pack that records perfectly
+while improvising its team is exactly the defect this contract now closes.
+
 Two meta-rules bind everything below, and this file honors them in its own writing:
 
 - **Gates, not prose.** Every invariant a script can check ships in the pack as a
@@ -46,16 +55,23 @@ lines: a bootstrap block (fresh start vs resume-from-CURRENT; never re-scaffold,
 never restart a milestone because context was lost); the guardrails digest (e);
 the loop, one line per step, with RECORD explicit; the context-economy rules; the
 precedence order (guardrails > checkpoints > spec > milestone definitions > own
-notes); the evidence rule; the delegation policy in two lines. The goal prompt is
-the statute book; this file is the constitution.
+notes); the evidence rule; a compact delegation policy that names the team's roles
+and their tiers and points at the full topology contract (below) rather than
+re-deriving it. The goal prompt is the statute book; this file is the
+constitution.
 
-**(c) Agent definitions** — builder(s) and read-only auditor(s), each with a
-`tools:` allowlist from day one and the binding report contract in the body:
-summary of what changed and why + commit SHAs + each gate command with only its
-final ~5 output lines; never diffs, full logs, or file bodies. Crash posture:
-commit the first coherent piece within the first work block. Model, effort, and
-verbosity defaults come from the session model's rubric at emit time — never
-hardcoded here.
+**(c) Agent definitions** — the roles derived from the brief's workstreams and
+domains (see *The topology contract* below), each with a `tools:` allowlist from
+day one, an explicit justified `model:` + `effort:` (from the delegation-tier
+layer — never left to inherit the session model by default), and the binding
+report contract in the body: summary of what changed and why + commit SHAs + each
+gate command with only its final ~5 output lines; never diffs, full logs, or file
+bodies. Crash posture: commit the first coherent piece within the first work
+block. A dynamic delegation additionally carries the four-part dispatch brief
+(objective · output format · tools/sources · boundaries), restating every path,
+branch/SHA, and decision the subagent needs — it inherits nothing. Verbosity and
+the *degree* of fan-out come from the runtime model's rubric; *who runs what*
+comes from `delegation-tiers.md`.
 
 **(d) State-file contracts:**
 
@@ -87,6 +103,59 @@ may break them.
 **(g) Gate scripts** — mechanized, shipped as runnable files: record_check
 (G1/G2) and the staleness watchdog (G4), instantiated from `pack-templates/`
 with the pack's CONFIG filled in from the brief.
+
+## The topology contract
+
+The counterpart to the recording contract: the team-design invariants a pack
+instantiates, restored and parameterized from the field template. Each is a brief
+binding rule the pack encodes; the topology self-check (`tune-goal-protocol.md`
+Step 3.5) walks the `X`-table and fails a pack that violates one. Roles, models,
+and effort are *derived*, never a fixed pair copied from a program build.
+
+- **X1 — Role derivation.** The team's roles come from the brief's workstreams and
+  domains, not a fixed pair: one role per independent workstream, and a read-only
+  auditor role per risk domain the brief carries. The auditor archetypes are
+  **security** (authz, secrets, injection), **code-quality** (correctness,
+  regressions, contracts), **ux** (the deployed experience, pixel/flow judgment),
+  and **domain-parity** (does the build match the brief's domain rules). A pack
+  emits only the roles its brief and scale tier justify; every emitted role maps to
+  a workstream or domain (no unmapped role), and every risk domain the brief names
+  has an owner (no unowned domain).
+- **X2 — Per-agent model + effort.** Every agent definition carries an explicit,
+  justified `model:` and `effort:`. A team on one tier for every role is a finding
+  unless the pack states why (e.g. a single high-stakes program build that
+  deliberately trades cost for correctness). Inheriting the session model by
+  default is the deleted-defaults defect, not a choice.
+- **X3 — Delegation-tier layer.** `model:`/`effort:` per role resolve from
+  `references/delegation-tiers.md`, keyed to the model each role **runs on** — which
+  may differ from, or be a different provider than, the generating session's model.
+  The session rubric never supplies "which model runs what"; it supplies only the
+  fan-out posture (X7). Where a role's runtime model is unpinned, the pack ladders
+  the tier as an assumption.
+- **X4 — Four-part dispatch brief.** Every delegation states **objective · output
+  format · tools/sources · boundaries**, and restates all needed context — file
+  paths, branch + SHA, decisions — because the subagent inherits none of the
+  parent's history. This is the dispatch-side mirror of the report contract (B3):
+  as important, and separate.
+- **X5 — Correctness serialization (always binding).** One writer at a time per
+  working copy; parallel writers require isolated worktrees with the orchestrator
+  integrating results; the orchestrator never commits while a builder is mid-flight
+  on the same branch; deploys are globally stateful — serialize them, and never
+  write a branch during a verify run (mid-run edits invalidate the evidence). This
+  half of serialization holds on every model; it is *how* agent teams avoid
+  conflicts, not an Opus-era default.
+- **X6 — Read-only fan-out.** Read-only work — auditors, reviewers, research, docs
+  writing, and live verify runs against the deployed URL — fans out freely and may
+  overlap with each other and with the one running builder. Read-only roles are not
+  serialized; only writers are.
+- **X7 — Scale-to-brief, model-conditioned fan-out.** Team size scales to
+  complexity (1 for simple; 2–4 for parallel workstreams; 10+ only for genuine
+  program scale); over-provisioning is a named anti-pattern. The scale tier (§ the
+  Step-0 intake and `delegation-tiers.md`) gates *which* components/gates/roles
+  emit. The *degree* of fan-out within that — more-vs-fewer subagents,
+  async-vs-blocking dispatch, long-lived-vs-disposable workers — is the
+  model-shaped variable the runtime model's rubric Delegation-defaults block sets;
+  the correctness invariants (X5) hold regardless.
 
 ## Mechanized gates (what packs ship as blocking scripts)
 
@@ -222,6 +291,23 @@ parses this table; no row may be missing or empty.
 | T13 | B2 delegated pixel judgment (orchestrator consumes verdicts, ≤1 composite image per milestone) |
 | T14 | B8 crash posture: commit from the first work block; tasks over ~30 minutes resumable from commits |
 | T15 | B8 redispatch resumes from HEAD, never rebuilds |
+
+### Topology traceability
+
+Every topology-contract point (X1..) maps to the pack clause, layer, or gate that
+encodes it — the team-design counterpart to the recording table above. The same
+test parses this table; no row may be missing or empty, and the topology
+self-check (`tune-goal-protocol.md` Step 3.5) walks it.
+
+| ID | Pack clause / layer / gate |
+|---|---|
+| X1 | Topology contract X1 (roles from workstreams/domains, not a fixed pair) + component (c); auditor archetypes security / code-quality / ux / domain-parity defined |
+| X2 | Component (c) + topology contract X2: every agent carries an explicit justified `model:` + `effort:`; no all-one-tier team without a stated reason |
+| X3 | `references/delegation-tiers.md` keyed to each role's runtime model (multi-provider); session rubric supplies only the fan-out posture (X7) |
+| X4 | Topology contract X4: four-part dispatch brief (objective · output format · tools/sources · boundaries), all context restated — the dispatch mirror of B3 |
+| X5 | Topology contract X5: correctness serialization (one writer per working copy, isolated worktrees, deploys serialized) — always binding, every model |
+| X6 | Topology contract X6: read-only fan-out (auditors, reviewers, research, verify overlap freely with each other and the one running builder) |
+| X7 | Topology contract X7: scale-to-brief team sizing + model-conditioned fan-out (degree of fan-out from the rubric Delegation-defaults); over-provisioning is a named anti-pattern |
 
 ## Decoupling
 

@@ -39,7 +39,7 @@ This skill uses Claude Code tool names and Claude Code / Nimbalyst model detecti
 Read, in order:
 1. `audit-protocol.md` (this dir) — the audit rubric + dimensions
 2. `prompt-rewrite-protocol.md` (this dir) — the Mode B checklist + QA loop (incl. fabrication ledger + prompt-class gate)
-3. `tune-goal-protocol.md` (this dir) — the Mode C brief-intake gate + pack emission + self-check (read, with `references/orchestration-pack.md`, only when Mode C is selected)
+3. `tune-goal-protocol.md` (this dir) — the Mode C brief-intake gate + pack emission + self-check (read, with `references/orchestration-pack.md` and `references/delegation-tiers.md`, only when Mode C is selected)
 4. `references/rubrics/<provider>/<session-model>.md` — the rubric for the model this session runs (selected in step 2 above)
 5. `references/common-anti-patterns.md` — the smell catalog
 
@@ -69,7 +69,7 @@ Follow `prompt-rewrite-protocol.md` end-to-end. **With config:** target detectio
 
 ## Mode C — Orchestration Pack (tune-goal)
 
-Follow `tune-goal-protocol.md` end-to-end. The knowledge source is `references/orchestration-pack.md` (provider-shared, model-agnostic); model-specific steering (delegation defaults, effort, verbosity) comes from the session model's rubric selected above — never hardcoded. **With config:** save the pack under `<output.packs>/` when configured (a user-named target directory always wins). **Standalone (no config):** present the pack structure in chat and offer to save. The pack is not presented until the protocol's self-check pass succeeds (every invariant encoded as a mechanized gate or binding rule; the emitted gate scripts compile).
+Follow `tune-goal-protocol.md` end-to-end. The knowledge source is `references/orchestration-pack.md` (provider-shared, model-agnostic — the pack contract **and** the topology contract). Team composition is two model-shaped layers: `references/delegation-tiers.md` supplies who runs what (per-role model + effort, keyed to each role's runtime model, which may span providers and differ from this session's model), and each runtime role's rubric supplies that model's fan-out posture, effort, and verbosity — never hardcoded here. **With config:** save the pack under `<output.packs>/` when configured (a user-named target directory always wins). **Standalone (no config):** present the pack structure in chat and offer to save. The pack is not presented until the protocol's self-check pass succeeds (every invariant encoded as a mechanized gate or binding rule; the emitted gate scripts compile; the topology self-check passes or the verdict is CONDITIONAL).
 
 ## Decoupling contract
 

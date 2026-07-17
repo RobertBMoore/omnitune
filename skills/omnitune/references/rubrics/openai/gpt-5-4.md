@@ -28,3 +28,10 @@ Read `_core.md` (the OpenAI provider core) first; this file adds only the GPT-5.
 - Apply the OpenAI core's two separate levers — follow the `reasoning.effort` / `text.verbosity` ladder and re-evaluate before escalating rather than assuming a fixed default `[BP]`; this rubric assumes `gpt-5.4` exposes the same controls as the documented Codex family `(verify)`.
 - Route subagent / latency-sensitive steps to `gpt-5.4-mini`, which OpenAI positions for responsive coding tasks and subagents. `(verify)`
 - `gpt-5.3-codex-spark` is a text-only research preview for near-instant iteration — not a drop-in for file-editing agentic work. `(verify)`
+
+## Delegation defaults (Mode C teams)
+
+When GPT-5.4 runs a role in a Mode C team, this is its fan-out posture (the tier layer in `references/delegation-tiers.md` sets who runs what):
+- **Tier position:** legacy workhorse — a prior Codex flagship; use it as a builder only when a workflow is pinned to it, and default new team leads to `gpt-5.5`. `(verify)`
+- **Route the cheap leg down:** send subagent / latency-sensitive steps to `gpt-5.4-mini`, which OpenAI positions for responsive coding and subagents. `(verify)`
+- **Migrate, don't port:** move a 5.4 team's role prompts to 5.5's contract rather than porting verbatim; 5.5 is a new family. `[LM]`

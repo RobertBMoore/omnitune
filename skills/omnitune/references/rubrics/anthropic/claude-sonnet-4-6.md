@@ -35,5 +35,11 @@ Re-synced against the live overview 2026-07-03; corrections are dated inline.
 - **Recency:** flag prompts that assume the model knows post-Aug-2025 facts without supplying them.
 - **Default tuning target** for cost-sensitive, high-volume skills.
 
+## Delegation defaults (Mode C teams)
+When Sonnet 4.6 runs a role in a Mode C team, this is its fan-out posture (the tier layer in `references/delegation-tiers.md` sets who runs what):
+- **Tier position:** workhorse (legacy) — the prior balanced builder/implementer tier, now superseded by Sonnet 5 as the drop-in successor. Reach for it only when a workflow is pinned to 4.6; otherwise default the builder tier to Sonnet 5.
+- **Fan-out:** moderate — apply the `_core §5.4` floor (subagents for parallel/isolated/independent work; direct for simple/sequential/single-file). It carries no Fable-style more-async reversal.
+- **Effort:** `high` default; set it explicitly when a skill must run across Sonnet versions, since the ladder differs on older Sonnets. Provide post-Aug-2025 facts in-context to any role it runs.
+
 ## Severity emphasis for Mode A on this model
 Core §1.1/§1.2 (scope, framing) and §3.5 (suggest-vs-act). **Recency-assumption** and **Opus-only assumptions** (adaptive-only thinking — Sonnet 4.6 also supports budget-based extended thinking) are the model-specific findings to flag when a skill runs on Sonnet. (128k output and the `high` effort default are shared with Opus 4.8, not Opus-only — corrected 2026-07-03.)

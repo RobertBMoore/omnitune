@@ -7,10 +7,12 @@ lastReviewed: 2026-07-13
 # Tune-Goal Protocol — omnitune Mode C
 
 Emit a launch-ready orchestration pack from a project brief. The pack contract —
-components, mechanized gates, binding rules, reflection clause — is
-`references/orchestration-pack.md`; it is provider-shared and model-agnostic.
-Model-specific steering comes from the **session model's** rubric
-(`references/rubrics/<provider>/<model>.md` + `_core.md`, selected upstream).
+components, the topology contract, mechanized gates, binding rules, reflection
+clause — is `references/orchestration-pack.md`; it is provider-shared and
+model-agnostic. Team composition comes from two model-shaped sources: the
+**delegation-tier layer** (`references/delegation-tiers.md`) supplies who runs
+what (per-role model + effort), keyed to the model each role runs on; each
+runtime role's **rubric** supplies that model's fan-out posture and register.
 The pack is not presented until it passes the self-check pass (step 3).
 
 ## Step 0 — Brief intake gate (run FIRST)
@@ -34,24 +36,34 @@ the reflection cadence of milestone close or 24h, the ~8KB buffer cap) are cited
 to that file, not laddered. A specific that is neither cited nor laddered is a
 fabrication and fails the self-check.
 
-## Step 1 — Load the knowledge source and the session rubric
+## Step 1 — Load the knowledge sources, the tier layer, and the team's rubrics
 
 Read, in order:
 
 1. `references/orchestration-pack.md` — end to end: the pack contract (components
-   a-g), gates G1-G4, binding rules B1-B14, the reflection clause, the
-   traceability table.
+   a-g), the **topology contract** (points X1-X7), gates G1-G4, binding rules
+   B1-B14, the reflection clause, the traceability tables.
 2. `references/reflection-protocol.md` — the local-Dream contract (points R1-R7)
    the pack's reflection clause inherits; read when emitting component (b)/(g)
    so the clause is complete, not a stub.
-3. `references/rubrics/<provider>/<session-model>.md` + `_core.md` — the rubric
-   selected upstream by `SKILL.md` step 2.
+3. `references/delegation-tiers.md` — the delegation-tier layer: role →
+   recommended model + effort per provider. This is where per-agent `model:` /
+   `effort:` come from (topology point X3), keyed to the model each role RUNS on.
+4. The **runtime team's** rubrics — for **each distinct model** in the Step-0
+   runtime model set (which may span anthropic / openai / xai), load
+   `references/rubrics/<provider>/<model>.md` + that provider's `_core.md`,
+   resolving each id with `scripts/resolve_model.py`. The generating session's
+   rubric is loaded too, but it is only one of the set: a team generated on Opus
+   that runs builders on Fable and an auditor on Grok needs all three rubrics.
 
-The rubric, never this protocol, supplies the model-shaped values: the delegation
-default (which model orchestrates, what builders/auditors run on), effort and
-verbosity defaults for the agent definitions, register and structure guidance for
-the goal prompt and constitution. Where the rubric is silent, ladder the choice
-as an assumption.
+The delegation-tier layer (3) supplies **who runs what** — the per-role model and
+effort. Each role's rubric (4) supplies that model's **fan-out posture** — the
+degree of fan-out (more vs fewer subagents), blocking vs async dispatch,
+long-lived vs disposable workers — plus its effort/verbosity, register, and
+structure guidance. The rubric never names which model runs a role; the tier layer
+never sets fan-out posture. Where the tier layer or a rubric is silent — or a
+role's runtime model is unpinned — ladder the choice as an assumption in the
+fabrication ledger.
 
 ## Step 2 — Emit the pack
 

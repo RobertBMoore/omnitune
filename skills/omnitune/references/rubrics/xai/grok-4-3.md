@@ -33,3 +33,11 @@ Read `_core.md` (the xAI provider core) first; this file adds the Grok 4.3 calib
 - **Lean on the non-hallucination positioning, don't rely on it:** still require citations/verification steps in prompts where facts are load-bearing (Core §4) — a low hallucination *rate* is not a zero rate. `[omnitune]`
 - **1M-token window:** long-context placement rules apply — durable/static content early, the ask at the end; recount token budgets rather than reusing numbers tuned for 256k-class models. `[omnitune]`
 - **Image input is available** — prefer sending the actual screenshot/diagram over describing it in prose when the task is visual. `[XM]` (usage advice `[omnitune]`)
+
+## Delegation defaults (Mode C teams)
+
+When Grok 4.3 runs a role in a Mode C team, this is its fan-out posture (the tier layer in `references/delegation-tiers.md` sets who runs what):
+- **Tier position:** frontier — xAI's recommended model for Chat and Coding; the right choice for the orchestrator/lead and hard reviews, and strong instruction-following rewards an explicit dispatch contract. `[XM]`
+- **Route the build tier down:** inside Grok Build CLI / multi-step file-editing workflows prefer `grok-build-0.1` for builder roles; keep Grok 4.3 as the lead. `(verify)`
+- **Effort per role:** set reasoning effort to the task — higher for cross-file/debug audits, lower for scoped work; the model page documents no per-level behavior, so calibrate empirically. `(verify)` `[XM]`
+- **Vision auditor:** its image input makes it a usable UX/visual auditor — send the screenshot, don't describe it. `[XM]`

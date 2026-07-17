@@ -22,26 +22,46 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REF = os.path.join(ROOT, "skills", "omnitune", "references", "orchestration-pack.md")
 REFLECT = os.path.join(ROOT, "skills", "omnitune", "references", "reflection-protocol.md")
 TEMPLATES = os.path.join(ROOT, "skills", "omnitune", "references", "pack-templates")
+REFERENCES = os.path.join(ROOT, "skills", "omnitune", "references")
+DELEGATION_TIERS = os.path.join(REFERENCES, "delegation-tiers.md")
+AGENT_TEMPLATE = os.path.join(REFERENCES, "agent-md-template.md")
+PROTOCOL = os.path.join(ROOT, "skills", "omnitune", "tune-goal-protocol.md")
+RUBRICS = os.path.join(REFERENCES, "rubrics")
 AUDIT_IDS = {"P0-1", "P0-2", "P0-3", "P1-3", "P1-4", "P1-5", "P1-6",
              "P2-7", "P2-8", "P3-9"}
 RULE_IDS = {"T%d" % i for i in range(1, 16)}
 REFLECT_IDS = {"R%d" % i for i in range(1, 8)}
+# Topology-contract points (X1..) — the counterpart to the recording contract,
+# restored/parameterized from the deleted team-design layer. Grows by phase; the
+# count assertion below is the current total.
+TOPOLOGY_IDS = {"X%d" % i for i in range(1, 8)}
 
 
 def _table_rows(path=REF):
     """Return {ID: clause-cell} for table rows `| <ID> | <clause> |`.
 
-    IDs are audit findings (P0-1), template rules (T1), or reflection-contract
-    points (R1) — enough to parse both reference files' tables.
+    IDs are audit findings (P0-1), template rules (T1), reflection-contract
+    points (R1), or topology-contract points (X1) — enough to parse every
+    reference file's tables.
     """
     with open(path, encoding="utf-8") as f:
         text = f.read()
     rows = {}
     for line in text.splitlines():
-        m = re.match(r"^\|\s*(P\d+-\d+|T\d+|R\d+)\s*\|\s*(.*?)\s*\|\s*$", line)
+        m = re.match(r"^\|\s*(P\d+-\d+|T\d+|R\d+|X\d+)\s*\|\s*(.*?)\s*\|\s*$", line)
         if m:
             rows[m.group(1)] = m.group(2)
     return rows
+
+
+def _rubric_files():
+    """Every rubric markdown file under references/rubrics/ (core + per-model)."""
+    out = []
+    for dirpath, _dirs, files in os.walk(RUBRICS):
+        for f in files:
+            if f.endswith(".md"):
+                out.append(os.path.join(dirpath, f))
+    return sorted(out)
 
 
 class TestTraceabilityTable(unittest.TestCase):
@@ -105,6 +125,68 @@ class TestReflectionProtocol(unittest.TestCase):
             text = f.read()
         self.assertIn("reflection-protocol.md", text,
                       "orchestration-pack.md reflection clause must point at reflection-protocol.md")
+
+
+class TestTopologyContract(unittest.TestCase):
+    """The restored team-design layer: a topology contract with its own
+    traceability table, a delegation-tier layer, model/effort agent slots, and a
+    delegation-defaults block in every rubric. Guards against the F0 regression
+    (the model-agnostic refactor deleting the team-design content) recurring."""
+
+    def test_every_topology_point_present(self):
+        missing = sorted(TOPOLOGY_IDS - set(_table_rows()),
+                         key=lambda t: int(t[1:]))
+        self.assertEqual(missing, [], "topology-contract points missing from "
+                         "orchestration-pack.md: %s" % missing)
+
+    def test_no_empty_topology_cells(self):
+        rows = _table_rows()
+        for xid in sorted(TOPOLOGY_IDS):
+            cell = rows.get(xid, "")
+            self.assertTrue(cell and set(cell) - {"-", ":", " "},
+                            "topology-contract row %s has an empty clause cell" % xid)
+
+    def test_topology_row_count(self):
+        present = set(_table_rows()) & TOPOLOGY_IDS
+        self.assertEqual(len(present), len(TOPOLOGY_IDS),
+                         "expected %d topology rows, found %d"
+                         % (len(TOPOLOGY_IDS), len(present)))
+
+    def test_delegation_tiers_reference_exists(self):
+        self.assertTrue(os.path.exists(DELEGATION_TIERS), "missing %s" % DELEGATION_TIERS)
+        with open(DELEGATION_TIERS, encoding="utf-8") as f:
+            text = f.read().lower()
+        for provider in ("anthropic", "openai", "xai"):
+            self.assertIn(provider, text,
+                          "delegation-tiers.md must cover provider '%s'" % provider)
+        # the three tier roles the 90.2% tiered-team result rests on
+        for role in ("orchestrat", "build", "explore"):
+            self.assertIn(role, text,
+                          "delegation-tiers.md must name the '%s' tier role" % role)
+
+    def test_agent_template_has_model_and_effort_slots(self):
+        with open(AGENT_TEMPLATE, encoding="utf-8") as f:
+            text = f.read()
+        self.assertRegex(text, r"(?m)^model:",
+                         "agent-md-template.md frontmatter must expose a model: slot")
+        self.assertRegex(text, r"(?m)^effort:",
+                         "agent-md-template.md frontmatter must expose an effort: slot")
+
+    def test_every_rubric_has_delegation_defaults(self):
+        for path in _rubric_files():
+            with open(path, encoding="utf-8") as f:
+                text = f.read().lower()
+            self.assertIn("delegation defaults", text,
+                          "rubric %s missing a Delegation defaults block"
+                          % os.path.relpath(path, ROOT))
+
+    def test_protocol_false_promise_removed(self):
+        with open(PROTOCOL, encoding="utf-8") as f:
+            text = f.read()
+        self.assertNotIn("which model orchestrates, what builders/auditors run on", text,
+                         "tune-goal-protocol.md still carries the deleted-layer false promise")
+        self.assertIn("delegation-tiers.md", text,
+                      "tune-goal-protocol.md Step 1 must load the delegation-tier layer")
 
 
 if __name__ == "__main__":

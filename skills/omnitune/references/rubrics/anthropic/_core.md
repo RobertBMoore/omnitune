@@ -90,3 +90,9 @@ Rank findings by blast radius:
 
 ## How Mode A aggregates (hardened)
 The report is driven by **per-dimension findings**, not a single average. The overall verdict uses a **floor rule, not an arithmetic mean**: any dimension scoring 1 (Critical) caps the overall verdict at **"Critical — do not pass,"** regardless of how strong the other dimensions are. A safety-critical finding must never be averaged away. Dimensions that don't apply are recorded **N/A** and excluded entirely.
+
+## Delegation defaults (Mode C teams)
+When Mode C composes an orchestration team, this rubric supplies the **fan-out posture** — never the team roster. Two levers, two owners:
+- **Who runs what** (per-role model + effort) comes from `references/delegation-tiers.md`, keyed to the model each role *runs on*, not the generating session's model. The provider-general frame: orchestrator = frontier tier; builder/implementer = workhorse tier; read-only explorer/auditor = cheap tier. A tiered team beats an all-one-model team by a wide margin (the 90.2% result); defaulting every role to one model is a finding.
+- **Fan-out posture** — more vs fewer subagents, blocking vs async dispatch, long-lived vs disposable workers — is model-specific and lives in each per-model rubric's Delegation-defaults block. `_core §5.4` sets the shared floor ("subagents for parallel/isolated/independent work; direct for simple/sequential/single-file"); the per-model file sets the *degree*. Where a per-model file reverses this floor, that file wins.
+The correctness invariant — one writer per file/branch, parallel writers on isolated worktrees — is not a posture; it holds on every model (topology point X5).

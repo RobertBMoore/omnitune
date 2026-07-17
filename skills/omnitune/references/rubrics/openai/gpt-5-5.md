@@ -28,3 +28,11 @@ Read `_core.md` (the OpenAI provider core) first; this file adds the GPT-5.5 cal
 - Route subagent / high-volume / latency-sensitive steps to `gpt-5.4-mini`, which OpenAI positions for responsive coding tasks and subagents. `(verify)`
 - `gpt-5.3-codex-spark` is a text-only research preview for near-instant iteration — not a drop-in for file-editing agentic work. `(verify)`
 - Lean on 5.5's metaprompting: when a task is underspecified, have it tighten the prompt/plan before implementing. `[CG]`
+
+## Delegation defaults (Mode C teams)
+
+When GPT-5.5 runs a role in a Mode C team, this is its fan-out posture (the tier layer in `references/delegation-tiers.md` sets who runs what):
+- **Tier position:** frontier + workhorse — the recommended Codex flagship, the right model for the orchestrator/lead and hard reviews, and a strong builder at a lower effort. `[MD]`
+- **Route the cheap leg down:** send subagent / high-volume / latency-sensitive steps to `gpt-5.4-mini`, which OpenAI positions for responsive coding and subagents. `(verify)`
+- **Effort is the fan-out dial as much as the depth dial:** start build roles at low/medium effort and raise for cross-file or debugging work; a scoped dispatch brief (goal · context · constraints · done-when) keeps a worker on-task. `[LM]`
+- **Not a drop-in for 5.4:** migrate a legacy team's role prompts to 5.5's contract rather than porting them verbatim. `[LM]`

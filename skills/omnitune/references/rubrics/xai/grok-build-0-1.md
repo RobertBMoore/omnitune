@@ -27,3 +27,11 @@ Read `_core.md` (the xAI provider core) first; this file adds the Grok Build 0.1
 - Give it verifiable done-criteria and let it run the loop (reproduce, edit, test, re-check); a coding agent rewards a checkable "Done when" over prose description. `[omnitune]`
 - For fast, well-scoped subtasks prefer a lower reasoning effort; reserve higher effort for debugging and cross-file changes. `[omnitune]`
 - Confirm the exact id and any `-latest` alias against the live `/v1/models` listing before pinning it in automation. `[XR]`
+
+## Delegation defaults (Mode C teams)
+
+When Grok Build 0.1 runs a role in a Mode C team, this is its fan-out posture (the tier layer in `references/delegation-tiers.md` sets who runs what):
+- **Tier position:** workhorse — the dedicated agentic-coding builder tier inside Grok Build CLI; route file-editing and multi-step build roles here and keep Grok 4.3 as the orchestrator/lead. `(verify)` `[XM]`
+- **Give it a checkable Done-when and let it run the loop** (reproduce, edit, test, re-check); a coding-agent role rewards a verifiable completion criterion over prose. `[omnitune]`
+- **Effort by subtask:** lower reasoning effort for fast, well-scoped subtasks; reserve higher effort for debugging and cross-file changes. `[omnitune]`
+- **~256K window:** keep a role's durable standards in AGENTS.md and let long sessions compact rather than restating context in every dispatch. `(verify)` `[XM]`

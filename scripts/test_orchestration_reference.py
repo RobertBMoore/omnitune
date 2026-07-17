@@ -35,7 +35,11 @@ REFLECT_IDS = {"R%d" % i for i in range(1, 8)}
 # Topology-contract points (X1..) — the counterpart to the recording contract,
 # restored/parameterized from the deleted team-design layer. Grows by phase; the
 # count assertion below is the current total.
-TOPOLOGY_IDS = {"X%d" % i for i in range(1, 10)}
+TOPOLOGY_IDS = {"X%d" % i for i in range(1, 12)}
+AGENT_TEAM_TEMPLATE = os.path.join(REFERENCES, "pack-templates", "agent-team.md")
+ANTI_PATTERNS = os.path.join(REFERENCES, "common-anti-patterns.md")
+CONFIG_YAML = os.path.join(ROOT, "omnitune.config.yaml")
+GOLDEN_PACK = os.path.join(ROOT, "tuner", "regression", "goal-pack-golden.md")
 
 
 def _table_rows(path=REF):
@@ -249,6 +253,73 @@ class TestSupervisionStack(unittest.TestCase):
         self.assertIn("reserved decision", reflect,
                       "reflection-protocol.md must surface the co-operator/supervisor fork "
                       "as a reserved decision, not decide it silently")
+
+
+class TestEcosystem(unittest.TestCase):
+    """Phase 4: native coordination substrate + untrusted-output handling (X10/X11),
+    the agent-team template, the topology anti-patterns, and a set output.packs so
+    a pack corpus exists."""
+
+    def test_coordination_substrate_present(self):
+        with open(REF, encoding="utf-8") as f:
+            text = f.read().lower()
+        self.assertIn("coordination substrate", text,
+                      "the pack must have a coordination-substrate section (X10)")
+        self.assertIn("worktree", text, "native primitives must include isolation: worktree")
+        self.assertIn("agent teams", text, "native primitives must name agent teams")
+
+    def test_guardrails_untrusted_output(self):
+        with open(REF, encoding="utf-8") as f:
+            text = f.read().lower()
+        self.assertIn("untrusted", text,
+                      "guardrails digest (e) must treat subagent/tool/web output as untrusted (X11)")
+
+    def test_agent_team_template_exists(self):
+        self.assertTrue(os.path.exists(AGENT_TEAM_TEMPLATE), "missing %s" % AGENT_TEAM_TEMPLATE)
+        with open(AGENT_TEAM_TEMPLATE, encoding="utf-8") as f:
+            text = f.read()
+        for slot in ("model:", "effort:", "tools:"):
+            self.assertIn(slot, text, "agent-team.md must expose a %s slot" % slot)
+        self.assertRegex(text.lower(), r"context.budget",
+                         "agent-team.md must carry a context-budget slot")
+
+    def test_topology_anti_patterns_cataloged(self):
+        with open(ANTI_PATTERNS, encoding="utf-8") as f:
+            text = f.read().lower()
+        for smell in ("mono-model", "over-fan-out", "general-purpose", "program apparatus"):
+            self.assertIn(smell, text,
+                          "common-anti-patterns.md must catalog the '%s' topology smell" % smell)
+
+    def test_config_sets_output_packs(self):
+        with open(CONFIG_YAML, encoding="utf-8") as f:
+            text = f.read()
+        self.assertRegex(text, r"(?m)^\s+packs:\s*\S",
+                         "omnitune.config.yaml must set output.packs so a pack corpus exists")
+
+
+class TestGoldenPack(unittest.TestCase):
+    """Item 15: a golden emitted-pack fixture whose topology assertions close the
+    generate-then-score loop — a rubric/reference change that drops tiering, the
+    dispatch brief, or scale-sizing is caught here."""
+
+    def test_golden_pack_exists_and_asserts_topology(self):
+        self.assertTrue(os.path.exists(GOLDEN_PACK), "missing %s" % GOLDEN_PACK)
+        with open(GOLDEN_PACK, encoding="utf-8") as f:
+            text = f.read()
+        low = text.lower()
+        self.assertRegex(text, r"(?m)^class:\s*goal-pack", "golden fixture must be class goal-pack")
+        for token in ("model:", "effort:"):
+            self.assertIn(token, text, "golden pack must show per-agent %s tiering" % token)
+        for brief in ("objective", "output format", "boundaries"):
+            self.assertIn(brief, low, "golden pack must show the four-part dispatch brief (%s)" % brief)
+        self.assertRegex(low, r"solo/pair|squad|program",
+                         "golden pack must name the selected scale tier")
+
+    def test_reflection_r1_cites_session_bound(self):
+        rows = _table_rows(REFLECT)
+        r1 = rows.get("R1", "")
+        self.assertRegex(r1, r"1.?100|100 sessions|1-100",
+                         "R1 must cite the Dreams 1–100 session input bound")
 
 
 def _load_record_check():

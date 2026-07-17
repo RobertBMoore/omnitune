@@ -78,9 +78,10 @@
       "provider": "anthropic",
       "family": "opus",
       "status": "ga",
-      "ga_date": null,
+      "ga_date": "2026-05-28",
       "deprecated_date": null,
       "rubric": "references/rubrics/anthropic/claude-opus-4-8.md",
+      "ga_date_note": "Sourced 2026-07-17 from the anthropic.com announcement and the Claude Opus 4.8 system card, both dated May 28, 2026.",
       "source_urls": [
         "https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-8",
         "https://platform.claude.com/docs/en/about-claude/models/migration-guide",

@@ -21,7 +21,7 @@ Scan the host repo without writing anything, then **draft the config yourself** 
 - Read a representative `SKILL.md` from **each** skill root (or ≥3 if there are many) to infer naming + routing style.
 - **Draft `routing[]`** — for each skill, propose the keyword phrases a user would type, inferred from its name + description + first-action section.
 - **Draft `context_pointers[]`** — infer which files each skill cites (voice, brand, design docs).
-- **Draft** output paths, including an optional `output.packs` default for Mode C, and note candidate `house_rules` / `reserved_decisions` files.
+- **Draft** output paths, and **default `output.packs` on** (e.g. `docs/orchestration/`) so a Mode C pack corpus exists to review and regress — omit it only if the user declines; note candidate `house_rules` / `reserved_decisions` files.
 This adapts to any business: the wizard does the technical authoring by reading the repo; routing tables and pointers are never the operator's to write blind.
 
 ### 2. Gauge explanation depth (not field coverage)

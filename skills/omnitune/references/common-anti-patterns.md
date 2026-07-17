@@ -53,3 +53,27 @@ Each entry: the smell, what current models do with it, and a before/after. Examp
 ## 11. Invented requirements in a rewrite (Mode B)
 **Model behavior:** a prompt rewrite silently adds specifics (counts, prices, dates, scope) the user never stated, laundering assumptions into an authoritative-looking result.
 **Fix:** the fabrication ledger — every added specific is cited to a config pointer or surfaced as "I assumed X — confirm." (See `prompt-rewrite-protocol.md`.)
+
+## Topology anti-patterns (Mode C teams)
+
+These are the smells the Step 3.5 topology self-check catches. See `orchestration-pack.md` (topology contract X1-X11) and `delegation-tiers.md`.
+
+## 12. Mono-model team
+**Model behavior:** every role — orchestrator, builders, auditors — inherits the one session model because no `model:` was set, defaulting the whole team to one tier. This is the exact single-tier configuration a tiered team beats by a wide margin (the 90.2% result), and it is expensive.
+**Fix:** pin each role's `model:`+`effort:` from `delegation-tiers.md`, keyed to the model it runs on — frontier orchestrator, workhorse builders, cheap explorers/auditors.
+
+## 13. Over-fan-out
+**Model behavior:** more builders (or subagents) than the brief has independent workstreams — "50 subagents for a simple query," the #1 named multi-agent failure. Coordination cost rises, quality does not.
+**Fix:** one builder per independent workstream (1 / 2–4 / 10+ by complexity); "three focused agents beat five scattered ones." Read-only auditors fan out freely; writers do not.
+
+## 14. General-purpose spawn for build or audit
+**Model behavior:** dispatching a general-purpose agent to implement or review, instead of a named role with a scoped `tools:` allowlist — investigation and execution get crossed, and the allowlist security boundary is lost.
+**Fix:** named builder/auditor roles with day-one allowlists (B14); general-purpose is for investigation only.
+
+## 15. Program apparatus on a pair build
+**Model behavior:** a solo/pair build gets the full program contract — mandatory milestone auditors, session registry, ~8KB buffer, scheduled reflection, watchdog — marked READY. The ceremony is gate-enforced on a team that never needed it, so the operator fakes audit files or deletes the gate.
+**Fix:** select the scale tier from the intake (writers + horizon); Solo/Pair and Squad strip apparatus. Program is the only field-validated tier.
+
+## 16. Missing dispatch context (a subagent inheriting nothing)
+**Model behavior:** a delegation omits paths, branch/SHA, or the decisions the worker needs, because the parent "knows" them — but the subagent inherits none of the parent's history and duplicates work or guesses.
+**Fix:** the four-part dispatch brief (objective · output format · tools/sources · boundaries), restating every path, branch/SHA, and decision (X4).

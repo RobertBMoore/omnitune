@@ -79,7 +79,7 @@ below and fails if any point is missing or demoted to prose.
 
 | ID | Reflection-contract point |
 |---|---|
-| R1 | **Bounded input.** A run reads only the transcripts since the last reflection, plus the state files, evidence tails, and git metadata, under an explicit size cap. If the window exceeds the cap, the run narrows scope and says so in its output — it never reads everything. (A prior unbounded audit exhausted its context budget.) |
+| R1 | **Bounded input.** A run reads only the transcripts since the last reflection, plus the state files, evidence tails, and git metadata, under an explicit size cap — mirroring the managed-agent Dreams bound of **1–100 past sessions** per run. If the window exceeds the cap, the run narrows scope and says so in its output — it never reads everything. (A prior unbounded audit exhausted its context budget.) |
 | R2 | **Steering, not editing.** Each run accepts a short steering instruction (focus areas, content to preserve, output conventions) and is a synthesis pass over its inputs, never an editor: a targeted single-entry fix is made by editing the output artifact directly, never by instructing the reflection to make it. |
 | R3 | **Read-only inputs; curation rules.** Inputs are never modified. Lesson-store curation merges duplicates, replaces stale or contradicted entries with the latest value, and records each correction with why. |
 | R4 | **Two artifacts, two disposal semantics.** A run produces a **curated lesson store** (adopt-or-discard) and an **orchestration-drift audit** filed append-only under `audits/` with severities every run — the audit is never discardable, whether or not the operator acts on it. |

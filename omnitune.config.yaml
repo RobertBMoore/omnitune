@@ -9,6 +9,7 @@ reserved_decisions: ""
 output:
   reports: "reports/"
   prompts: "docs/prompts/"
+  packs: "docs/orchestration/"   # Mode C packs land here (one dated subdirectory each) so a corpus exists to review and regress
 model_sync:
   channel: "badge"
   target_model: ""

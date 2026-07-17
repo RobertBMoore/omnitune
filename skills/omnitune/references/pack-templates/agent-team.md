@@ -39,7 +39,7 @@ name: <workstream>-builder
 description: Implements one delegated, well-scoped build task on the milestone branch. The orchestrator plans and reviews; this agent builds.
 model: <workhorse tier for this role's runtime provider — see delegation-tiers.md>
 effort: <high | xhigh — matched to the task's judgment load>
-tools: Bash, Read, Edit, Write, Glob, Grep
+tools: [Bash, Read, Edit, Write, Glob, Grep]
 context-budget: <e.g. the milestone plan + the load-bearing files by path — not the whole repo>
 ---
 ```
@@ -57,7 +57,7 @@ name: <domain>-auditor       # security | code-quality | ux | domain-parity
 description: Reviews a milestone diff and the deployed dev stage for <domain> issues. Returns findings, never fixes.
 model: <same tier as the builder it reviews, or frontier for security/correctness>
 effort: <high | xhigh>
-tools: Read, Grep, Glob, Bash          # read-only — no Edit/Write
+tools: [Read, Grep, Glob, Bash]        # read-only — no Edit/Write
 context-budget: <the milestone diff + the deployed URL; not the builder's working context>
 ---
 ```

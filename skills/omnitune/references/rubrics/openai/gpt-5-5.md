@@ -34,5 +34,5 @@ Read `_core.md` (the OpenAI provider core) first; this file adds the GPT-5.5 cal
 When GPT-5.5 runs a role in a Mode C team, this is its fan-out posture (the tier layer in `references/delegation-tiers.md` sets who runs what):
 - **Tier position:** frontier + workhorse — the recommended Codex flagship, the right model for the orchestrator/lead and hard reviews, and a strong builder at a lower effort. `[MD]`
 - **Route the cheap leg down:** send subagent / high-volume / latency-sensitive steps to `gpt-5.4-mini`, which OpenAI positions for responsive coding and subagents. `(verify)`
-- **Effort is the fan-out dial as much as the depth dial:** start build roles at low/medium effort and raise for cross-file or debugging work; a scoped dispatch brief (goal · context · constraints · done-when) keeps a worker on-task. `[LM]`
+- **Effort is the fan-out dial as much as the depth dial:** start build roles at low/medium effort and raise for cross-file or debugging work; a scoped dispatch brief (goal · context · constraints · done-when — see `_core.md` for the mapping to the shared Mode C fields) keeps a worker on-task. `[LM]`
 - **Not a drop-in for 5.4:** migrate a legacy team's role prompts to 5.5's contract rather than porting them verbatim. `[LM]`

@@ -168,8 +168,9 @@ and effort are *derived*, never a fixed pair copied from a program build.
   (cheap tier, disposable — fresh-context verifiers beat self-critique on long
   runs) for risky/user-facing milestones. The existing auditors review the
   *product*; this reviews the *orchestrator's judgment*. Tier-gated: Squad+ for
-  risky work. A standing/hierarchical supervisor is reserved for true program
-  scale (10+ agents) and surfaced as a reserved decision, never added silently.
+  risky work. A standing/hierarchical supervisor is reserved for large-Program
+  scale (10+ concurrent agents, above the Program tier's 5+ entry) and surfaced
+  as a reserved decision, never added silently.
 - **X9 — Serialization is two kinds, not one.** **Correctness serialization** (X5
   — one writer per file/branch/working copy) is always binding, on every model —
   it is how agent teams avoid conflicts. **Throughput serialization** (collect all
@@ -317,12 +318,14 @@ cost — no single resident does it all:
    a single-pass verdict. *(new; X8)*
 5. **Scheduled reflection (local Dream)** — cross-run judgment drift. Tier-gated
    Squad+. *(exists)*
-6. **Standing/hierarchical supervisor** — reserved for true program scale
-   (10+ agents where one orchestrator can't hold coordination).
+6. **The dumb staleness watchdog** (G4) — orchestrator death, something the
+   orchestrator need not be alive to run. *(exists)*
+7. **Standing/hierarchical supervisor** — reserved for large-Program scale
+   (10+ concurrent agents — a stricter bar than the Program tier's 5+ entry —
+   where one orchestrator can't hold coordination).
 
-The staleness watchdog (G4) catches orchestrator death — something the
-orchestrator need not be alive to run. **The originating operator asked for a
-standing "Co-Operator" above the orchestrator; that fork (layer 6 vs the layered
+**The originating operator asked for a
+standing "Co-Operator" above the orchestrator; that fork (layer 7 vs the layered
 cadence above) is a reserved decision the pack surfaces to the operator, not one
 it decides silently** — a resident that doubles cost and drifts alongside what it
 watches is not the default below program scale, but the choice is the operator's.
@@ -335,15 +338,20 @@ The field evidence validates exactly **one** scale — a 152-spawn program build
 **Program tier is that contract, unchanged.** The two smaller tiers are new and
 **strip** apparatus rather than the contract adding any: a solo/pair v1 must not
 ship program-grade machinery marked READY. Two Step-0 intake facts select the
-tier — **max concurrent writers/agents** and **horizon in days**. Scale tier and
+tier — **max concurrent writers/agents** and **horizon in days**. **Selection is
+deterministic:** each dial classifies on its own thresholds — writers ≤1 / 2–4 /
+5+; horizon ≤~3 days / under ~3 weeks / 3+ weeks — and the pack takes the
+**highest** tier either dial reaches, so a small-long build (1 writer × 6 weeks)
+and a large-short one (5 writers × 2 days) both land in Program, and a 1-writer
+×-5-day build lands in Squad. Scale tier and
 model tier are independent dials (a lean pair may still run its builder on the
 cheap model — see `delegation-tiers.md`).
 
-| Tier | Selector | Team | State files | Reflection | Watchdog | Audit-per-tag (C2) |
+| Tier | Selector (per dial; highest dial wins) | Team | State files | Reflection | Watchdog | Audit-per-tag (C2) |
 |---|---|---|---|---|---|---|
-| **Solo/Pair** | ≤1 concurrent writer, or ≤~3 days | orchestrator + 1 builder; a **combined** code/UX auditor only on user-facing/risky milestones | d1–d5 (CURRENT, MILESTONES, LOG, DECISIONS, BACKLOG) — drop registry + buffer | **off** — session-close append only; operator reviews at milestone close | optional | **none** — satisfied by the gate battery (lint/test/e2e green at HEAD) |
-| **Squad** (default) | 2–4 concurrent writers, or ~1–3 weeks | + parallel domain builders on isolated worktrees; dedicated code + UX auditors | + d6 session registry | milestone-close | on | user-facing / risky milestones only |
-| **Program** | 5+ concurrent agents, or 3+ weeks | full role taxonomy (security / code-quality / ux / domain-parity) | all seven (+ d7 continuity buffer) | milestone-close or 24h | required | every tag, all auditor roles |
+| **Solo/Pair** | writers ≤1 · horizon ≤~3 days | orchestrator + 1 builder; a **combined** code/UX auditor only on user-facing/risky milestones | d1–d5 (CURRENT, MILESTONES, LOG, DECISIONS, BACKLOG) — drop registry + buffer | **off** — session-close append only; operator reviews at milestone close | optional | **none** — satisfied by the gate battery (lint/test/e2e green at HEAD) |
+| **Squad** (default) | writers 2–4 · horizon >3 days–<3 weeks | + parallel domain builders on isolated worktrees; dedicated code + UX auditors | + d6 session registry | milestone-close | on | user-facing / risky milestones only |
+| **Program** | writers/agents 5+ · horizon 3+ weeks | full role taxonomy (security / code-quality / ux / domain-parity) | all seven (+ d7 continuity buffer) | milestone-close or 24h | required | every tag, all auditor roles |
 
 **Always-on at every tier (the recording + safety spine — never stripped):**
 components (a) goal prompt, (b) constitution, (e) guardrails digest, (f)

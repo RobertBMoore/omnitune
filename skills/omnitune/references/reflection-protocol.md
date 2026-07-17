@@ -53,10 +53,12 @@ not a single resident that doubles cost and drifts alongside what it watches:
   **orchestrator death** — something the orchestrator need not be alive to run.
 
 The originating operator asked for a standing **"Co-Operator" agent above the
-orchestrator**. That is layer six — a standing/hierarchical supervisor — and it is
-a **reserved decision**, surfaced to the operator rather than declined silently:
-it earns its ~2–3× cost only at true program scale (10+ agents where one
-orchestrator can no longer hold coordination). Below that, the layered cadence
+orchestrator**. That is layer seven — a standing/hierarchical supervisor above
+the six legs listed here (the watchdog is layer six) — and it is a **reserved
+decision**, surfaced to the operator rather than declined silently: it earns its
+~2–3× cost only at large-Program scale (10+ concurrent agents — a stricter bar
+than the Program tier's 5+ entry — where one orchestrator can no longer hold
+coordination). Below that, the layered cadence
 above is the recommended "better way"; at or above it, the operator chooses.
 Present the fork; do not decide it for them.
 

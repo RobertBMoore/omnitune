@@ -310,7 +310,7 @@ class TestGoldenPack(unittest.TestCase):
         self.assertRegex(text, r"(?m)^class:\s*goal-pack", "golden fixture must be class goal-pack")
         for token in ("model:", "effort:"):
             self.assertIn(token, text, "golden pack must show per-agent %s tiering" % token)
-        for brief in ("objective", "output format", "boundaries"):
+        for brief in ("objective", "output format", "tools/sources", "boundaries"):
             self.assertIn(brief, low, "golden pack must show the four-part dispatch brief (%s)" % brief)
         self.assertRegex(low, r"solo/pair|squad|program",
                          "golden pack must name the selected scale tier")

@@ -119,7 +119,9 @@ def run_checks(root):
     tier = str(cfg.get("tier", "program")).lower()
     user_facing = {m.lower() for m in cfg.get("user_facing_milestones", [])}
     audits_dir = os.path.join(root, cfg["audits_dir"])
-    filed = os.listdir(audits_dir) if os.path.isdir(audits_dir) else []
+    filed = ([f for f in os.listdir(audits_dir)
+              if os.path.isfile(os.path.join(audits_dir, f))]
+             if os.path.isdir(audits_dir) else [])
     for tag in tags:
         mid = tag[len(cfg["tag_prefix"]):]
         # solo-pair: the gate battery satisfies the audit requirement — no file

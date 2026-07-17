@@ -40,13 +40,13 @@ State-in-files · judgment-in-orchestrator · isolated workers with distilled re
 
 ## 4. Scale recommendation (firm, as requested)
 
-Three tiers, selected by two new intake questions — **max concurrent writers** and **horizon in days**. **Program tier = the current contract unchanged** (the only tier the field evidence validates); the new tiers *strip* apparatus rather than the contract adding any:
+Three tiers, selected by two new intake questions — **max concurrent writers** and **horizon in days**. **Selection is deterministic:** each dial classifies on its own thresholds (writers ≤1 / 2–4 / 5+; horizon ≤~3 days / under ~3 weeks / 3+ weeks) and the pack takes the **highest** tier either dial reaches — a small-long build (1 writer × 6 weeks) and a large-short one (5 writers × 2 days) both land in Program; 1 writer × 5 days lands in Squad. **Program tier = the current contract unchanged** (the only tier the field evidence validates); the new tiers *strip* apparatus rather than the contract adding any:
 
-| Tier | Selector | Team | State files | Reflection | Watchdog | Audit-per-tag (C2) |
+| Tier | Selector (per dial; highest dial wins) | Team | State files | Reflection | Watchdog | Audit-per-tag (C2) |
 |---|---|---|---|---|---|---|
-| **Solo/Pair** | ≤1 writer or ≤~3 days | orchestrator + 1 builder; combined auditor only on user-facing/risky milestones | CURRENT, MILESTONES, LOG, DECISIONS, BACKLOG | off (session-close append; operator reviews) | optional | satisfied by gate battery |
-| **Squad** (default) | 2–4 writers or 1–3 weeks | + parallel domain builders on isolated worktrees; code + UX auditors | + session registry | milestone-close | on | user-facing milestones |
-| **Program** | 5+ agents or 3+ weeks | full role taxonomy | all seven | milestone-close or 24h | required | all auditor roles |
+| **Solo/Pair** | writers ≤1 · horizon ≤~3 days | orchestrator + 1 builder; combined auditor only on user-facing/risky milestones | CURRENT, MILESTONES, LOG, DECISIONS, BACKLOG | off (session-close append; operator reviews) | optional | satisfied by gate battery |
+| **Squad** (default) | writers 2–4 · horizon >3 days–<3 weeks | + parallel domain builders on isolated worktrees; code + UX auditors | + session registry | milestone-close | on | user-facing milestones |
+| **Program** | writers/agents 5+ · horizon 3+ weeks | full role taxonomy | all seven | milestone-close or 24h | required | all auditor roles |
 
 Scale tier and **model tier are independent dials** — a lean pair team may still run builders on Haiku or Grok.
 

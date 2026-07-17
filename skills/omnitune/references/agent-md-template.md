@@ -15,6 +15,7 @@ description: <when the parent should dispatch this agent; include example trigge
 tools: [<the minimum tools this agent actually uses>]
 model: <the model this agent RUNS on, keyed to its tier — see references/delegation-tiers.md; use `inherit` only with a stated reason>
 effort: <low | medium | high | xhigh — matched to the role's judgment load>
+context-budget: <the inputs this agent needs by name — e.g. the plan + the load-bearing files by path, not the whole repo>
 ---
 
 # <Agent name>

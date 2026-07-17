@@ -52,7 +52,7 @@ Never soften a safety-critical or fail-closed directive (destructive actions, PI
 When Mode C composes a team on Grok models, this rubric supplies the fan-out posture; `references/delegation-tiers.md` supplies who runs what.
 - Same orchestrator–worker lever as every provider: a capable lead with cheaper specialist workers; reserve the flagship for the orchestrator and hard reviews, and route scoped/high-volume work to a lower-effort or lighter model. `[omnitune]`
 - The Grok API is OpenAI-/Anthropic-SDK-compatible, so a Grok role composes into a mixed-provider team under a model-agnostic layer (per-agent model / LiteLLM) — omnitune's provider-neutral pack is that substrate; a native single-vendor orchestrator cannot host it. `[XM]`
-- Grok Build supports AGENTS.md, hooks, skills, and MCP: put a role's durable standards in AGENTS.md, and keep the dispatch brief (Goal · Context · Constraints · Done-when) explicit because it travels across providers unchanged. `[XM]`
+- Grok Build supports AGENTS.md, hooks, skills, and MCP: put a role's durable standards in AGENTS.md, and keep the four-part dispatch brief explicit because it travels across providers unchanged — Goal · Context · Constraints · Done-when map to the shared Mode C fields: Goal ↦ objective, Context ↦ tools/sources, Constraints ↦ boundaries, Done-when ↦ output format. `[XM]`
 - Effort is the fan-out/depth dial: set it to the role (higher for debugging and cross-file changes, lower for scoped subtasks) rather than adding "think harder" prose. `[omnitune]`
 
 ## Note on mixed-provider parity

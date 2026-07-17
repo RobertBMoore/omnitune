@@ -13,7 +13,9 @@ model-agnostic. Team composition comes from two model-shaped sources: the
 **delegation-tier layer** (`references/delegation-tiers.md`) supplies who runs
 what (per-role model + effort), keyed to the model each role runs on; each
 runtime role's **rubric** supplies that model's fan-out posture and register.
-The pack is not presented until it passes the self-check pass (step 3).
+The pack is presented once it passes the self-check pass (step 3) — or, when a
+check still fails after a fix attempt, with an explicit **CONDITIONAL** verdict
+naming the failures; it is never presented silently unchecked.
 
 ## Step 0 — Brief intake gate (run FIRST)
 
@@ -28,7 +30,7 @@ The input is a project brief. A pack needs, at minimum — **recording / operati
 
 And **team-design facts** (garbage-in for topology without them — a perfect emitter still cannot tier a team it was never told can run cheaply, split workstreams it was never told are independent, or right-size apparatus for a scale it never asked about):
 
-7. **Scale** — max concurrent writers/agents **and** horizon in days. These pick the **tier**: **Solo/Pair** (≤1 concurrent writer or ≤~3 days), **Squad** (2–4 writers or ~1–3 weeks, the default), **Program** (5+ agents or 3+ weeks). The tier gates which components, state files, gates, and roles emit (see `orchestration-pack.md` → *Scale tiers*).
+7. **Scale** — max concurrent writers/agents **and** horizon in days. These pick the **tier** deterministically: classify each dial on its own thresholds — writers: ≤1 → **Solo/Pair**, 2–4 → **Squad**, 5+ → **Program**; horizon: ≤~3 days → Solo/Pair, over ~3 days but under ~3 weeks → Squad, 3+ weeks → Program — then take the **highest** tier either dial reaches (1 writer × 6 weeks → Program; 5 writers × 2 days → Program; 1 writer × 5 days → Squad). Squad is the default when the dials are unstated. The tier gates which components, state files, gates, and roles emit (see `orchestration-pack.md` → *Scale tiers*).
 8. **Workstream independence** — which workstreams have independent context (can run in parallel on isolated worktrees) vs must serialize. Drives role count and decomposition (topology X1/X5/X6).
 9. **Required specializations** — which audit/domain roles the brief needs (security, code-quality, ux, domain-parity). Absent roles are not emitted; a named risk domain with no owner is a gap to surface.
 10. **Runtime model set** — which model(s)/provider(s) each role will **run** on (accept a multi-provider set: Claude + GPT + Grok). This is independent of the generating session's model and selects each role's `model:`/`effort:` from `delegation-tiers.md` and its fan-out posture from that model's rubric (topology X2/X3/X7). Default to the session model only where a role is unpinned.
@@ -158,8 +160,9 @@ Present, in this order:
 2. The pack's **reserved decisions** — anything the brief left open that the pack
    parked rather than guessed (e.g. unconfirmed checkpoint owners, the watchdog's
    scheduling mechanism and alert channel, notification wiring), each as a
-   numbered ask. **Always include the supervision fork** when scale is near/at
-   program (10+ agents): the layered oversight cadence (default) vs a standing
+   numbered ask. **Always include the supervision fork** at large-Program scale
+   — 10+ concurrent agents, a stricter bar than the Program tier's 5+ entry
+   (`orchestration-pack.md` → oversight layer 7): the layered oversight cadence (default) vs a standing
    "Co-Operator"/hierarchical supervisor — present it, do not decide it silently.
 3. The **Assumptions block** from the fabrication ledger — including the scale
    tier if it was laddered and each role's runtime model where it was assumed.

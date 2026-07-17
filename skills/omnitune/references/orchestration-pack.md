@@ -156,6 +156,25 @@ and effort are *derived*, never a fixed pair copied from a program build.
   async-vs-blocking dispatch, long-lived-vs-disposable workers — is the
   model-shaped variable the runtime model's rubric Delegation-defaults block sets;
   the correctness invariants (X5) hold regardless.
+- **X8 — Design-time supervision (the middle oversight layer).** Two checks the
+  drift audit structurally cannot make, because it measures change-from-prior-state
+  and a team *born* bad has no drift: (1) an **orchestration-fitness review** at
+  pack-emit (the Step 3.5 topology self-check *is* this t0 supervisor) and again at
+  **milestone-0**, scoring the team's initial design; and (2) a **per-milestone
+  fresh-context verifier** of the orchestrator's own decisions and synthesis
+  (cheap tier, disposable — fresh-context verifiers beat self-critique on long
+  runs) for risky/user-facing milestones. The existing auditors review the
+  *product*; this reviews the *orchestrator's judgment*. Tier-gated: Squad+ for
+  risky work. A standing/hierarchical supervisor is reserved for true program
+  scale (10+ agents) and surfaced as a reserved decision, never added silently.
+- **X9 — Serialization is two kinds, not one.** **Correctness serialization** (X5
+  — one writer per file/branch/working copy) is always binding, on every model —
+  it is how agent teams avoid conflicts. **Throughput serialization** (collect all
+  verdicts, then one consolidated fix wave, one redeploy per wave; blocking
+  dispatch — B6) is a *separate*, Opus-era default that optimizes redeploy cost on
+  a large parallel build; the target rubric's fan-out posture (X7) may relax it to
+  per-fix or async dispatch (e.g. a Fable-5 team). Never conflate the two: relaxing
+  throughput never relaxes correctness.
 
 ## Mechanized gates (what packs ship as blocking scripts)
 
@@ -220,10 +239,17 @@ Each is one brief rule; packs copy the rule, not an essay about it.
 - B5 — Every gate names its required environment explicitly; skip-as-pass is a
   red gate. Evidence older than the last code change touching its area is stale:
   re-run it. Nothing is marked complete from memory.
-- B6 — Collect all audit verdicts before dispatching fixes; then consolidated fix
-  waves, one redeploy per wave, not per fix.
-- B7 — One driver per branch/worktree; the session registry in CURRENT is the
-  ledger; a stand-down handshake precedes any relaunch of a presumed-dead session.
+- B6 — *Throughput serialization (model-relaxable — X9):* the Opus-era default is
+  collect all audit verdicts before dispatching fixes, then consolidated fix
+  waves, one redeploy per wave, not per fix. This optimizes redeploy cost on a
+  large parallel build; a target rubric whose fan-out posture is async (e.g.
+  Fable 5) may relax it to per-fix or async dispatch. It is not a correctness
+  invariant — relaxing it never licenses two writers on one file.
+- B7 — *Correctness serialization (always binding — X5/X9):* one writer per
+  branch/worktree, on every model. The session registry in CURRENT is the ledger,
+  and a stand-down handshake precedes any relaunch of a presumed-dead session
+  (registry + handshake are tier-gated coordination, Squad+; the one-writer rule
+  itself holds at every tier).
 - B8 — Crash posture: commit from the first work block; any task over ~30 minutes
   is resumable from its commits; a redispatch resumes from HEAD, never rebuilds.
 - B9 — Guardrails from session one: environment pin, destructive-command deny
@@ -248,18 +274,42 @@ Each is one brief rule; packs copy the rule, not an essay about it.
 
 ## Reflection clause (the pack's slot)
 
-Every pack carries a reflection clause: on a cadence — **default: milestone close
-or 24 hours, whichever comes first** — an independent fresh-context session reads
-bounded inputs and produces two artifacts with different disposal semantics: a
-**curated lesson store** (adopt-or-discard; adoption is an explicit recorded swap,
-never a default) and an **orchestration-drift audit** filed append-only under
-`audits/` with severities, never discardable. The staleness watchdog (G4) is the
-third leg of external checking: deterministic gates catch bookkeeping decay,
-scheduled fresh-context reflection catches judgment drift, and the dumb scheduled
-watchdog catches orchestrator death. External checking is a cadence, not a
-resident: no standing co-operator agent is added. The full reflection contract
-is `reflection-protocol.md` in this directory (points `R1`–`R7`); every pack's
-reflection clause points at it.
+Every pack carries a reflection clause: on a cadence — **default (Program tier):
+milestone close or 24 hours, whichever comes first**; **Squad: milestone close**;
+**Solo/Pair: off** (session-close append only; the operator is the drift check) —
+an independent fresh-context session reads bounded inputs and produces two
+artifacts with different disposal semantics: a **curated lesson store**
+(adopt-or-discard; adoption is an explicit recorded swap, never a default) and an
+**orchestration-drift audit** filed append-only under `audits/` with severities,
+never discardable.
+
+Oversight is **layered**, each layer catching a different failure at a different
+cost — no single resident does it all:
+
+1. **Deterministic gates** (record_check + lint/test/e2e) — bookkeeping decay and
+   broken builds. Always on. *(exists)*
+2. **Human checkpoints** — direction, scope, irreversible actions. Always on. *(exists)*
+3. **Orchestration-fitness review** at pack-emit and milestone-0 — scores the
+   team's *initial design*, the thing a drift audit structurally cannot see
+   (a team born bad has no drift). At emit this is the Step 3.5 topology
+   self-check. *(new; X8)*
+4. **Per-milestone fresh-context verifier** of the orchestrator's own
+   decisions/synthesis (cheap tier, disposable) — the missing middle layer;
+   auditors review the product, this reviews the orchestrator's judgment.
+   Tier-gated Squad+. *(new; X8)*
+5. **Scheduled reflection (local Dream)** — cross-run judgment drift. Tier-gated
+   Squad+. *(exists)*
+6. **Standing/hierarchical supervisor** — reserved for true program scale
+   (10+ agents where one orchestrator can't hold coordination).
+
+The staleness watchdog (G4) catches orchestrator death — something the
+orchestrator need not be alive to run. **The originating operator asked for a
+standing "Co-Operator" above the orchestrator; that fork (layer 6 vs the layered
+cadence above) is a reserved decision the pack surfaces to the operator, not one
+it decides silently** — a resident that doubles cost and drifts alongside what it
+watches is not the default below program scale, but the choice is the operator's.
+The full reflection contract is `reflection-protocol.md` in this directory
+(points `R1`–`R7`); every pack's reflection clause points at it.
 
 ## Scale tiers
 
@@ -342,6 +392,8 @@ self-check (`tune-goal-protocol.md` Step 3.5) walks it.
 | X5 | Topology contract X5: correctness serialization (one writer per working copy, isolated worktrees, deploys serialized) — always binding, every model |
 | X6 | Topology contract X6: read-only fan-out (auditors, reviewers, research, verify overlap freely with each other and the one running builder) |
 | X7 | Topology contract X7: scale-to-brief team sizing + model-conditioned fan-out (degree of fan-out from the rubric Delegation-defaults); over-provisioning is a named anti-pattern |
+| X8 | Topology contract X8 + reflection clause: orchestration-fitness review at emit (the Step 3.5 self-check) + milestone-0, and a per-milestone fresh-context verifier of the orchestrator's decisions (tier-gated, Squad+) |
+| X9 | Topology contract X9 + B6/B7: correctness serialization (X5) always binding; throughput serialization (B6 collect-then-wave) an Opus-era default the rubric's fan-out posture may relax |
 
 ## Decoupling
 

@@ -102,10 +102,11 @@ from the brief; the pack contains no other proper nouns.
 
 Do not present a pack that fails any of these; fix and re-check first.
 
-1. **Traceability walk.** Walk every row of `orchestration-pack.md`'s
+1. **Traceability walk.** Walk every row of `orchestration-pack.md`'s recording
    traceability table (P0-1..P3-9, T1..T15): the clause or gate it names must be
    present in the emitted pack as a gate script check or a binding constitution
-   rule. An invariant present only as prose-only policy is a failure.
+   rule. An invariant present only as prose-only policy is a failure. (The
+   topology table X1..X9 is walked in Step 3.5.)
 2. **Gate scripts runnable.** Run `python3 -m py_compile` on the emitted
    `record_check.py` and `bash -n` on the emitted `staleness_watchdog.sh`; both
    must pass. Quote the command tails as evidence.
@@ -117,7 +118,36 @@ Do not present a pack that fails any of these; fix and re-check first.
 If a check still fails after fixing, present the pack with verdict
 **CONDITIONAL**, naming each failing check in one line — never silently ship.
 
-## Step 4 — Present: pre-flight checklist and reserved decisions
+## Step 3.5 — Topology self-check (the design-fitness supervisor)
+
+The recording self-check (Step 3) validates *mechanics*; this validates the
+*team*. It is the orchestration-fitness review at emit time — the t0 supervisor
+the operator asked for. Walk the topology table X1..X9; a pack that fails any of
+these is not READY:
+
+1. **Model + effort on every agent.** Every agent definition carries `tools:`
+   **and** an explicit, justified `model:` + `effort:` (X2). A team on one tier for
+   every role fails unless the pack states why (X2/X3).
+2. **Roles map 1:1 to the brief.** Every emitted role owns a workstream or a risk
+   domain (no unmapped role); every risk domain the brief names has an owner (no
+   unowned domain) (X1). No general-purpose spawn for build or audit (B14).
+3. **Fan-out matches the runtime rubric.** Each role's fan-out posture, async/blocking
+   dispatch, and disposable/long-lived stance match *that role's model's* rubric
+   Delegation-defaults — not the generating model's (X7). A Fable-5-run role
+   carrying Opus's "fewer subagents / blocking barriers" is a failure.
+4. **Fable-5 emission scan.** For any role that runs on Fable 5: scan the emitted
+   agent/goal prose for reasoning-extraction triggers ("show / echo / narrate your
+   reasoning") → a HIGH failure (refusal trigger); and require the long-async
+   affordances (send-to-user, don't-end-on-a-promise, final-response re-grounding).
+5. **Cross-provider portability.** When roles span providers, flag any assumed-portable
+   capability — a structured-output gate, a vision-based UX audit, or
+   reasoning-extraction-sensitive prose — that one role's model may not support.
+6. **Serialization split intact.** Correctness serialization (X5, one writer per
+   file/branch) is present and unconditional; any relaxed throughput serialization
+   (X9/B6) is justified by the runtime rubric's async posture, not improvised.
+
+A topology failure yields the same **CONDITIONAL** verdict as a recording failure,
+naming each failing check in one line — never silently ship a mis-designed team.
 
 Present, in this order:
 
@@ -127,16 +157,21 @@ Present, in this order:
 2. The pack's **reserved decisions** — anything the brief left open that the pack
    parked rather than guessed (e.g. unconfirmed checkpoint owners, the watchdog's
    scheduling mechanism and alert channel, notification wiring), each as a
-   numbered ask.
-3. The **Assumptions block** from the fabrication ledger.
+   numbered ask. **Always include the supervision fork** when scale is near/at
+   program (10+ agents): the layered oversight cadence (default) vs a standing
+   "Co-Operator"/hierarchical supervisor — present it, do not decide it silently.
+3. The **Assumptions block** from the fabrication ledger — including the scale
+   tier if it was laddered and each role's runtime model where it was assumed.
 4. The file list (or the offer to save, in standalone mode).
 
 ## Definition of Done
 
 - Brief gaps were asked as numbered questions (or the brief supplied everything).
 - The pack contains all seven contract components, written per the meta-rules.
-- The self-check passed: traceability walk clean, gate scripts compile/lint, no
-  unlisted fabrications — or the verdict says CONDITIONAL and names the failures.
+- The self-check passed: recording traceability clean, gate scripts compile/lint,
+  no unlisted fabrications, **and the Step 3.5 topology self-check passed** (every
+  agent tiered and justified, roles map 1:1 to the brief, fan-out matches each
+  runtime rubric) — or the verdict says CONDITIONAL and names the failures.
 - The pre-flight checklist, reserved decisions, and assumptions were presented.
 - Files were written to the target directory when one was named or configured;
   otherwise the pack was presented in chat with an offer to save.

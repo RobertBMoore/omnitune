@@ -35,7 +35,7 @@ REFLECT_IDS = {"R%d" % i for i in range(1, 8)}
 # Topology-contract points (X1..) — the counterpart to the recording contract,
 # restored/parameterized from the deleted team-design layer. Grows by phase; the
 # count assertion below is the current total.
-TOPOLOGY_IDS = {"X%d" % i for i in range(1, 8)}
+TOPOLOGY_IDS = {"X%d" % i for i in range(1, 10)}
 
 
 def _table_rows(path=REF):
@@ -210,6 +210,45 @@ class TestScaleTiers(unittest.TestCase):
             self.assertIn(tier, text, "Step 0 intake must let the operator pick the %s tier" % tier)
         self.assertIn("Runtime model set", text,
                       "Step 0 intake must ask which model(s) the team runs on")
+
+
+class TestSupervisionStack(unittest.TestCase):
+    """Phase 3: the topology self-check (the t0 supervisor the operator asked
+    for), the per-milestone fresh-context verifier (the missing middle oversight
+    layer), the serialization split, and the co-operator fork surfaced as a
+    reserved decision instead of decided silently."""
+
+    def test_protocol_has_topology_self_check(self):
+        with open(PROTOCOL, encoding="utf-8") as f:
+            text = f.read()
+        self.assertIn("Step 3.5", text, "protocol must add a Step 3.5 topology self-check")
+        self.assertRegex(text.lower(), r"topology self-check",
+                         "Step 3.5 must be the topology self-check")
+        self.assertIn("CONDITIONAL", text,
+                      "a topology failure must be able to yield a CONDITIONAL verdict")
+
+    def test_pack_has_fitness_review_and_verifier(self):
+        with open(REF, encoding="utf-8") as f:
+            text = f.read().lower()
+        self.assertIn("fresh-context verifier", text,
+                      "the pack must carry a per-milestone fresh-context verifier layer")
+        self.assertIn("fitness", text,
+                      "the pack must carry an orchestration-fitness review at emit / M0")
+
+    def test_serialization_split_present(self):
+        with open(REF, encoding="utf-8") as f:
+            text = f.read().lower()
+        self.assertIn("throughput", text,
+                      "the pack must distinguish throughput serialization (model-relaxable)")
+        self.assertIn("correctness serialization", text,
+                      "the pack must keep correctness serialization always-binding")
+
+    def test_co_operator_is_a_reserved_decision(self):
+        with open(REFLECT, encoding="utf-8") as f:
+            reflect = f.read().lower()
+        self.assertIn("reserved decision", reflect,
+                      "reflection-protocol.md must surface the co-operator/supervisor fork "
+                      "as a reserved decision, not decide it silently")
 
 
 def _load_record_check():

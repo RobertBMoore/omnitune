@@ -30,26 +30,46 @@ It is the **curation half** of the memory pattern and does not stand alone:
 Neither substitutes for the other: without session-close append there is nothing
 to curate; without the Dream the store only grows and rots.
 
-## The standing verdict — external checking is a cadence, not a resident
+## Oversight is layered — and the co-operator is a reserved decision
 
-The orchestrator cannot be its own auditor, but the answer is not a standing
-co-operator agent that doubles cost and drifts alongside it. External checking is
-three scheduled legs, each catching a different decay, and **no resident agent is
-added**:
+The orchestrator cannot be its own auditor. The default answer is a **layered
+oversight stack**, each layer catching a different failure at a different cost —
+not a single resident that doubles cost and drifts alongside what it watches:
 
 - **Deterministic gates** (`record_check`, G1/G2) catch **bookkeeping decay** —
   every merge and tag.
-- **Scheduled fresh-context reflection** (this contract) catches **judgment
-  drift** — on the cadence below.
+- **Human checkpoints** catch **wrong direction / scope / irreversible actions** —
+  at decision points.
+- **Orchestration-fitness review** (the Step 3.5 topology self-check at emit, and
+  again at milestone-0) catches a **team that is *born* bad** — the failure a
+  drift audit structurally cannot see, because bad→bad has no drift.
+- **A per-milestone fresh-context verifier** of the orchestrator's own
+  decisions/synthesis (cheap, disposable) catches **orchestrator judgment errors** —
+  the middle layer the auditors, which review the product, do not cover. Tier-gated
+  Squad+ for risky/user-facing milestones.
+- **Scheduled fresh-context reflection** (this contract) catches **cross-run
+  judgment drift** — on the cadence below.
 - **The dumb staleness watchdog** (`staleness_watchdog.sh`, G4) catches
   **orchestrator death** — something the orchestrator need not be alive to run.
 
+The originating operator asked for a standing **"Co-Operator" agent above the
+orchestrator**. That is layer six — a standing/hierarchical supervisor — and it is
+a **reserved decision**, surfaced to the operator rather than declined silently:
+it earns its ~2–3× cost only at true program scale (10+ agents where one
+orchestrator can no longer hold coordination). Below that, the layered cadence
+above is the recommended "better way"; at or above it, the operator chooses.
+Present the fork; do not decide it for them.
+
 ## Cadence
 
-Coarser than per-turn. **Default: milestone close or 24 hours, whichever comes
-first** (the value the pack's reflection clause carries; see
-`orchestration-pack.md`). A pack may set a different cadence from the brief, but
-never per-turn — reflection is a synthesis pass, not a running commentary.
+Coarser than per-turn, and **tier-gated** (see `orchestration-pack.md` → *Scale
+tiers*): **Program — milestone close or 24 hours, whichever comes first**;
+**Squad — milestone close**; **Solo/Pair — off**, degraded to a session-close
+lesson append the operator reviews at milestone close (the operator is the drift
+check on a small, actively-supervised build). A pack may set a different cadence
+from the brief, but never per-turn — reflection is a synthesis pass, not a running
+commentary. The Dream itself may run on a cheaper model than the build (it is a
+bounded synthesis pass, not the build's control loop).
 
 ## Contract
 

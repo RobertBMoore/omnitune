@@ -48,9 +48,9 @@ A strong first prompt is not enough for long-running agent work. Common failure 
 
 It is best for Git-backed, multi-milestone work with deployments, parallel agents, operator approvals, or continuity across context windows. For a one-off task, `tune-prompt` is lighter.
 
-Before emitting a pack, Mode C asks numbered questions for missing deploy targets, gate commands and environments, checkpoint ownership, quiet hours, milestones, and the save location. Every added project-specific detail must come from the brief/config or be labeled as an assumption. It then checks contract traceability, all seven required components, the fabrication ledger, line caps, and Python/Bash gate syntax. An unresolved check is never presented as ready.
+Before emitting a pack, Mode C asks numbered questions for missing deploy targets, gate commands and environments, checkpoint ownership, quiet hours, milestones, and the save location — and for the team-design facts (scale, runtime models per role, and workstream independence) that let it size and tier the agent team. Every added project-specific detail must come from the brief/config or be labeled as an assumption. It then runs the recording self-check (contract traceability, all seven required components, the fabrication ledger, line caps, Python/Bash gate syntax) and the topology self-check (every agent tiered and justified, roles mapping to the brief, fan-out matching each runtime rubric). An unresolved check is never presented as ready.
 
-CI fails if any of 25 traceability mappings or seven reflection rows is missing or empty, or if either gate template fails Python/Bash syntax checks. These structural checks do not guarantee a project outcome or replace product tests, security review, CI, or human launch approval. See the [Tune Goal guide](wiki/Tune-Goal.md) for the full lifecycle and a privacy-safe, production-shaped example.
+CI fails if any of 25 recording mappings, eleven topology-contract points, or seven reflection rows is missing or empty, or if either gate template fails Python/Bash syntax checks. These structural checks do not guarantee a project outcome or replace product tests, security review, CI, or human launch approval. See the [Tune Goal guide](wiki/Tune-Goal.md) for the full lifecycle and a privacy-safe, production-shaped example.
 
 ## Why it self-updates
 

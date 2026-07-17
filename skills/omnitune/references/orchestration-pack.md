@@ -2,13 +2,13 @@
 name: orchestration-pack
 description: >-
   Knowledge source for omnitune Mode C (tune-goal) — the contract a launch-ready
-  orchestration pack must satisfy: pack components, the invariants packs encode
-  as mechanized gates or brief binding rules, the gate-script contracts, the
-  reflection clause, and a traceability table proving no field lesson was
-  dropped. Provider-shared and model-agnostic: Mode C composes this file with
-  the session model's rubric (references/rubrics/<provider>/<model>.md + _core.md)
-  for model-specific steering.
-lastReviewed: 2026-07-13
+  orchestration pack must satisfy: pack components, the topology contract (team
+  design), the scale tiers, the invariants packs encode as mechanized gates or
+  brief binding rules, the gate-script contracts, the reflection clause, and
+  traceability tables proving no field lesson was dropped. Provider-shared and
+  model-agnostic: Mode C composes this file with the delegation-tier layer
+  (delegation-tiers.md) and each runtime role's rubric for model-specific steering.
+lastReviewed: 2026-07-17
 ---
 
 # Orchestration pack contract — omnitune Mode C

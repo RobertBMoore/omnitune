@@ -21,7 +21,7 @@ Mode C is especially useful for Git-backed product builds, large migrations, mul
 ## How the flow works
 
 1. **Intake gate.** Mode C maps the brief and asks numbered questions for any required launch fact it cannot find. It does not silently invent commands, URLs, owners, cadence, or scope.
-2. **Model shaping.** The provider-shared pack contract is combined with the active session model's rubric. Delegation, effort, verbosity, and instruction shape are model-specific; project facts are not.
+2. **Model shaping and tiering.** The provider-shared pack contract (the recording contract **and** the topology contract) is combined with two model-shaped layers: a delegation-tier layer that assigns each role its model and effort (orchestrator on the frontier tier, builders on the workhorse tier, explorers/auditors on the cheap tier — keyed to the model each role actually runs on, which may span providers), and each runtime role's rubric, which sets that model's fan-out posture and instruction shape. Project facts come from the brief, not the model.
 3. **Seven-part emission.** It creates every required component and instantiates the two dependency-free gate scripts.
 4. **Self-check.** It walks contract traceability, checks the fabrication ledger and component/line caps, then runs `python3 -m py_compile` and `bash -n` on the emitted gates.
 5. **Operator handoff.** It presents the pre-flight checklist first, followed by reserved decisions, assumptions, and the file list. An unresolved self-check failure is named and is never treated as ready.
@@ -34,17 +34,19 @@ With `output.packs` configured, packs save under a dated subdirectory; an existi
 |---|---|
 | Goal prompt | Mission, milestones, per-milestone reading map, state schema, numbered checkpoints, and definition of done |
 | Constitution | A short auto-loaded operating contract: resume rules, loop, precedence, evidence, context economy, delegation, and guardrails |
-| Agent definitions | Scoped builders and read-only auditors with explicit tool allowlists, crash posture, and a compact report contract |
+| Agent definitions | Roles derived from the brief's workstreams and domains, each with an explicit tool allowlist, a per-role model + effort tier, the four-part dispatch brief, crash posture, and a compact report contract |
 | State-file contracts | CURRENT, MILESTONES, LOG, DECISIONS, BACKLOG, live-session registry, and a capped continuity buffer |
 | Guardrails digest | Environment pin, destructive-command controls, secret placement, and operator-only actions from session one |
 | Operator pre-flight | Plugins/MCPs to disable, catalog-size audit, blocking checkpoints, experience-pass calendar, and quiet hours |
 | Gate scripts | `record_check.py` for record discipline and `staleness_watchdog.sh` for an externally detectable stale heartbeat |
 
-The pack also carries a fresh-context reflection clause. By default, at milestone close or 24 hours, it curates bounded session lessons into an adopt-or-discard store and always files an append-only orchestration-drift audit. Memory becomes policy only after explicit promotion; the reflection is a cadence, not a resident co-orchestrator.
+The pack also carries a fresh-context reflection clause and a **layered oversight stack**: deterministic gates, human checkpoints, an orchestration-fitness review at emit and milestone-0 (the design-time supervisor), a per-milestone fresh-context verifier of the orchestrator's own judgment, tier-gated reflection, and — reserved for true program scale — a standing supervisor. Reflection curates bounded session lessons into an adopt-or-discard store and always files an append-only drift audit; memory becomes policy only after explicit promotion. A standing "co-operator" above the orchestrator is surfaced as a reserved decision for the operator to choose, not decided silently.
 
-## Give it these six things
+The whole emit is **scale-tiered**. Two intake facts — concurrent writers and horizon — select **Solo/Pair**, **Squad** (default), or **Program**. Program is the field-validated contract, unchanged; the smaller tiers strip apparatus (fewer state files, tier-proportional milestone audits, reflection off or lighter) so a two-person build never ships program-grade machinery marked ready.
 
-A rough brief is acceptable — Mode C will ask for gaps — but the strongest first pass names:
+## Give it these facts
+
+A rough brief is acceptable — Mode C will ask for gaps — but the strongest first pass names both the **operations facts**:
 
 1. **Deploy target:** stages, deploy commands, and the dev URL used for verification.
 2. **Gate commands:** lint, test, and end-to-end commands plus the environment each requires.
@@ -52,6 +54,12 @@ A rough brief is acceptable — Mode C will ask for gaps — but the strongest f
 4. **Quiet hours:** the no-interrupt window and the severity allowed to break it.
 5. **Milestones:** phases or enough bounded scope for Mode C to propose them.
 6. **Target directory:** where the pack should be saved.
+
+…and the **team-design facts** that let it size and tier the agent team instead of guessing:
+
+7. **Scale:** how many concurrent writers/agents, over how many days — this picks the tier (Solo/Pair, Squad, Program).
+8. **Runtime models:** which model(s) or providers each role will run on (Claude, GPT, Grok) — independent of the model generating the pack.
+9. **Specializations & independence:** which audit/domain roles the work needs, and which workstreams are independent enough to run in parallel.
 
 Name environment variables, never secret values. Put credentials in the project's secret store and describe only the contract the agents must follow.
 
@@ -116,11 +124,11 @@ That is the power shift: prose such as “keep me updated,” “run the tests,�
 
 ## What quality is mechanically checked
 
-Mode C performs a structural self-check before handoff: seven components, traceability, the fabrication ledger, line caps, and gate-script syntax. The repository's CI separately fails if any of 25 traceability mappings or seven reflection-contract rows is missing or empty, or if either shipped gate template fails Python/Bash syntax checks.
+Mode C performs a structural self-check before handoff: the recording self-check (seven components, traceability, the fabrication ledger, line caps, gate-script syntax) **and** the topology self-check (every agent tiered and justified, roles mapping one-to-one to the brief's workstreams and domains, fan-out matching each runtime model's rubric). The repository's CI separately fails if any of 25 recording mappings, eleven topology-contract points, or seven reflection-contract rows is missing or empty, or if either shipped gate template fails Python/Bash syntax checks.
 
 Those checks are meaningful but bounded. They detect missing/empty mappings and syntax regressions; they do not generate a golden pack, validate template semantics or your deploy commands, or guarantee the resulting product. Project lint/tests/e2e, security review, operator pre-flight, and launch approval remain authoritative.
 
-A shorter FieldNotes brief also appears in the Mode C regression corpus. That fixture protects coverage classification, not a golden generated output. To run the structural contract check directly:
+A shorter FieldNotes brief appears in the Mode C regression corpus, and a companion golden fixture scores the *team* a good pack designs — its tiering, dispatch briefs, and scale-sizing — so a change that quietly drops topology is caught, not just a change that drops a component. To run the structural contract check directly:
 
 ```text
 cd scripts

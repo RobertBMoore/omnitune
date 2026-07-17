@@ -1,7 +1,7 @@
 ---
 name: tune-goal-protocol
 description: omnitune Mode C — turn a project brief into a launch-ready orchestration pack for the session model, gated by a brief-intake question step and a fabrication ledger, self-checked against the pack contract's traceability list before presenting. Repo-agnostic; the pack contract comes from references/orchestration-pack.md, output paths from omnitune.config.
-lastReviewed: 2026-07-13
+lastReviewed: 2026-07-17
 ---
 
 # Tune-Goal Protocol — omnitune Mode C
@@ -52,8 +52,9 @@ fabrication and fails the self-check.
 Read, in order:
 
 1. `references/orchestration-pack.md` — end to end: the pack contract (components
-   a-g), the **topology contract** (points X1-X7), gates G1-G4, binding rules
-   B1-B14, the reflection clause, the traceability tables.
+   a-g), the **topology contract** (points X1-X11), the **Scale tiers** section,
+   gates G1-G4, binding rules B1-B14, the reflection clause, the traceability
+   tables.
 2. `references/reflection-protocol.md` — the local-Dream contract (points R1-R7)
    the pack's reflection clause inherits; read when emitting component (b)/(g)
    so the clause is complete, not a stub.
@@ -106,7 +107,7 @@ Do not present a pack that fails any of these; fix and re-check first.
    traceability table (P0-1..P3-9, T1..T15): the clause or gate it names must be
    present in the emitted pack as a gate script check or a binding constitution
    rule. An invariant present only as prose-only policy is a failure. (The
-   topology table X1..X9 is walked in Step 3.5.)
+   topology table X1..X11 is walked in Step 3.5.)
 2. **Gate scripts runnable.** Run `python3 -m py_compile` on the emitted
    `record_check.py` and `bash -n` on the emitted `staleness_watchdog.sh`; both
    must pass. Quote the command tails as evidence.
@@ -122,7 +123,7 @@ If a check still fails after fixing, present the pack with verdict
 
 The recording self-check (Step 3) validates *mechanics*; this validates the
 *team*. It is the orchestration-fitness review at emit time — the t0 supervisor
-the operator asked for. Walk the topology table X1..X9; a pack that fails any of
+the operator asked for. Walk the topology table X1..X11; a pack that fails any of
 these is not READY:
 
 1. **Model + effort on every agent.** Every agent definition carries `tools:`

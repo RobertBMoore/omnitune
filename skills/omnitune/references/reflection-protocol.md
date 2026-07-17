@@ -7,7 +7,7 @@ description: >-
   Provider-shared and model-agnostic: it composes with orchestration-pack.md
   (whose reflection clause points here) and the session model's rubric, which
   supplies the in-session session-close reflection this contract curates.
-lastReviewed: 2026-07-13
+lastReviewed: 2026-07-17
 ---
 
 # Reflection protocol — the local Dream (omnitune Mode C)
